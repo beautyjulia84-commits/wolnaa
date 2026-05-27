@@ -117,7 +117,7 @@ export async function POST(req: NextRequest) {
         {
           filename: `ticket-${ticketId}.png`,
           content: qrBase64,
-          content_type: "image/png",
+          contentType: "image/png",
         },
       ],
     });
