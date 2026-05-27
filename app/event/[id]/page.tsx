@@ -201,7 +201,7 @@ export default function EventPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          eventTitle: event.title,
+          eventTitle: event?.title || "",
           customerName,
           customerEmail,
           lineItems,
