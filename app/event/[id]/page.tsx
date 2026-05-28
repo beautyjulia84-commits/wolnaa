@@ -3,6 +3,12 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { createClient } from "@supabase/supabase-js";
+
+const sb = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -89,15 +95,31 @@ export default function EventPage() {
   const [loading, setLoading] = useState(false);
   const [checkoutError, setCheckoutError] = useState("");
 
-  // Event aus localStorage laden
+  // Event aus Supabase laden
   useEffect(() => {
-    const events = safeParseJSON<EventItem[]>(localStorage.getItem("wolnaa-events"), []);
-    const found = events.find((item) => slugify(item.title) === id);
-    if (found) {
-      setEvent(found);
-    } else {
-      setNotFound(true);
+    async function loadEvent() {
+      const { data, error } = await sb
+        .from("events")
+        .select("*")
+        .order("created_at", { ascending: true });
+
+      if (error || !data) {
+        console.error("Event laden Fehler:", error);
+        setNotFound(true);
+        return;
+      }
+
+      const events = data.map((row: any) => row.data ?? row);
+      const found = events.find((item: EventItem) => slugify(item.title) === id || item.id === id);
+
+      if (found) {
+        setEvent(found);
+      } else {
+        setNotFound(true);
+      }
     }
+
+    loadEvent();
   }, [id]);
 
   if (notFound) {
