@@ -130,7 +130,7 @@ export default function EventPage() {
       const res = await fetch("/api/create-checkout-session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ eventTitle: event.title, customerName, customerEmail, lineItems, total, ticketId, discountCode: appliedDiscount?.code ?? null }),
+        body: JSON.stringify({ eventTitle: event!.title, customerName, customerEmail, lineItems, total, ticketId, discountCode: appliedDiscount?.code ?? null }),
       });
       if (!res.ok) throw new Error();
       const data = await res.json();
