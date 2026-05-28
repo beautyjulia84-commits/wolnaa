@@ -110,7 +110,7 @@ export default function EventPage() {
       }
 
       const events = data.map((row: any) => row.data ?? row);
-      const found = events.find((item: EventItem) => slugify(item.title) === id || item.id === id);
+      const found = events.find((item: EventItem) => slugify(item.title) === id || (item as any).id === id);
 
       if (found) {
         setEvent(found);
