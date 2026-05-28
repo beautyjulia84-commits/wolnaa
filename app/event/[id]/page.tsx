@@ -74,10 +74,12 @@ export default function EventPage() {
   useEffect(() => { loadEvent(); }, [id]);
 
   async function loadEvent() {
+    try {
     const { data } = await sb.from("events").select("*");
     if (!data) { setNotFound(true); return; }
     const found = data.find((e: EventItem) => slugify(e.title) === id);
     if (found) setEvent(found); else setNotFound(true);
+    } catch { setNotFound(true); }
   }
 
   if (notFound) {
