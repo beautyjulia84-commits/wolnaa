@@ -87,7 +87,7 @@ export default function EventPage() {
   function calcTotal() {
     let t = allTickets.reduce((s, tk, i) => s + (ticketQtys[i] ?? 0) * parseFloat(tk.price || "0"), 0);
     if (selectedLounge !== null && event?.lounge_list?.[selectedLounge])
-      t += parseFloat(event.lounge_list[selectedLounge].price || "0");
+      t += parseFloat((event.lounges || event.lounge_list || [])[selectedLounge].price || "0");
     if (appliedDiscount) t *= (1 - parseFloat(appliedDiscount.percent) / 100);
     return t;
   }
@@ -121,7 +121,7 @@ export default function EventPage() {
         .map((t, i) => ({ name: t.name, price: t.price, qty: ticketQtys[i] ?? 0 }))
         .filter(t => t.qty > 0);
       if (selectedLounge !== null && event?.lounge_list?.[selectedLounge]) {
-        const l = event.lounge_list[selectedLounge];
+        const l = (event.lounges || event.lounge_list || [])[selectedLounge];
         lineItems.push({ name: l.name, price: l.price, qty: 1 });
       }
       const res = await fetch("/api/create-checkout-session", {
@@ -145,8 +145,8 @@ export default function EventPage() {
 
       {/* ── Hero ── */}
       <div className="relative h-[45vh] md:h-[55vh] overflow-hidden">
-        {event.image_url
-          ? <img src={event.image_url} alt={event.title} className="w-full h-full object-cover" />
+        {(event.imageUrl || event.image_url)
+          ? <img src={(event.imageUrl || event.image_url)} alt={event.title} className="w-full h-full object-cover" />
           : <div className="w-full h-full bg-gradient-to-br from-zinc-900 via-zinc-950 to-black" />
         }
         {/* Gradient overlays */}
@@ -235,11 +235,11 @@ export default function EventPage() {
             )}
 
             {/* VIP Lounges */}
-            {event.lounges && event.lounge_list?.length > 0 && (
+            {event.lounges && (event.lounges || event.lounge_list || [])?.length > 0 && (
               <div className="bg-zinc-900/60 border border-zinc-800 rounded-3xl p-5 backdrop-blur-sm">
                 <h2 className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-4">VIP Lounge</h2>
                 <div className="space-y-2">
-                  {event.lounge_list.map((lounge, i) => (
+                  {(event.lounges || event.lounge_list || []).map((lounge, i) => (
                     <button key={i} onClick={() => setSelectedLounge(selectedLounge === i ? null : i)}
                       className={`w-full flex items-center justify-between rounded-2xl border px-4 py-3.5 text-left transition-all ${selectedLounge === i ? "border-yellow-400 bg-yellow-400/10" : "border-zinc-800 bg-zinc-950/50 hover:border-zinc-700"}`}>
                       <div>
@@ -259,7 +259,7 @@ export default function EventPage() {
             )}
 
             {/* Rabattcode */}
-            {event.discount_codes?.length > 0 && (
+            {(event.discountCodes || event.discount_codes || [])?.length > 0 && (
               <div className="bg-zinc-900/60 border border-zinc-800 rounded-3xl p-5 backdrop-blur-sm">
                 <h2 className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-3">Rabattcode</h2>
                 <div className="flex gap-2">
