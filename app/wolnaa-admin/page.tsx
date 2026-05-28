@@ -112,13 +112,24 @@ export default function WolnaaAdmin() {
 
   // FIX 4: All localStorage reads are now independent (were nested inside savedEvents if-block)
   useEffect(() => {
-    const savedEvents = localStorage.getItem("wolnaa-events");
+    async function loadEvents() {
+      const { data } = await supabaseBrowser
+        .from("events")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (data) {
+        setEvents(data.map((e: any) => e.data));
+      }
+    }
+
+    loadEvents();
+
     const savedOrders = localStorage.getItem("wolnaa-orders");
     const savedImpressum = localStorage.getItem("wolnaa-impressum");
     const savedDatenschutz = localStorage.getItem("wolnaa-datenschutz");
     const savedAgb = localStorage.getItem("wolnaa-agb");
 
-    if (savedEvents) setEvents(JSON.parse(savedEvents));
     if (savedOrders) setOrders(JSON.parse(savedOrders));
     if (savedImpressum) setImpressum(savedImpressum);
     if (savedDatenschutz) setDatenschutz(savedDatenschutz);
