@@ -164,7 +164,7 @@ export default function AdminPage() {
   }, []);
   useEffect(() => {
     if (!authed) return;
-    setEvents(safeJSON(localStorage.getItem("wolnaa-events"), []));
+    loadEvents();
     setLegal({ impressum: localStorage.getItem("wolnaa-impressum") ?? "", datenschutz: localStorage.getItem("wolnaa-datenschutz") ?? "", agb: localStorage.getItem("wolnaa-agb") ?? "", teilnahme: localStorage.getItem("wolnaa-teilnahme") ?? "", widerruf: localStorage.getItem("wolnaa-widerruf") ?? "" });
   }, [authed]);
   useEffect(() => { if (authed && page === "tickets") loadTickets(); }, [authed, page]);
@@ -178,7 +178,27 @@ export default function AdminPage() {
   function logout() { localStorage.removeItem("wolnaa-admin"); localStorage.removeItem("wolnaa-admin-pw"); setAuthed(false); }
   async function loadTickets() { setTicketLoading(true); const { data } = await supabase.from("tickets").select("*").order("created_at", { ascending: false }); setTickets(data ?? []); setTicketLoading(false); }
 
-  function saveEvs(u: EventItem[]) { setEvents(u); localStorage.setItem("wolnaa-events", JSON.stringify(u)); }
+  async function loadEvents() {
+    const { data } = await supabase
+      .from("events")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    setEvents((data ?? []).map((row: any) => row.data ?? row));
+  }
+
+  async function saveEvs(u: EventItem[]) {
+    setEvents(u);
+
+    for (const event of u) {
+      await supabase
+        .from("events")
+        .upsert({
+          id: (event as any).id,
+          data: event,
+        });
+    }
+  }
   function delEv(i: number) { if (!confirm("Event löschen?")) return; saveEvs(events.filter((_, j) => j !== i)); }
   function newEvent() { setEv(JSON.parse(JSON.stringify(EMPTY))); setEvIdx(null); setPage("event-new"); }
   function editEvent(i: number) { setEv(JSON.parse(JSON.stringify(events[i]))); setEvIdx(i); setPage("event-edit"); }
