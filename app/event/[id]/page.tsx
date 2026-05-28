@@ -13,11 +13,16 @@ const sb = createClient(
 type TicketType = { name: string; price: string; quantity: string };
 type Lounge = { name: string; persons: string; price: string };
 type DiscountCode = { code: string; percent: string };
+
 type EventItem = {
   id: string; title: string; city: string; date: string; time: string;
-  location: string; address: string; image_url: string; price: string;
-  description: string; tickets: TicketType[];
-  lounges: boolean; lounge_list: Lounge[]; discount_codes: DiscountCode[];
+  location: string; address: string;
+  image_url?: string; imageUrl?: string;
+  price: string; description: string;
+  tickets: TicketType[];
+  lounges: boolean | Lounge[];
+  lounge_list?: Lounge[]; loungeList?: Lounge[];
+  discount_codes?: DiscountCode[]; discountCodes?: DiscountCode[];
 };
 
 function slugify(t: string) {
@@ -31,6 +36,18 @@ function formatDate(d: string) {
       weekday: "long", day: "numeric", month: "long", year: "numeric",
     });
   } catch { return d; }
+}
+
+// Helper to normalize event data regardless of old/new format
+function normalize(e: EventItem) {
+  return {
+    ...e,
+    imageUrl: e.image_url || e.imageUrl || "",
+    tickets: Array.isArray(e.tickets) ? e.tickets : [],
+    loungeList: Array.isArray(e.lounge_list) ? e.lounge_list : Array.isArray(e.loungeList) ? e.loungeList : Array.isArray(e.lounges) ? e.lounges as Lounge[] : [],
+    hasLounges: e.lounges === true || (Array.isArray(e.lounge_list) && e.lounge_list.length > 0) || (Array.isArray(e.loungeList) && e.loungeList.length > 0) || (Array.isArray(e.lounges) && e.lounges.length > 0),
+    discountCodes: Array.isArray(e.discount_codes) ? e.discount_codes : Array.isArray(e.discountCodes) ? e.discountCodes : [],
+  };
 }
 
 export default function EventPage() {
@@ -81,16 +98,17 @@ export default function EventPage() {
     );
   }
 
-  const allTickets = event.tickets ?? [];
-  const loungeList = event.lounge_list ?? [];
-  const discountCodes = event.discount_codes ?? [];
+  const n = normalize(event);
+  const allTickets = n.tickets;
+  const loungeList = n.loungeList;
+  const discountCodes = n.discountCodes;
+  const imageUrl = n.imageUrl;
   const totalTickets = Object.values(ticketQtys).reduce((a, b) => a + b, 0);
 
   function calcTotal() {
     let t = allTickets.reduce((s, tk, i) => s + (ticketQtys[i] ?? 0) * parseFloat(tk.price || "0"), 0);
-    if (selectedLounge !== null && loungeList[selectedLounge]) {
+    if (selectedLounge !== null && loungeList[selectedLounge])
       t += parseFloat(loungeList[selectedLounge].price || "0");
-    }
     if (appliedDiscount) t *= (1 - parseFloat(appliedDiscount.percent) / 100);
     return t;
   }
@@ -148,8 +166,8 @@ export default function EventPage() {
 
       {/* Hero */}
       <div className="relative h-[45vh] md:h-[55vh] overflow-hidden">
-        {event.image_url
-          ? <img src={event.image_url} alt={event.title} className="w-full h-full object-cover" />
+        {imageUrl
+          ? <img src={imageUrl} alt={event.title} className="w-full h-full object-cover" />
           : <div className="w-full h-full bg-gradient-to-br from-zinc-900 via-zinc-950 to-black" />
         }
         <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/30 to-transparent" />
@@ -181,9 +199,7 @@ export default function EventPage() {
             {event.address && (
               <div className="flex items-center gap-2.5 text-sm">
                 <span className="w-8 h-8 rounded-lg bg-zinc-800 border border-zinc-700 flex items-center justify-center shrink-0">🗺️</span>
-                <a href={`https://maps.google.com/?q=${encodeURIComponent(event.address)}`} target="_blank" rel="noopener noreferrer" className="text-yellow-400 hover:text-yellow-300 transition-colors hover:underline underline-offset-2">
-                  {event.address}
-                </a>
+                <a href={`https://maps.google.com/?q=${encodeURIComponent(event.address)}`} target="_blank" rel="noopener noreferrer" className="text-yellow-400 hover:text-yellow-300 transition-colors hover:underline underline-offset-2">{event.address}</a>
               </div>
             )}
           </div>
@@ -212,7 +228,7 @@ export default function EventPage() {
                   {allTickets.map((ticket, i) => (
                     <div key={i} className={`flex items-center justify-between rounded-2xl border px-4 py-3.5 transition-colors ${(ticketQtys[i] ?? 0) > 0 ? "border-yellow-400/50 bg-yellow-400/5" : "border-zinc-800 bg-zinc-950/50"}`}>
                       <div>
-                        <p className="font-semibold text-sm">{ticket.name}</p>
+                        <p className="font-semibold text-sm">{ticket.name || "Ticket"}</p>
                         <p className="text-yellow-400 font-bold text-sm mt-0.5">{parseFloat(ticket.price || "0").toFixed(2)} €</p>
                       </div>
                       <div className="flex items-center gap-2.5">
@@ -227,7 +243,7 @@ export default function EventPage() {
             )}
 
             {/* VIP Lounges */}
-            {event.lounges && loungeList.length > 0 && (
+            {n.hasLounges && loungeList.length > 0 && (
               <div className="bg-zinc-900/60 border border-zinc-800 rounded-3xl p-5">
                 <h2 className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-4">VIP Lounge</h2>
                 <div className="space-y-2">
@@ -240,7 +256,7 @@ export default function EventPage() {
                       </div>
                       <div className="flex items-center gap-2.5">
                         <span className="text-yellow-400 font-bold text-sm">{parseFloat(lounge.price || "0").toFixed(2)} €</span>
-                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${selectedLounge === i ? "border-yellow-400 bg-yellow-400" : "border-zinc-700"}`}>
+                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${selectedLounge === i ? "border-yellow-400 bg-yellow-400" : "border-zinc-700"}`}>
                           {selectedLounge === i && <span className="text-black text-[10px] font-black">✓</span>}
                         </div>
                       </div>
@@ -299,7 +315,6 @@ export default function EventPage() {
               className={`w-full rounded-2xl py-5 font-black text-base transition-all duration-200 ${canProceed ? "bg-yellow-400 text-black hover:bg-yellow-300 shadow-lg shadow-yellow-400/20" : "bg-zinc-800 text-zinc-600 cursor-not-allowed"}`}>
               {totalTickets === 0 ? "Ticket auswählen" : `Jetzt kaufen · ${total.toFixed(2)} €`}
             </button>
-
             <p className="text-center text-zinc-600 text-xs">🔒 Sichere Zahlung über Stripe</p>
           </div>
         </div>
@@ -309,14 +324,12 @@ export default function EventPage() {
       {checkoutOpen && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-end md:items-center justify-center p-0 md:p-6" onClick={() => setCheckoutOpen(false)}>
           <div className="w-full md:max-w-md bg-zinc-900 border border-zinc-800 rounded-t-[2rem] md:rounded-[2rem] overflow-hidden" onClick={e => e.stopPropagation()}>
-            <div className="px-6 pt-6 pb-4 border-b border-zinc-800">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h2 className="text-lg font-black">Bestellung abschließen</h2>
-                  <p className="text-zinc-500 text-sm mt-0.5">{totalTickets} Ticket{totalTickets !== 1 ? "s" : ""} · <span className="text-yellow-400 font-bold">{total.toFixed(2)} €</span></p>
-                </div>
-                <button onClick={() => setCheckoutOpen(false)} className="w-8 h-8 rounded-full border border-zinc-700 text-zinc-400 flex items-center justify-center hover:text-white transition-colors text-sm">✕</button>
+            <div className="px-6 pt-6 pb-4 border-b border-zinc-800 flex items-center justify-between">
+              <div>
+                <h2 className="text-lg font-black">Bestellung abschließen</h2>
+                <p className="text-zinc-500 text-sm mt-0.5">{totalTickets} Ticket{totalTickets !== 1 ? "s" : ""} · <span className="text-yellow-400 font-bold">{total.toFixed(2)} €</span></p>
               </div>
+              <button onClick={() => setCheckoutOpen(false)} className="w-8 h-8 rounded-full border border-zinc-700 text-zinc-400 flex items-center justify-center hover:text-white text-sm">✕</button>
             </div>
             <div className="p-6 space-y-4">
               <div>
@@ -335,7 +348,7 @@ export default function EventPage() {
               {checkoutError && <div className="bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3"><p className="text-red-400 text-sm">{checkoutError}</p></div>}
             </div>
             <div className="px-6 pb-6 flex gap-3">
-              <button onClick={() => setCheckoutOpen(false)} className="flex-1 rounded-xl border border-zinc-700 py-3.5 text-sm font-semibold text-zinc-400 hover:text-white hover:border-zinc-500 transition-colors">Zurück</button>
+              <button onClick={() => setCheckoutOpen(false)} className="flex-1 rounded-xl border border-zinc-700 py-3.5 text-sm font-semibold text-zinc-400 hover:text-white transition-colors">Zurück</button>
               <button onClick={submitOrder} disabled={loading} className="flex-1 rounded-xl bg-yellow-400 text-black font-black py-3.5 text-sm hover:bg-yellow-300 transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
                 {loading ? <><div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />Laden...</> : "Mit Stripe bezahlen"}
               </button>
