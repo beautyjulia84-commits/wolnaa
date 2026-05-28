@@ -2,36 +2,38 @@
 
 import Image from "next/image";
 import { useEffect, useState, useCallback } from "react";
+import { createClient } from "@supabase/supabase-js";
 
-type Ticket = { label: string; price: string; };
-type Lounge = { name: string; persons: string; price: string; };
-type DiscountCode = { code: string; percent: string; };
-type EventItem = {
-  title: string; city: string; date: string; time: string;
-  location: string; price: string; tickets?: Ticket[];
-  imageUrl?: string; description: string; lounges: boolean;
-  loungeList?: Lounge[]; discountCodes?: DiscountCode[];
-};
+const sb = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
+
 type LegalType = "impressum" | "datenschutz" | "agb" | "teilnahme" | "widerruf" | null;
+
+type EventItem = {
+  id: string;
+  title: string; city: string; date: string; time: string;
+  location: string; address: string; image_url: string; price: string;
+  description: string; tickets: any[];
+  lounges: boolean; lounge_list: any[]; discount_codes: any[];
+};
 
 function createEventLink(title: string): string {
   return `/event/${title.toLowerCase().replace(/\s+/g, "-").replace(/[^\w-]+/g, "")}`;
 }
+
 function getStartingPrice(event: EventItem): string {
-  if (event.tickets && event.tickets.length > 0) return event.tickets[0].price;
-  return event.price || "0";
-}
-function safeParseJSON<T>(raw: string | null, fallback: T): T {
-  if (!raw) return fallback;
-  try { return JSON.parse(raw) as T; } catch { return fallback; }
+  if (event.tickets && event.tickets.length > 0) return parseFloat(event.tickets[0].price || "0").toFixed(2);
+  return parseFloat(event.price || "0").toFixed(2);
 }
 
 function EventCard({ event }: { event: EventItem }) {
   return (
     <a href={createEventLink(event.title)} className="group block rounded-[32px] overflow-hidden border border-white/10 bg-gradient-to-b from-zinc-950 to-black hover:border-yellow-400 transition-all duration-300 shadow-2xl hover:shadow-yellow-400/10 hover:-translate-y-1">
       <div className="relative h-56 flex items-center justify-center bg-[radial-gradient(circle_at_top,#2b1b00_0%,#111_38%,#000_100%)] overflow-hidden">
-        {event.imageUrl ? (
-          <img src={event.imageUrl} alt={event.title} className="w-full h-56 object-cover transition-transform duration-500 group-hover:scale-105" />
+        {event.image_url ? (
+          <img src={event.image_url} alt={event.title} className="w-full h-56 object-cover transition-transform duration-500 group-hover:scale-105" />
         ) : (
           <Image src="/wolnaa-logo.png" alt="WOLNAA" width={230} height={90} className="h-auto w-[190px] object-contain opacity-90" />
         )}
@@ -42,13 +44,11 @@ function EventCard({ event }: { event: EventItem }) {
         <p className="text-zinc-400 mt-2 text-sm">{event.city}{event.location && ` · ${event.location}`}</p>
         <div className="mt-5 flex items-center justify-between">
           <p className="text-yellow-400 font-bold text-lg">ab {getStartingPrice(event)} €</p>
-          {event.lounges && event.loungeList && event.loungeList.length > 0 && (
+          {event.lounges && event.lounge_list?.length > 0 && (
             <span className="text-xs text-zinc-400 border border-zinc-700 rounded-full px-3 py-1">VIP Lounges</span>
           )}
         </div>
-        <div className="mt-6 w-full rounded-2xl bg-white py-4 text-center text-black text-sm font-bold tracking-wide group-hover:bg-yellow-400 transition-colors duration-200">
-          Event öffnen
-        </div>
+        <div className="mt-6 w-full rounded-2xl bg-white py-4 text-center text-black text-sm font-bold tracking-wide group-hover:bg-yellow-400 transition-colors duration-200">Event öffnen</div>
       </div>
     </a>
   );
@@ -64,7 +64,7 @@ function EmptyState() {
   );
 }
 
-function LegalModal({ type, content, onClose }: { type: LegalType; content: string; onClose: () => void; }) {
+function LegalModal({ type, content, onClose }: { type: LegalType; content: string; onClose: () => void }) {
   const titles: Record<string, string> = {
     impressum: "Impressum", datenschutz: "Datenschutzerklärung",
     agb: "Allgemeine Geschäftsbedingungen", teilnahme: "Teilnahmebedingungen", widerruf: "Widerrufsrecht",
@@ -78,7 +78,7 @@ function LegalModal({ type, content, onClose }: { type: LegalType; content: stri
   if (!type) return null;
   return (
     <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4" onClick={onClose} role="dialog" aria-modal="true">
-      <div className="bg-zinc-950 border border-zinc-700 rounded-3xl p-8 max-w-3xl w-full max-h-[80vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+      <div className="bg-zinc-950 border border-zinc-700 rounded-3xl p-8 max-w-3xl w-full max-h-[80vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-black">{titles[type]}</h2>
           <button onClick={onClose} className="text-zinc-400 hover:text-yellow-400 transition-colors text-sm border border-zinc-700 rounded-full px-4 py-1.5">Schließen ✕</button>
@@ -91,22 +91,39 @@ function LegalModal({ type, content, onClose }: { type: LegalType; content: stri
 
 export default function Home() {
   const [events, setEvents] = useState<EventItem[]>([]);
+  const [mounted, setMounted] = useState(false);
   const [showLegal, setShowLegal] = useState<LegalType>(null);
   const [legalContent, setLegalContent] = useState<Record<string, string>>({});
-  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
-    const savedEvents = safeParseJSON<EventItem[]>(localStorage.getItem("wolnaa-events"), []);
-    if (savedEvents.length > 0) setEvents(savedEvents);
-    setLegalContent({
-      impressum: localStorage.getItem("wolnaa-impressum") ?? "",
-      datenschutz: localStorage.getItem("wolnaa-datenschutz") ?? "",
-      agb: localStorage.getItem("wolnaa-agb") ?? "",
-      teilnahme: localStorage.getItem("wolnaa-teilnahme") ?? "",
-      widerruf: localStorage.getItem("wolnaa-widerruf") ?? "",
-    });
+    loadEvents();
+    loadLegal();
   }, []);
+
+  async function loadEvents() {
+    const { data, error } = await sb
+      .from("events")
+      .select("*")
+      .order("created_at", { ascending: true });
+
+    if (error) {
+      console.error("Events laden Fehler:", error);
+      setEvents([]);
+      return;
+    }
+
+    setEvents((data ?? []).map((row: any) => row.data ?? row));
+  }
+
+  async function loadLegal() {
+    const { data } = await sb.from("settings").select("*");
+    if (data) {
+      const map: Record<string, string> = {};
+      data.forEach(r => { map[r.key] = r.value; });
+      setLegalContent(map);
+    }
+  }
 
   const closeLegal = useCallback(() => setShowLegal(null), []);
 
@@ -117,7 +134,6 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-black text-white overflow-hidden">
-      {/* Hero */}
       <section className="relative min-h-[38vh] flex items-start justify-center pt-10 md:pt-24 px-6 bg-[radial-gradient(circle_at_top,#241600_0%,#080808_42%,#000_100%)]">
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/10 to-black" />
         <div className="relative z-10 max-w-7xl mx-auto text-center">
@@ -130,34 +146,23 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Events */}
       <section id="events" className="max-w-7xl mx-auto px-6 py-24">
         <p className="text-yellow-400 uppercase tracking-[4px] text-sm mb-3">Upcoming</p>
         <h2 className="text-4xl md:text-6xl font-black mb-12">Kommende Veranstaltungen</h2>
         <div className="grid md:grid-cols-3 gap-8">
           {mounted && events.length === 0 && <EmptyState />}
-          {mounted && events.map((event, index) => <EventCard key={`${event.title}-${index}`} event={event} />)}
+          {mounted && events.map(event => <EventCard key={event.id} event={event} />)}
         </div>
       </section>
 
-      {/* Footer */}
       <footer className="border-t border-white/10 pt-8 pb-6 text-center">
-        {/* Legal Links */}
         <div className="flex flex-wrap items-center justify-center gap-4 text-sm text-zinc-400 mb-4">
           {legalLinks.map(([key, label]) => (
-            <button key={key!} onClick={() => setShowLegal(key)} className="hover:text-yellow-400 transition-colors underline-offset-4 hover:underline">
-              {label}
-            </button>
+            <button key={key!} onClick={() => setShowLegal(key)} className="hover:text-yellow-400 transition-colors underline-offset-4 hover:underline">{label}</button>
           ))}
         </div>
-
-        {/* Copyright */}
-        <p className="text-zinc-500 text-sm mb-4">© 2026 WOLNAA</p>
-
-        {/* Admin Login */}
-        <a href="/admin" className="inline-flex items-center gap-2 text-xs text-zinc-700 hover:text-zinc-500 transition-colors">
-          <span>⚙</span> Admin
-        </a>
+        <p className="text-zinc-500 text-sm mb-3">© 2026 WOLNAA</p>
+        <a href="/admin" className="inline-flex items-center gap-1.5 text-xs text-zinc-700 hover:text-zinc-500 transition-colors">⚙ Admin</a>
       </footer>
 
       {showLegal && <LegalModal type={showLegal} content={legalContent[showLegal!] ?? ""} onClose={closeLegal} />}
