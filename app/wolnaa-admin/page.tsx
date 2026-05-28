@@ -1,7 +1,6 @@
 "use client";
-
 import { useEffect, useState, useCallback } from "react";
-
+import { supabaseBrowser } from "@/lib/supabase-browser";
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 type Ticket = {
@@ -127,7 +126,20 @@ export default function WolnaaAdmin() {
   }, []);
 
   useEffect(() => {
-    localStorage.setItem("wolnaa-events", JSON.stringify(events));
+    async function saveEvents() {
+      for (const event of events) {
+        await supabaseBrowser
+          .from("events")
+          .upsert({
+            id: event.id,
+            data: event,
+          });
+      }
+    }
+
+    if (events.length > 0) {
+      saveEvents();
+    }
   }, [events]);
 
   useEffect(() => {
