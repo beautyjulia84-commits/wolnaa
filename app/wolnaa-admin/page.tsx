@@ -119,51 +119,27 @@ export default function WolnaaAdmin() {
         .order("created_at", { ascending: false });
 
       if (data) {
-        setEvents(data.map((e: any) => e.data));
+        setEvents(data.map((e: any) => e.data).filter((e: any) => e && e.date !== undefined));
       }
     }
 
     loadEvents();
-
     const savedOrders = localStorage.getItem("wolnaa-orders");
-    const savedImpressum = localStorage.getItem("wolnaa-impressum");
-    const savedDatenschutz = localStorage.getItem("wolnaa-datenschutz");
-    const savedAgb = localStorage.getItem("wolnaa-agb");
-
     if (savedOrders) setOrders(JSON.parse(savedOrders));
-    if (savedImpressum) setImpressum(savedImpressum);
-    if (savedDatenschutz) setDatenschutz(savedDatenschutz);
-    if (savedAgb) setAgb(savedAgb);
+    supabaseBrowser.from("legal").select("*").then(({ data: legalData }) => {
+      if (legalData) {
+        legalData.forEach((row) => {
+          if (row.key === "impressum") setImpressum(row.content);
+          if (row.key === "datenschutz") setDatenschutz(row.content);
+          if (row.key === "agb") setAgb(row.content);
+        });
+      }
+    });
   }, []);
 
-  useEffect(() => {
-    async function saveEvents() {
-      for (const event of events) {
-        await supabaseBrowser
-          .from("events")
-          .upsert({
-            id: event.id,
-            data: event,
-          });
-      }
-    }
 
-    if (events.length > 0) {
-      saveEvents();
-    }
-  }, [events]);
 
-  useEffect(() => {
-    localStorage.setItem("wolnaa-impressum", impressum);
-  }, [impressum]);
 
-  useEffect(() => {
-    localStorage.setItem("wolnaa-datenschutz", datenschutz);
-  }, [datenschutz]);
-
-  useEffect(() => {
-    localStorage.setItem("wolnaa-agb", agb);
-  }, [agb]);
 
   // ─── Event Field Helpers ──────────────────────────────────────────────────
 
@@ -238,21 +214,48 @@ export default function WolnaaAdmin() {
 
   // ─── Save / Delete Event ──────────────────────────────────────────────────
 
-  function saveEvent() {
+  async function saveEvent() {
     if (!eventData.title.trim()) {
       showToast("Bitte Event-Titel eingeben.", "error");
       return;
     }
 
+    const eventId = editingEventId ?? crypto.randomUUID();
+
+    // Automatisch Promoter-Rabattcode generieren (nur bei neuem Event)
+    let updatedDiscountCodes = [...eventData.discountCodes];
+    if (!editingEventId) {
+      const promoterCode = "PROMOTER-" + Math.random().toString(36).substring(2, 8).toUpperCase();
+      updatedDiscountCodes = [
+        ...updatedDiscountCodes,
+        { code: promoterCode, percent: "20" },
+      ];
+    }
+
+    const finalEvent: EventItem = {
+      ...eventData,
+      id: eventId,
+      discountCodes: updatedDiscountCodes,
+    };
+
+    // Direkt in Supabase speichern
+    const { error } = await supabaseBrowser
+      .from("events")
+      .upsert({ id: eventId, data: finalEvent });
+
+    if (error) {
+      showToast("Fehler beim Speichern: " + error.message, "error");
+      return;
+    }
+
     if (editingEventId) {
-      setEvents((prev) =>
-        prev.map((e) => (e.id === editingEventId ? { ...eventData, id: editingEventId } : e))
-      );
+      setEvents((prev) => prev.map((e) => (e.id === editingEventId ? finalEvent : e)));
       setEditingEventId(null);
       showToast("Event erfolgreich aktualisiert.", "success");
     } else {
-      setEvents((prev) => [...prev, { ...eventData, id: crypto.randomUUID() }]);
-      showToast("Event erfolgreich gespeichert.", "success");
+      setEvents((prev) => [...prev, finalEvent]);
+      const code = updatedDiscountCodes.at(-1)?.code;
+      showToast("Event gespeichert! Promoter-Code: " + code, "success");
     }
 
     setEventData(emptyEvent);
@@ -1365,10 +1368,17 @@ export default function WolnaaAdmin() {
 
                   <button
                     className="btn btn-primary"
-                    onClick={() => {
-                      localStorage.setItem("wolnaa-impressum", impressum);
-                      localStorage.setItem("wolnaa-datenschutz", datenschutz);
-                      localStorage.setItem("wolnaa-agb", agb);
+                    onClick={async () => {
+                      const { error: legalError } = await supabaseBrowser.from("legal").upsert([
+                        { key: "impressum", content: impressum },
+                        { key: "datenschutz", content: datenschutz },
+                        { key: "agb", content: agb },
+                      ]);
+                      if (legalError) {
+                        showToast("Fehler: " + legalError.message, "error");
+                        console.error("Legal Error:", legalError);
+                        return;
+                      }
                       setLegalSaved(true);
                       showToast("Rechtliche Texte gespeichert.", "success");
                     }}
