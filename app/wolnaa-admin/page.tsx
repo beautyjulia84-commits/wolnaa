@@ -94,6 +94,8 @@ export default function WolnaaAdmin() {
   const [impressum, setImpressum] = useState("");
   const [datenschutz, setDatenschutz] = useState("");
   const [agb, setAgb] = useState("");
+  const [teilnahme, setTeilnahme] = useState("");
+  const [widerruf, setWiderruf] = useState("");
   const [toasts, setToasts] = useState<Toast[]>([]);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
   const [legalSaved, setLegalSaved] = useState(false);
@@ -132,6 +134,8 @@ export default function WolnaaAdmin() {
           if (row.key === "impressum") setImpressum(row.content);
           if (row.key === "datenschutz") setDatenschutz(row.content);
           if (row.key === "agb") setAgb(row.content);
+          if (row.key === "teilnahme") setTeilnahme(row.content);
+          if (row.key === "widerruf") setWiderruf(row.content);
         });
       }
     });
@@ -1366,6 +1370,8 @@ export default function WolnaaAdmin() {
                     />
                   </div>
 
+                  <div className="legal-section"><label className="legal-label">Teilnahmebedingungen</label><textarea className="input" style={{ minHeight: 140 }} value={teilnahme} onChange={(e) => { setTeilnahme(e.target.value); setLegalSaved(false); }} placeholder="Teilnahmebedingungen …" /></div>
+                  <div className="legal-section"><label className="legal-label">Widerrufsrecht</label><textarea className="input" style={{ minHeight: 140 }} value={widerruf} onChange={(e) => { setWiderruf(e.target.value); setLegalSaved(false); }} placeholder="Widerrufsrecht …" /></div>
                   <button
                     className="btn btn-primary"
                     onClick={async () => {
@@ -1373,6 +1379,8 @@ export default function WolnaaAdmin() {
                         { key: "impressum", content: impressum },
                         { key: "datenschutz", content: datenschutz },
                         { key: "agb", content: agb },
+                        { key: "teilnahme", content: teilnahme },
+                        { key: "widerruf", content: widerruf },
                       ]);
                       if (legalError) {
                         showToast("Fehler: " + legalError.message, "error");
