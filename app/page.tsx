@@ -190,7 +190,7 @@ export default function Home() {
       <section className="relative min-h-[38vh] flex items-start justify-center pt-10 md:pt-24 px-6 bg-[radial-gradient(circle_at_top,#241600_0%,#080808_42%,#000_100%)]">
         <div className="absolute right-5 top-5 md:right-10 md:top-8 z-20 flex items-center gap-4">
           <a
-            href="https://www.tiktok.com/@wolnaa"
+            href="https://www.tiktok.com/@wolnaa_event?_r=1&_t=ZG-96mDjgLge8H"
             target="_blank"
             rel="noopener noreferrer"
             aria-label="WOLNAA TikTok"
@@ -202,7 +202,7 @@ export default function Home() {
           </a>
 
           <a
-            href="https://www.instagram.com/wolnaa"
+            href="https://www.instagram.com/wolnaa_event?igsh=MWExbHJlcms3ZXp4MQ=="
             target="_blank"
             rel="noopener noreferrer"
             aria-label="WOLNAA Instagram"
@@ -252,7 +252,7 @@ export default function Home() {
 
           <div className="flex flex-wrap items-center justify-center gap-4">
             <a
-              href="https://www.tiktok.com/@wolnaa"
+              href="https://www.tiktok.com/@wolnaa_event?_r=1&_t=ZG-96mDjgLge8H"
               target="_blank"
               rel="noopener noreferrer"
               className="rounded-2xl bg-yellow-400 px-6 py-4 text-sm font-black text-black hover:bg-yellow-300 transition-colors"
@@ -261,7 +261,7 @@ export default function Home() {
             </a>
 
             <a
-              href="https://www.instagram.com/wolnaa"
+              href="https://www.instagram.com/wolnaa_event?igsh=MWExbHJlcms3ZXp4MQ=="
               target="_blank"
               rel="noopener noreferrer"
               className="rounded-2xl border border-white/15 px-6 py-4 text-sm font-black text-white hover:border-yellow-400 hover:text-yellow-400 transition-colors"
