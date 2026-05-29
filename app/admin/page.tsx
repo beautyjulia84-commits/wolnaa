@@ -83,6 +83,16 @@ function eventToRow(e: EventItem) {
   };
 }
 
+
+async function uploadImage(file: File): Promise<string> {
+  const ext = file.name.split(".").pop();
+  const fileName = `${Date.now()}.${ext}`;
+  const { data, error } = await sb.storage.from("images").upload(fileName, file, { upsert: true });
+  if (error) throw error;
+  const { data: urlData } = sb.storage.from("images").getPublicUrl(fileName);
+  return urlData.publicUrl;
+}
+
 const inp = "w-full rounded-xl border border-zinc-700 bg-zinc-950 focus:border-yellow-400 px-4 py-3 text-white placeholder:text-zinc-500 outline-none transition-all text-sm";
 const lbl = "block text-xs font-semibold text-zinc-400 mb-1.5 uppercase tracking-wide";
 
@@ -182,6 +192,7 @@ export default function AdminPage() {
   const [legalTab, setLegalTab] = useState<LegalKey>("impressum");
   const [legalSaved, setLegalSaved] = useState(false);
   const [saveLoading, setSaveLoading] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
 
   useEffect(() => {
     if (localStorage.getItem("wolnaa-admin") === "true") {
@@ -251,7 +262,7 @@ export default function AdminPage() {
     if (evIdx) {
       await sb.from("events").update(row).eq("id", evIdx);
     } else {
-      const { error } = await sb.from("events").insert(row); if (error) { alert("Fehler: " + error.message); setSaveLoading(false); return; }
+      await sb.from("events").insert(row);
     }
     await loadEvents();
     setSaveLoading(false);
@@ -319,7 +330,9 @@ export default function AdminPage() {
             ))}
           </nav>
           <div className="flex items-center gap-2 shrink-0">
-            <Link href="/" className="text-zinc-500 text-xs hover:text-white hidden sm:block">Website</Link>
+            <Link href="/" className="hidden sm:flex items-center gap-1.5 rounded-lg border border-zinc-700 text-zinc-300 text-xs px-3 py-1.5 hover:border-yellow-400 hover:text-yellow-400 transition-colors">
+              ← Zur Website
+            </Link>
             <button onClick={logout} className="text-zinc-500 text-xs hover:text-white">Logout</button>
           </div>
         </div>
@@ -477,8 +490,24 @@ export default function AdminPage() {
                     {ev.address && <a href={`https://maps.google.com/?q=${encodeURIComponent(ev.address)}`} target="_blank" rel="noopener noreferrer" className="text-yellow-400 text-xs mt-1.5 inline-block hover:underline">In Google Maps prüfen →</a>}
                   </div>
                   <div>
-                    <label className={lbl}>Bild-URL</label>
-                    <input value={ev.imageUrl} onChange={e => f("imageUrl", e.target.value)} placeholder="https://..." className={inp} />
+                    <label className={lbl}>Bild hochladen</label>
+                    <div className="space-y-2">
+                      <label className="flex items-center justify-center gap-2 w-full rounded-xl border-2 border-dashed border-zinc-700 hover:border-yellow-400 py-4 cursor-pointer transition-colors bg-zinc-950">
+                        <svg className="w-5 h-5 text-zinc-400" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
+                        <span className="text-zinc-400 text-sm">{uploadingImage ? "Wird hochgeladen..." : "Bild auswählen"}</span>
+                        <input type="file" accept="image/*" className="hidden" onChange={async (e) => {
+                          const file = e.target.files?.[0];
+                          if (!file) return;
+                          setUploadingImage(true);
+                          try {
+                            const url = await uploadImage(file);
+                            f("imageUrl", url);
+                          } catch { alert("Upload fehlgeschlagen."); }
+                          finally { setUploadingImage(false); }
+                        }} />
+                      </label>
+                      <input value={ev.imageUrl} onChange={e => f("imageUrl", e.target.value)} placeholder="oder Bild-URL eingeben..." className={inp} />
+                    </div>
                     {ev.imageUrl && <img src={ev.imageUrl} alt="" className="mt-2 h-24 w-full object-cover rounded-xl" onError={e => (e.currentTarget.style.display = "none")} />}
                   </div>
                 </div>
