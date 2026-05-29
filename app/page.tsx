@@ -219,7 +219,7 @@ export default function Home() {
           <div className="flex justify-center mb-10">
             <Image src="/wolnaa-logo.png" alt="WOLNAA Logo" width={720} height={240} priority className="w-[300px] md:w-[620px] h-auto object-contain drop-shadow-[0_0_45px_rgba(255,210,80,0.22)]" />
           </div>
-          <p className="-mt-2 text-zinc-400 text-base md:text-lg tracking-wide">
+          <p className="relative -top-4 text-zinc-400 text-base md:text-lg tracking-wide">
             Exclusive Events&nbsp;•&nbsp;Russische Vibes&nbsp;•&nbsp;Unvergessliche Nächte.
           </p>
 
