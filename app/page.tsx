@@ -188,6 +188,32 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-black text-white overflow-hidden">
       <section className="relative min-h-[38vh] flex items-start justify-center pt-10 md:pt-24 px-6 bg-[radial-gradient(circle_at_top,#241600_0%,#080808_42%,#000_100%)]">
+        <div className="absolute right-5 top-5 md:right-10 md:top-8 z-20 flex items-center gap-4">
+          <a
+            href="https://www.tiktok.com/@wolnaa"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="WOLNAA TikTok"
+            className="text-yellow-400 hover:text-yellow-300 transition-all duration-200 hover:drop-shadow-[0_0_10px_rgba(250,204,21,0.8)]"
+          >
+            <svg viewBox="0 0 24 24" className="w-6 h-6 md:w-7 md:h-7 fill-current" aria-hidden="true">
+              <path d="M16.6 5.82c1.05.78 2.32 1.24 3.66 1.27v3.15a7.8 7.8 0 0 1-3.7-.93v5.45c0 3.55-2.88 6.43-6.43 6.43A6.43 6.43 0 0 1 3.7 14.76c0-3.55 2.88-6.43 6.43-6.43.39 0 .77.04 1.14.1v3.28a3.15 3.15 0 1 0 2.23 3.01V2.8h3.1c.17 1.22.88 2.31 2 3.02z"/>
+            </svg>
+          </a>
+
+          <a
+            href="https://www.instagram.com/wolnaa"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="WOLNAA Instagram"
+            className="text-yellow-400 hover:text-yellow-300 transition-all duration-200 hover:drop-shadow-[0_0_10px_rgba(250,204,21,0.8)]"
+          >
+            <svg viewBox="0 0 24 24" className="w-6 h-6 md:w-7 md:h-7 fill-current" aria-hidden="true">
+              <path d="M7.75 2h8.5A5.76 5.76 0 0 1 22 7.75v8.5A5.76 5.76 0 0 1 16.25 22h-8.5A5.76 5.76 0 0 1 2 16.25v-8.5A5.76 5.76 0 0 1 7.75 2zm0 2A3.75 3.75 0 0 0 4 7.75v8.5A3.75 3.75 0 0 0 7.75 20h8.5A3.75 3.75 0 0 0 20 16.25v-8.5A3.75 3.75 0 0 0 16.25 4h-8.5zM12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10zm0 2a3 3 0 1 0 0 6 3 3 0 0 0 0-6zm5.25-2.25a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5z"/>
+            </svg>
+          </a>
+        </div>
+
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/10 to-black" />
         <div className="relative z-10 max-w-7xl mx-auto text-center">
           <div className="flex justify-center mb-10">
@@ -197,24 +223,6 @@ export default function Home() {
             Exclusive Events&nbsp;•&nbsp;Russische Vibes&nbsp;•&nbsp;Unvergessliche Nächte.
           </p>
 
-          <div className="mt-7 flex flex-wrap items-center justify-center gap-4">
-            <a
-              href="https://www.tiktok.com/@wolnaa"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="rounded-full border border-yellow-400/40 px-5 py-2.5 text-sm font-bold text-yellow-400 hover:bg-yellow-400 hover:text-black transition-colors"
-            >
-              TikTok
-            </a>
-            <a
-              href="https://www.instagram.com/wolnaa"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="rounded-full border border-yellow-400/40 px-5 py-2.5 text-sm font-bold text-yellow-400 hover:bg-yellow-400 hover:text-black transition-colors"
-            >
-              Instagram
-            </a>
-          </div>
         </div>
       </section>
 
@@ -224,34 +232,6 @@ export default function Home() {
         <div className="grid md:grid-cols-3 gap-8">
           {mounted && events.length === 0 && <EmptyState />}
           {mounted && events.map(event => <EventCard key={event.id} event={event} />)}
-        </div>
-      </section>
-
-      <section className="max-w-5xl mx-auto px-6 pb-20 text-center">
-        <div className="rounded-[32px] border border-white/10 bg-zinc-950/80 px-6 py-10">
-          <p className="text-yellow-400 uppercase tracking-[4px] text-xs mb-3">Community</p>
-          <h2 className="text-3xl md:text-5xl font-black mb-4">Folge WOLNAA</h2>
-          <p className="text-zinc-400 max-w-2xl mx-auto mb-7">
-            Exklusive Eventvideos, Ankündigungen und Behind the Scenes findest du auf TikTok und Instagram.
-          </p>
-          <div className="flex flex-wrap items-center justify-center gap-4">
-            <a
-              href="https://www.tiktok.com/@wolnaa"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="rounded-2xl bg-yellow-400 px-6 py-4 text-sm font-black text-black hover:bg-yellow-300 transition-colors"
-            >
-              TikTok folgen
-            </a>
-            <a
-              href="https://www.instagram.com/wolnaa"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="rounded-2xl border border-white/15 px-6 py-4 text-sm font-black text-white hover:border-yellow-400 hover:text-yellow-400 transition-colors"
-            >
-              Instagram folgen
-            </a>
-          </div>
         </div>
       </section>
 
