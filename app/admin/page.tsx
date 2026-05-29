@@ -251,7 +251,7 @@ export default function AdminPage() {
     if (evIdx) {
       await sb.from("events").update(row).eq("id", evIdx);
     } else {
-      await sb.from("events").insert(row);
+      const { error } = await sb.from("events").insert(row); if (error) { alert("Fehler: " + error.message); setSaveLoading(false); return; }
     }
     await loadEvents();
     setSaveLoading(false);
