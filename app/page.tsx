@@ -235,6 +235,43 @@ export default function Home() {
         </div>
       </section>
 
+
+      <section className="max-w-5xl mx-auto px-6 pb-20 text-center">
+        <div className="rounded-[32px] border border-white/10 bg-zinc-950/80 px-6 py-10">
+          <p className="text-yellow-400 uppercase tracking-[4px] text-xs mb-3">
+            Community
+          </p>
+
+          <h2 className="text-3xl md:text-5xl font-black mb-4">
+            Folge WOLNAA
+          </h2>
+
+          <p className="text-zinc-400 max-w-2xl mx-auto mb-7">
+            Exklusive Eventvideos, Ankündigungen und Behind the Scenes auf TikTok und Instagram.
+          </p>
+
+          <div className="flex flex-wrap items-center justify-center gap-4">
+            <a
+              href="https://www.tiktok.com/@wolnaa"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded-2xl bg-yellow-400 px-6 py-4 text-sm font-black text-black hover:bg-yellow-300 transition-colors"
+            >
+              TikTok folgen
+            </a>
+
+            <a
+              href="https://www.instagram.com/wolnaa"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded-2xl border border-white/15 px-6 py-4 text-sm font-black text-white hover:border-yellow-400 hover:text-yellow-400 transition-colors"
+            >
+              Instagram folgen
+            </a>
+          </div>
+        </div>
+      </section>
+
       <footer className="border-t border-white/10 pt-8 pb-6 text-center">
         <div className="flex flex-wrap items-center justify-center gap-4 text-sm text-zinc-400 mb-4">
           {legalLinks.map(([key, label]) => (
