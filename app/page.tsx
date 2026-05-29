@@ -89,6 +89,59 @@ function LegalModal({ type, content, onClose }: { type: LegalType; content: stri
   );
 }
 
+
+function CookieBanner() {
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const consent = localStorage.getItem('wolnaa-cookie-consent');
+    if (!consent) setVisible(true);
+  }, []);
+
+  function accept() {
+    localStorage.setItem('wolnaa-cookie-consent', 'all');
+    setVisible(false);
+  }
+
+  function decline() {
+    localStorage.setItem('wolnaa-cookie-consent', 'necessary');
+    setVisible(false);
+  }
+
+  if (!visible) return null;
+
+  return (
+    <div style={{
+      position: 'fixed', bottom: 24, left: '50%', transform: 'translateX(-50%)',
+      width: '90%', maxWidth: 560, zIndex: 9999,
+      background: '#111', border: '1px solid #333',
+      borderRadius: 20, padding: '20px 24px',
+      boxShadow: '0 8px 40px rgba(0,0,0,0.6)',
+      display: 'flex', flexDirection: 'column', gap: 14,
+    }}>
+      <div>
+        <p style={{ color: '#fff', fontWeight: 700, fontSize: 15, marginBottom: 6 }}>🍪 Cookie-Hinweis</p>
+        <p style={{ color: '#a1a1aa', fontSize: 13, lineHeight: 1.6 }}>
+          Wir verwenden Cookies für den Betrieb der Website. Mit Klick auf "Alle akzeptieren" stimmst du der Nutzung aller Cookies zu.{' '}
+          <button onClick={() => {}} style={{ color: '#facc15', background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, padding: 0 }}>Datenschutz</button>
+        </p>
+      </div>
+      <div style={{ display: 'flex', gap: 10 }}>
+        <button onClick={accept} style={{
+          flex: 1, background: '#facc15', color: '#000',
+          border: 'none', borderRadius: 12, padding: '10px 16px',
+          fontWeight: 700, fontSize: 14, cursor: 'pointer',
+        }}>Alle akzeptieren</button>
+        <button onClick={decline} style={{
+          flex: 1, background: 'transparent', color: '#a1a1aa',
+          border: '1px solid #333', borderRadius: 12, padding: '10px 16px',
+          fontWeight: 600, fontSize: 14, cursor: 'pointer',
+        }}>Nur notwendige</button>
+      </div>
+    </div>
+  );
+}
+
 export default function Home() {
   const [events, setEvents] = useState<EventItem[]>([]);
   const [mounted, setMounted] = useState(false);
@@ -165,6 +218,7 @@ export default function Home() {
         <a href="/admin" className="inline-flex items-center gap-1.5 text-xs text-zinc-700 hover:text-zinc-500 transition-colors">⚙ Admin</a>
       </footer>
 
+      <CookieBanner />
       {showLegal && <LegalModal type={showLegal} content={legalContent[showLegal!] ?? ""} onClose={closeLegal} />}
     </main>
   );
