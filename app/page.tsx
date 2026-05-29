@@ -196,6 +196,25 @@ export default function Home() {
           <p className="mt-6 text-zinc-300 text-xl md:text-2xl tracking-wide">
             Exclusive Events&nbsp;•&nbsp;Russische Vibes&nbsp;•&nbsp;Unvergessliche Nächte.
           </p>
+
+          <div className="mt-7 flex flex-wrap items-center justify-center gap-4">
+            <a
+              href="https://www.tiktok.com/@wolnaa"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded-full border border-yellow-400/40 px-5 py-2.5 text-sm font-bold text-yellow-400 hover:bg-yellow-400 hover:text-black transition-colors"
+            >
+              TikTok
+            </a>
+            <a
+              href="https://www.instagram.com/wolnaa"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded-full border border-yellow-400/40 px-5 py-2.5 text-sm font-bold text-yellow-400 hover:bg-yellow-400 hover:text-black transition-colors"
+            >
+              Instagram
+            </a>
+          </div>
         </div>
       </section>
 
@@ -205,6 +224,34 @@ export default function Home() {
         <div className="grid md:grid-cols-3 gap-8">
           {mounted && events.length === 0 && <EmptyState />}
           {mounted && events.map(event => <EventCard key={event.id} event={event} />)}
+        </div>
+      </section>
+
+      <section className="max-w-5xl mx-auto px-6 pb-20 text-center">
+        <div className="rounded-[32px] border border-white/10 bg-zinc-950/80 px-6 py-10">
+          <p className="text-yellow-400 uppercase tracking-[4px] text-xs mb-3">Community</p>
+          <h2 className="text-3xl md:text-5xl font-black mb-4">Folge WOLNAA</h2>
+          <p className="text-zinc-400 max-w-2xl mx-auto mb-7">
+            Exklusive Eventvideos, Ankündigungen und Behind the Scenes findest du auf TikTok und Instagram.
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-4">
+            <a
+              href="https://www.tiktok.com/@wolnaa"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded-2xl bg-yellow-400 px-6 py-4 text-sm font-black text-black hover:bg-yellow-300 transition-colors"
+            >
+              TikTok folgen
+            </a>
+            <a
+              href="https://www.instagram.com/wolnaa"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded-2xl border border-white/15 px-6 py-4 text-sm font-black text-white hover:border-yellow-400 hover:text-yellow-400 transition-colors"
+            >
+              Instagram folgen
+            </a>
+          </div>
         </div>
       </section>
 
