@@ -117,10 +117,10 @@ export default function Home() {
   }
 
   async function loadLegal() {
-    const { data } = await sb.from("settings").select("*");
+    const { data } = await sb.from("legal").select("*");
     if (data) {
       const map: Record<string, string> = {};
-      data.forEach(r => { map[r.key] = r.value; });
+      data.forEach(r => { map[r.key] = r.content; });
       setLegalContent(map);
     }
   }
