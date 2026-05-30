@@ -180,14 +180,16 @@ export default function EventPage() {
               {n.tickets.map((ticket, i) => (
                 <div key={i} className="flex items-center justify-between bg-zinc-900 border border-zinc-800 rounded-2xl px-5 py-4">
                   <div><p className="font-bold text-base">{ticket.name || "Ticket"}</p><p className="text-yellow-400 font-bold mt-0.5">{parseFloat(ticket.price || "0").toFixed(2)} €</p></div>
-                  <select value={ticketQtys[i] ?? 0} onChange={e => setTicketQtys(p => ({ ...p, [i]: parseInt(e.target.value) }))} className="bg-zinc-800 border border-zinc-700 text-white rounded-xl px-4 py-2.5 text-sm font-bold outline-none focus:border-yellow-400 transition-colors cursor-pointer">
-                    {[0,1,2,3,4,5,6,7,8,9,10].map(n => <option key={n} value={n}>{n}</option>)}
-                  </select>
+                  <div className="flex items-center gap-2">
+                    <button onClick={() => setTicketQtys(p => ({ ...p, [i]: Math.max(0, (p[i] ?? 0) - 1) }))} className="w-9 h-9 rounded-full border border-zinc-700 flex items-center justify-center font-bold hover:border-yellow-400 hover:text-yellow-400 transition-colors text-lg">−</button>
+                    <span className="w-6 text-center font-bold">{ticketQtys[i] ?? 0}</span>
+                    <button onClick={() => setTicketQtys(p => ({ ...p, [i]: (p[i] ?? 0) + 1 }))} className="w-9 h-9 rounded-full bg-yellow-400 text-black flex items-center justify-center font-bold hover:bg-yellow-300 transition-colors text-lg">+</button>
+                  </div>
                 </div>
               ))}
               {n.hasLounges && n.loungeList.length > 0 && (
                 <>
-                  <p className="text-xs font-bold text-zinc-500 uppercase tracking-widest pt-2">VIP Lounge</p>
+                  <p className="text-xs font-bold text-zinc-500 uppercase tracking-widest pt-2">Lounge</p>
                   {n.loungeList.map((lounge, i) => (
                     <button key={i} onClick={() => setSelectedLounge(selectedLounge === i ? null : i)} className={`w-full flex items-center justify-between rounded-2xl border px-5 py-4 text-left transition-all ${selectedLounge === i ? "border-yellow-400 bg-yellow-400/10" : "border-zinc-800 bg-zinc-900"}`}>
                       <div><p className="font-bold">{lounge.name}</p><p className="text-zinc-500 text-xs mt-0.5">bis {lounge.persons} Personen</p></div>

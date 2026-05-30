@@ -538,9 +538,9 @@ export default function AdminPage() {
               </div>
 
               <div className="bg-zinc-950 rounded-2xl border border-zinc-800 overflow-hidden">
-                <div className="px-4 py-3 border-b border-zinc-800 bg-zinc-900"><p className={lbl + " mb-0"}>VIP Lounges</p></div>
+                <div className="px-4 py-3 border-b border-zinc-800 bg-zinc-900"><p className={lbl + " mb-0"}>Lounge</p></div>
                 <div className="p-4 space-y-3">
-                  <Toggle value={ev.lounges} onChange={v => f("lounges", v)} label="VIP Lounges anbieten" />
+                  <Toggle value={ev.lounges} onChange={v => f("lounges", v)} label="Lounges anbieten" />
                   {ev.lounges && (
                     <div className="space-y-3 pt-3 border-t border-zinc-800">
                       {ev.loungeList.map((l, i) => (
