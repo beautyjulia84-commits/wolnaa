@@ -39,8 +39,8 @@ export async function POST(req: NextRequest) {
     });
 
     if (dbError) {
-      console.error("Supabase Fehler:", dbError);
-      return NextResponse.json({ error: "Datenbankfehler." }, { status: 500 });
+      console.error("Supabase Fehler:", JSON.stringify(dbError));
+      return NextResponse.json({ error: "Datenbankfehler.", details: dbError.message, code: dbError.code }, { status: 500 });
     }
 
     // ── QR-Code generieren ────────────────────────────────────────────────
