@@ -8,6 +8,8 @@ export async function POST(req: Request) {
     const body = await req.json();
     const { eventTitle, customerName, customerEmail, lineItems, ticketId, total } = body;
 
+    const totalAmount = Math.round(Number(total) * 100);
+
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       customer_email: customerEmail,
@@ -17,16 +19,16 @@ export async function POST(req: Request) {
         customerEmail: customerEmail || "",
         ticketId: ticketId || "",
       },
-      line_items: lineItems.map((item: any) => ({
-        quantity: item.qty || item.quantity || 1,
+      line_items: [{
+        quantity: 1,
         price_data: {
           currency: "eur",
           product_data: {
-            name: item.name || "Ticket",
+            name: lineItems.map((i: any) => i.name).join(", ") || "Ticket",
           },
-          unit_amount: Math.round(Number(item.price) * 100),
+          unit_amount: totalAmount,
         },
-      })),
+      }],
       success_url: "https://wolnaa.de/success?session_id={CHECKOUT_SESSION_ID}",
       cancel_url: "https://wolnaa.de",
     });
