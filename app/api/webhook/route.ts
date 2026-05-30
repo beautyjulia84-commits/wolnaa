@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
   if (event.type === "checkout.session.completed") {
     const session = event.data.object as Stripe.Checkout.Session;
     const { eventTitle, customerName, ticketId } = session.metadata ?? {};
-    const customerEmail = session.customer_email ?? "";
+    const customerEmail = session.customer_details?.email ?? session.customer_email ?? session.metadata?.customerEmail ?? "";
     const amount = (session.amount_total ?? 0) / 100;
 
     if (!ticketId || !eventTitle || !customerName || !customerEmail) {
