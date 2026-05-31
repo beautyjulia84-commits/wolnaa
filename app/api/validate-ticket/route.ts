@@ -24,6 +24,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ valid: false, reason: "Ticket nicht gefunden." }, { status: 404 });
   }
 
+  if (ticket.status === "cancelled") {
+    return NextResponse.json({
+      valid: false,
+      reason: "Ticket wurde storniert.",
+    }, { status: 400 });
+  }
   if (ticket.status === "checked_in") {
     return NextResponse.json({
       valid: false,
