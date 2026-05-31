@@ -188,7 +188,7 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-black text-white overflow-hidden">
       <section className="relative min-h-[38vh] flex items-start justify-center pt-10 md:pt-24 px-6 bg-[radial-gradient(circle_at_top,#241600_0%,#080808_42%,#000_100%)]">
-        <div className="absolute right-5 top-1 md:right-10 md:top-2 z-20 flex items-center gap-4">
+        <div className="absolute right-5 top-6 md:right-10 md:top-8 z-20 flex items-center gap-4">
           <a
             href="https://www.tiktok.com/@wolnaa_event?_r=1&_t=ZG-96mDjgLge8H"
             target="_blank"
