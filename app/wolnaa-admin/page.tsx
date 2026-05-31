@@ -136,11 +136,16 @@ export default function WolnaaAdmin() {
       if (data) {
         setOrders(
           data.map((t: any) => ({
-            id: t.ticket_id || t.id,
+            id: t.ticket_id || t.id || "",
             customerName: t.customer_name || "",
             customerEmail: t.customer_email || "",
             eventTitle: t.event_title || "",
-            amount: Number(t.amount || 0),
+            amount: Number(
+              t.total_amount ||
+              t.price ||
+              t.amount ||
+              0
+            ),
             status: t.status || "Bezahlt",
           }))
         );
