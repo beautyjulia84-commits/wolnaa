@@ -307,6 +307,17 @@ export default function AdminPage() {
   function setLng(i: number, k: keyof Lounge, v: string) { const l = [...ev.loungeList]; l[i] = { ...l[i], [k]: v }; f("loungeList", l); }
   function setDC(i: number, k: keyof DiscountCode, v: string) { const d = [...ev.discountCodes]; d[i] = { ...d[i], [k]: v }; f("discountCodes", d); }
 
+  async function cancelTicket(ticketId: string, name: string) {
+    if (!confirm(`Ticket von ${name} wirklich stornieren? Der Kunde erhält sein Geld zurück.`)) return;
+    const res = await fetch("/api/cancel-ticket", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "x-admin-token": adminPw },
+      body: JSON.stringify({ ticketId }),
+    });
+    if (res.ok) { alert("✅ Storniert! Kunde wird per E-Mail informiert."); loadTickets(); }
+    else { const d = await res.json(); alert("Fehler: " + d.error); }
+  }
+
   const filtered = ticketFilter ? tickets.filter(t => t.event_title.toLowerCase().includes(ticketFilter.toLowerCase())) : tickets;
   const revenue = tickets.reduce((s, t) => s + t.amount, 0);
   const checkedIn = tickets.filter(t => t.status === "checked_in").length;
@@ -424,7 +435,7 @@ export default function AdminPage() {
               <div className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
-                    <thead><tr className="border-b border-zinc-800">{["Name & E-Mail", "Event", "Betrag", "Status", "Check-in"].map(h => <th key={h} className="text-left text-zinc-500 font-medium px-4 py-3 text-xs uppercase tracking-wide whitespace-nowrap">{h}</th>)}</tr></thead>
+                    <thead><tr className="border-b border-zinc-800">{["Name & E-Mail", "Event", "Betrag", "Status", "Check-in", ""].map(h => <th key={h} className="text-left text-zinc-500 font-medium px-4 py-3 text-xs uppercase tracking-wide whitespace-nowrap">{h}</th>)}</tr></thead>
                     <tbody>
                       {filtered.length === 0 ? <tr><td colSpan={5} className="text-center text-zinc-600 py-10 text-sm">Keine Einträge.</td></tr>
                         : filtered.map(t => (
@@ -432,7 +443,8 @@ export default function AdminPage() {
                             <td className="px-4 py-3"><p className="font-semibold text-sm">{t.customer_name}</p><p className="text-zinc-500 text-xs">{t.customer_email}</p></td>
                             <td className="px-4 py-3 text-zinc-400 text-xs whitespace-nowrap">{t.event_title}</td>
                             <td className="px-4 py-3 font-bold text-sm whitespace-nowrap">€{t.amount.toFixed(2)}</td>
-                            <td className="px-4 py-3 whitespace-nowrap"><span className={`rounded-full px-2.5 py-1 text-xs font-medium ${t.status === "checked_in" ? "bg-green-400/10 text-green-400" : "bg-yellow-400/10 text-yellow-400"}`}>{t.status === "checked_in" ? "✓ Eingecheckt" : "Bezahlt"}</span></td>
+                            <td className="px-4 py-3 whitespace-nowrap"><span className={`rounded-full px-2.5 py-1 text-xs font-medium ${t.status === "checked_in" ? "bg-green-400/10 text-green-400" : t.status === "cancelled" ? "bg-red-400/10 text-red-400" : "bg-yellow-400/10 text-yellow-400"}`}>{t.status === "checked_in" ? "✓ Eingecheckt" : t.status === "cancelled" ? "✕ Storniert" : "Bezahlt"}</span></td>
+                            <td className="px-4 py-3 whitespace-nowrap">{t.status !== "cancelled" && <button onClick={() => cancelTicket(t.ticket_id, t.customer_name)} className="rounded-lg border border-red-500/30 text-red-400 text-xs px-3 py-1.5 hover:bg-red-500/10 transition-colors font-medium">Stornieren</button>}</td>
                             <td className="px-4 py-3 text-zinc-500 text-xs whitespace-nowrap">{t.checked_in_at ? new Date(t.checked_in_at).toLocaleString("de-DE") : "—"}</td>
                           </tr>
                         ))}
