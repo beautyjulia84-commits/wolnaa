@@ -126,8 +126,29 @@ export default function WolnaaAdmin() {
     }
 
     loadEvents();
-    const savedOrders = localStorage.getItem("wolnaa-orders");
-    if (savedOrders) setOrders(JSON.parse(savedOrders));
+
+    async function loadOrders() {
+      const { data } = await supabaseBrowser
+        .from("tickets")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (data) {
+        setOrders(
+          data.map((t: any) => ({
+            id: t.ticket_id || t.id,
+            customerName: t.customer_name || "",
+            customerEmail: t.customer_email || "",
+            eventTitle: t.event_title || "",
+            amount: Number(t.amount || 0),
+            status: t.status || "Bezahlt",
+          }))
+        );
+      }
+    }
+
+    loadOrders();
+
     supabaseBrowser.from("legal").select("*").then(({ data: legalData }) => {
       if (legalData) {
         legalData.forEach((row) => {
