@@ -241,8 +241,33 @@ export default function AdminPage() {
 
   async function loadTickets() {
     setTicketLoading(true);
-    const { data } = await sb.from("tickets").select("*").order("created_at", { ascending: false });
-    setTickets(data ?? []);
+
+    const { data, error } = await sb
+      .from("tickets")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("Tickets laden Fehler:", error);
+      setTickets([]);
+      setTicketLoading(false);
+      return;
+    }
+
+    setTickets(
+      (data ?? []).map((t: any) => ({
+        ...t,
+        id: t.id,
+        ticket_id: t.ticket_id || "",
+        event_title: t.event_title || "",
+        customer_name: t.customer_name || "",
+        customer_email: t.customer_email || "",
+        amount: Number(t.total_amount || t.price || t.amount || 0),
+        status: t.status || "paid",
+        created_at: t.created_at || "",
+      }))
+    );
+
     setTicketLoading(false);
   }
 
