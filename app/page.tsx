@@ -188,7 +188,7 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-black text-white overflow-hidden">
       <section className="relative min-h-[38vh] flex items-start justify-center pt-10 md:pt-24 px-6 bg-[radial-gradient(circle_at_top,#241600_0%,#080808_42%,#000_100%)]">
-        <div className="absolute right-5 top-1 md:right-10 md:top-2 z-20 flex items-center gap-4">
+        <div className="absolute right-5 top-0 md:right-10 md:top-0 z-20 flex items-center gap-4">
           <a
             href="https://www.tiktok.com/@wolnaa_event?_r=1&_t=ZG-96mDjgLge8H"
             target="_blank"
@@ -219,7 +219,7 @@ export default function Home() {
           <div className="flex justify-center mb-10">
             <Image src="/wolnaa-logo.png" alt="WOLNAA Logo" width={720} height={240} priority className="w-[300px] md:w-[620px] h-auto object-contain drop-shadow-[0_0_45px_rgba(255,210,80,0.22)]" />
           </div>
-          <p className="relative -top-10 text-zinc-400 text-base md:text-lg tracking-wide">
+          <p className="relative -top-00 text-zinc-400 text-base md:text-lg tracking-wide">
             Exclusive Events&nbsp;•&nbsp;Russische Vibes&nbsp;•&nbsp;Unvergessliche Nächte.
           </p>
 
