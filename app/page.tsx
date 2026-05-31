@@ -80,7 +80,7 @@ function LegalModal({ type, content, onClose }: { type: LegalType; content: stri
     <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4" onClick={onClose} role="dialog" aria-modal="true">
       <div className="bg-zinc-950 border border-zinc-700 rounded-3xl p-8 max-w-3xl w-full max-h-[80vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
         <div className="flex flex-col items-center mb-6 gap-3">
-          <button onClick={onClose} className="absolute top-[-50px] right-4 bg-yellow-400 text-black font-bold text-sm border border-yellow-300 rounded-full px-4 py-2 shadow-lg z-50">Schließen ✕</button>
+          <button onClick={onClose} className="absolute top-4 left-1/2 -translate-x-1/2 bg-yellow-400 text-black font-bold text-sm border border-yellow-300 rounded-full px-4 py-2 shadow-lg z-50">Schließen ✕</button>
           <h2 className="text-2xl font-black text-center">{titles[type]}</h2>
         </div>
         {content ? <div className="whitespace-pre-wrap text-zinc-300 leading-7 text-base">{content}</div> : <p className="text-zinc-500 italic">Kein Inhalt hinterlegt.</p>}
