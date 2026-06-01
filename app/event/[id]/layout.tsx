@@ -6,13 +6,8 @@ const sb = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-function slugify(t: string) {
-  return t.toLowerCase().replace(/\s+/g, "-").replace(/[^\w-]+/g, "");
-}
-
 export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
-  const { data } = await sb.from("events").select("*");
-  const event = data?.find((e: any) => slugify(e.title || "") === params.id);
+  const { data: event } = await sb.from("events").select("*").eq("slug", params.id).single();
 
   if (!event) return { title: "WOLNAA – Event nicht gefunden" };
 
