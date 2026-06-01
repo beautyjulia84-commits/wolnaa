@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Bebas_Neue, DM_Sans } from "next/font/google";
 import "./globals.css";
+import TikTokPixel from "./TikTokPixel";
 
 // ─── Fonts ────────────────────────────────────────────────────────────────────
 
@@ -92,6 +93,7 @@ export default function RootLayout({
       className={`${bebasNeue.variable} ${dmSans.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-black text-white">
+        <TikTokPixel />
         {children}
       </body>
     </html>
