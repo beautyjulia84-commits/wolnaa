@@ -76,10 +76,8 @@ export default function EventPage() {
 
   async function loadEvent() {
     try {
-      const { data } = await sb.from("events").select("*");
-      if (!data) { setNotFound(true); return; }
-      const found = data.find((e: any) => slugify(e.data?.title || e.title || "") === id);
-      if (found) setEvent(found.data || found);
+      const { data } = await sb.from("events").select("*").eq("slug", id).single();
+      if (data) setEvent(data);
       else setNotFound(true);
     } catch { setNotFound(true); }
   }
