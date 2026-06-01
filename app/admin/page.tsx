@@ -195,7 +195,9 @@ export default function AdminPage() {
   const [uploadingImage, setUploadingImage] = useState(false);
 
   useEffect(() => {
+    // Middleware schützt die Route - wenn wir hier sind, sind wir eingeloggt
     setAuthed(true);
+    setAdminPw(process.env.NEXT_PUBLIC_ADMIN_PW ?? "");
   }, []);
 
   useEffect(() => {
