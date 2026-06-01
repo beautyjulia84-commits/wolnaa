@@ -7,12 +7,12 @@ export default function ImpressumPage() {
 
   useEffect(() => {
     supabaseBrowser
-      .from('legal')
-      .select('content')
+      .from('settings')
+      .select('value')
       .eq('key', 'impressum')
       .single()
       .then(({ data }) => {
-        if (data) setText(data.content);
+        if (data) setText(data.value);
       });
   }, []);
 
