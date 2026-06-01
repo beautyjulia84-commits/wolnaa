@@ -108,6 +108,16 @@ export default function EventPage() {
   }
   const total = calcTotal();
 
+  useEffect(() => {
+    if (typeof window !== "undefined" && (window as any).ttq) {
+      (window as any).ttq.track("ViewContent", {
+        content_name: event?.title || "Event",
+        value: total,
+        currency: "EUR",
+      });
+    }
+  }, [event, total]);
+
   function applyDiscount() {
     setDiscountError(""); setDiscountSuccess(false);
     const code = discountInput.trim().toUpperCase();
