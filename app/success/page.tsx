@@ -1,4 +1,5 @@
 "use client";
+import { useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Suspense } from "react";
@@ -32,6 +33,15 @@ function SuccessContent() {
 }
 
 export default function SuccessPage() {
+  useEffect(() => {
+    if (typeof window !== "undefined" && (window as any).ttq) {
+      (window as any).ttq.track("CompletePayment", {
+        content_name: "WOLNAA Ticket",
+        currency: "EUR",
+      });
+    }
+  }, []);
+
   return (
     <Suspense>
       <SuccessContent />
