@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 
 const sb = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
 export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
