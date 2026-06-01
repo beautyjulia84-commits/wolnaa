@@ -65,9 +65,14 @@ function rowToEvent(r: any): EventItem {
 }
 
 // Convert EventItem → Supabase row
+function slugify(t: string) {
+  return t.toLowerCase().replace(/\s+/g, "-").replace(/[^\w-]+/g, "");
+}
+
 function eventToRow(e: EventItem) {
   return {
     title: e.title,
+    slug: slugify(e.title),
     city: e.city,
     date: e.date,
     time: e.time,
