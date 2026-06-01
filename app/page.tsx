@@ -279,7 +279,7 @@ export default function Home() {
           ))}
         </div>
         <p className="text-zinc-500 text-sm mb-3">© 2026 WOLNAA</p>
-        <a href="/admin" className="inline-flex items-center gap-1.5 text-xs text-zinc-700 hover:text-zinc-500 transition-colors">⚙ Admin</a>
+
       </footer>
 
       <CookieBanner />
