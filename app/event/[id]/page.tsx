@@ -235,7 +235,16 @@ export default function EventPage() {
                   <p className="text-zinc-600 text-xs">{totalTickets} Ticket{totalTickets !== 1 ? "s" : ""}</p>
                 </div>
               )}
-              <button onClick={() => setStep("checkout")} disabled={!canCheckout} className={`w-full py-4 rounded-2xl font-black text-base transition-all ${canCheckout ? "bg-yellow-400 text-black hover:bg-yellow-300" : "bg-zinc-800 text-zinc-600 cursor-not-allowed"}`}>
+              <button onClick={() => {
+                  if (typeof window !== "undefined" && (window as any).ttq) {
+                    (window as any).ttq.track("InitiateCheckout", {
+                      content_name: event?.title || "Event",
+                      value: total,
+                      currency: "EUR",
+                    });
+                  }
+                  setStep("checkout");
+                }} disabled={!canCheckout} className={`w-full py-4 rounded-2xl font-black text-base transition-all ${canCheckout ? "bg-yellow-400 text-black hover:bg-yellow-300" : "bg-zinc-800 text-zinc-600 cursor-not-allowed"}`}>
                 {!hasSelection ? "Ticket auswählen" : !isAdult || !acceptedLegal ? "Bitte Bedingungen akzeptieren" : `Weiter · ${total.toFixed(2)} €`}
               </button>
               <p className="text-center text-zinc-600 text-xs mt-3">🔒 Sichere Zahlung über Stripe</p>
