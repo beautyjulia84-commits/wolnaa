@@ -195,10 +195,7 @@ export default function AdminPage() {
   const [uploadingImage, setUploadingImage] = useState(false);
 
   useEffect(() => {
-    if (localStorage.getItem("wolnaa-admin") === "true") {
-      setAuthed(true);
-      setAdminPw(localStorage.getItem("wolnaa-admin-pw") ?? "");
-    }
+    setAuthed(true);
   }, []);
 
   useEffect(() => {
@@ -274,11 +271,14 @@ export default function AdminPage() {
   async function login() {
     setPwErr("");
     const res = await fetch("/api/admin-login", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ password: pw }) });
-    if (res.ok) { localStorage.setItem("wolnaa-admin", "true"); localStorage.setItem("wolnaa-admin-pw", pw); setAdminPw(pw); setAuthed(true); }
+    if (res.ok) { setAdminPw(pw); setAuthed(true); }
     else setPwErr("Falsches Passwort.");
   }
 
-  function logout() { localStorage.removeItem("wolnaa-admin"); localStorage.removeItem("wolnaa-admin-pw"); setAuthed(false); }
+  async function logout() {
+    await fetch("/api/admin-login", { method: "DELETE" });
+    setAuthed(false);
+  }
 
   async function saveEv() {
     if (!ev.title) return;

@@ -2,13 +2,22 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
   const { password } = await req.json();
-
   if (password === process.env.ADMIN_PASSWORD) {
-    return NextResponse.json({ ok: true });
+    const res = NextResponse.json({ ok: true });
+    res.cookies.set("wolnaa-admin-token", password, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 60 * 60 * 24 * 7, // 7 Tage
+      path: "/",
+    });
+    return res;
   }
+  return NextResponse.json({ error: "Falsches Passwort." }, { status: 401 });
+}
 
-  return NextResponse.json(
-    { error: "Falsches Passwort." },
-    { status: 401 }
-  );
+export async function DELETE() {
+  const res = NextResponse.json({ ok: true });
+  res.cookies.delete("wolnaa-admin-token");
+  return res;
 }
