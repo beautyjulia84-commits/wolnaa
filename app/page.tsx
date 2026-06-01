@@ -83,7 +83,15 @@ function LegalModal({ type, content, onClose }: { type: LegalType; content: stri
           <button onClick={onClose} className="absolute top-4 left-1/2 -translate-x-1/2 bg-yellow-400 text-black font-bold text-sm border border-yellow-300 rounded-full px-4 py-2 shadow-lg z-50">Schließen ✕</button>
           <h2 className="text-2xl font-black text-center">{titles[type]}</h2>
         </div>
-        {content ? <div className="whitespace-pre-wrap text-zinc-300 leading-7 text-base">{content}</div> : <p className="text-zinc-500 italic">Kein Inhalt hinterlegt.</p>}
+        {content ? <div className="text-zinc-300 leading-7 text-base">{content.split("\n").map((line, i) => {
+  const urlRegex = /(https?:\/\/[^\s]+|[\w.-]+@[\w.-]+\.[a-z]{2,})/gi;
+  const parts = line.split(urlRegex);
+  return <p key={i} className="mb-2">{parts.map((part, j) => {
+    if (part.match(/^https?:\/\//)) return <a key={j} href={part} target="_blank" rel="noopener noreferrer" className="text-yellow-400 underline">{part}</a>;
+    if (part.match(/[\w.-]+@[\w.-]+\.[a-z]{2,}/)) return <a key={j} href={`mailto:${part}`} className="text-yellow-400 underline">{part}</a>;
+    return part;
+  })}</p>;
+})}</div> : <p className="text-zinc-500 italic">Kein Inhalt hinterlegt.</p>}
       </div>
     </div>
   );
