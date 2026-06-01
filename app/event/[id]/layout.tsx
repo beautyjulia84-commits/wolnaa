@@ -1,13 +1,20 @@
-import { createClient } from "@supabase/supabase-js";
 import type { Metadata } from "next";
 
-const sb = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+async function getEvent(slug: string) {
+  const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/events?slug=eq.${slug}&select=*`;
+  const res = await fetch(url, {
+    headers: {
+      "apikey": process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      "Authorization": `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY!}`,
+    },
+    cache: "no-store",
+  });
+  const data = await res.json();
+  return data?.[0] ?? null;
+}
 
 export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
-  const { data: event } = await sb.from("events").select("*").eq("slug", params.id).single();
+  const event = await getEvent(params.id);
 
   if (!event) return { title: "WOLNAA – Event nicht gefunden" };
 
