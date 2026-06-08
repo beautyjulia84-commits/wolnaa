@@ -45,7 +45,7 @@ function EventCard({ event }: { event: EventItem }) {
         <div className="mt-5 flex items-center justify-between">
           <p className="text-yellow-400 font-bold text-lg">ab {getStartingPrice(event)} €</p>
           {event.lounges && event.lounge_list?.length > 0 && (
-            <span className="text-xs text-zinc-400 border border-zinc-700 rounded-full px-3 py-1">VIP Lounges</span>
+            <span className="text-xs text-zinc-400 border border-zinc-700 rounded-full px-3 py-1">Lounge</span>
           )}
         </div>
         <div className="mt-6 w-full rounded-2xl bg-white py-4 text-center text-black text-sm font-bold tracking-wide group-hover:bg-yellow-400 transition-colors duration-200">Event öffnen</div>
