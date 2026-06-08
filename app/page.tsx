@@ -23,6 +23,16 @@ function createEventLink(event: EventItem): string {
   return `/event/${(event as any).slug || event.title.toLowerCase().replace(/\s+/g, "-").replace(/[^\w-]+/g, "")}`;
 }
 
+function calcCountdown(d: string) {
+  if (!d) return null;
+  const diff = new Date(d + "T00:00:00").getTime() - new Date().getTime();
+  const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
+  if (days < 0) return null;
+  if (days === 0) return "Heute!";
+  if (days === 1) return "Morgen!";
+  return `Noch ${days} Tage`;
+}
+
 function getStartingPrice(event: EventItem): string {
   if (event.tickets && event.tickets.length > 0) return parseFloat(event.tickets[0].price || "0").toFixed(2);
   return parseFloat(event.price || "0").toFixed(2);
@@ -39,7 +49,10 @@ function EventCard({ event }: { event: EventItem }) {
         )}
       </div>
       <div className="p-7">
-        <p className="text-yellow-400 text-sm font-medium tracking-wide">{event.date}{event.time && ` · ${event.time}`}</p>
+        <div className="flex items-center justify-between">
+          <p className="text-yellow-400 text-sm font-medium tracking-wide">{event.date}{event.time && ` · ${event.time}`}</p>
+          {calcCountdown(event.date) && <span className="bg-yellow-400 text-black text-xs font-bold px-2 py-0.5 rounded-full whitespace-nowrap">{calcCountdown(event.date)}</span>}
+        </div>
         <h3 className="text-2xl font-bold mt-3 leading-tight">{event.title}</h3>
         <p className="text-zinc-400 mt-2 text-sm">{event.city}{event.location && ` · ${event.location}`}</p>
         <div className="mt-5 flex items-center justify-between">
