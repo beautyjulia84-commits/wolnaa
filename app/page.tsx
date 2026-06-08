@@ -292,6 +292,31 @@ export default function Home() {
         </div>
       </section>
 
+      {/* FAQ */}
+      <section className="max-w-5xl mx-auto px-4 pb-10">
+        <div className="rounded-[32px] border border-white/10 bg-zinc-950/80 px-6 py-10">
+          <p className="text-yellow-400 uppercase tracking-[4px] text-xs mb-3 text-center">FAQ</p>
+          <h2 className="text-3xl md:text-4xl font-black mb-8 text-center">Häufige Fragen</h2>
+          <div className="space-y-4 max-w-2xl mx-auto">
+            {[
+              { q: "Wie alt muss ich sein?", a: "Unsere Events sind ausschließlich für Personen ab 18 Jahren. Ein gültiger Ausweis wird beim Einlass kontrolliert." },
+              { q: "Wie erhalte ich mein Ticket?", a: "Nach erfolgreicher Zahlung erhältst du dein Ticket mit QR-Code sofort per E-Mail." },
+              { q: "Kann ich mein Ticket stornieren?", a: "Ja, Stornierungen sind möglich. Kontaktiere uns per E-Mail an kontakt@wolnaa.de und wir kümmern uns um die Rückerstattung." },
+              { q: "Gibt es VIP Lounges?", a: "Bei ausgewählten Events bieten wir exklusive VIP Lounges an. Die Verfügbarkeit siehst du direkt auf der Event-Seite." },
+              { q: "Wo kann ich parken?", a: "Parkmöglichkeiten findest du in der Nähe des Veranstaltungsortes. Die genaue Adresse ist auf der Event-Seite verlinkt." },
+            ].map((item, i) => (
+              <details key={i} className="group border border-white/10 rounded-2xl overflow-hidden">
+                <summary className="flex items-center justify-between px-5 py-4 cursor-pointer font-semibold text-sm hover:text-yellow-400 transition-colors list-none">
+                  {item.q}
+                  <span className="text-zinc-500 group-open:rotate-180 transition-transform">▼</span>
+                </summary>
+                <p className="px-5 pb-4 text-zinc-400 text-sm leading-relaxed">{item.a}</p>
+              </details>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Kontakt */}
       <section className="max-w-5xl mx-auto px-4 pb-10">
         <div className="rounded-[32px] border border-white/10 bg-zinc-950/80 px-6 py-10 text-center">
