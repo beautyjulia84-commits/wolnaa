@@ -328,7 +328,7 @@ export default function Home() {
             {[
               { q: "Wie alt muss ich sein?", a: "Unsere Events sind ausschließlich für Personen ab 18 Jahren. Ein gültiger Ausweis wird beim Einlass kontrolliert." },
               { q: "Wie erhalte ich mein Ticket?", a: "Nach erfolgreicher Zahlung erhältst du dein Ticket mit QR-Code sofort per E-Mail." },
-              { q: "Kann ich mein Ticket stornieren?", a: "Ja, Stornierungen sind möglich. Kontaktiere uns per E-Mail an kontakt@wolnaa.de und wir kümmern uns um die Rückerstattung." },
+
               { q: "Gibt es Lounges?", a: "Bei ausgewählten Events bieten wir exklusive VIP Lounges an. Die Verfügbarkeit siehst du direkt auf der Event-Seite." },
               { q: "Wo kann ich parken?", a: "Parkmöglichkeiten findest du in der Nähe des Veranstaltungsortes. Die genaue Adresse ist auf der Event-Seite verlinkt." },
             ].map((item, i) => (
