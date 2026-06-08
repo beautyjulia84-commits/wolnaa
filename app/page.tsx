@@ -329,7 +329,7 @@ export default function Home() {
               { q: "Wie alt muss ich sein?", a: "Unsere Events sind ausschließlich für Personen ab 18 Jahren. Ein gültiger Ausweis wird beim Einlass kontrolliert." },
               { q: "Wie erhalte ich mein Ticket?", a: "Nach erfolgreicher Zahlung erhältst du dein Ticket mit QR-Code sofort per E-Mail." },
               { q: "Kann ich mein Ticket stornieren?", a: "Ja, Stornierungen sind möglich. Kontaktiere uns per E-Mail an kontakt@wolnaa.de und wir kümmern uns um die Rückerstattung." },
-              { q: "Gibt es VIP Lounges?", a: "Bei ausgewählten Events bieten wir exklusive VIP Lounges an. Die Verfügbarkeit siehst du direkt auf der Event-Seite." },
+              { q: "Gibt es Lounges?", a: "Bei ausgewählten Events bieten wir exklusive VIP Lounges an. Die Verfügbarkeit siehst du direkt auf der Event-Seite." },
               { q: "Wo kann ich parken?", a: "Parkmöglichkeiten findest du in der Nähe des Veranstaltungsortes. Die genaue Adresse ist auf der Event-Seite verlinkt." },
             ].map((item, i) => (
               <details key={i} className="group border border-white/10 rounded-2xl overflow-hidden">
@@ -350,7 +350,7 @@ export default function Home() {
           <p className="text-yellow-400 uppercase tracking-[4px] text-xs mb-3">Kontakt</p>
           <h2 className="text-3xl md:text-4xl font-black mb-4">Schreib uns</h2>
           <p className="text-zinc-400 max-w-xl mx-auto mb-8 text-sm leading-relaxed">
-            Fragen zu Tickets, VIP Lounges oder Kooperationen? Wir antworten schnell!
+            Fragen zu Tickets, Lounges oder Kooperationen? Wir antworten schnell!
           </p>
           <div className="flex flex-wrap items-center justify-center gap-4">
             <a href="https://www.instagram.com/wolnaa_event" target="_blank" rel="noopener noreferrer"
