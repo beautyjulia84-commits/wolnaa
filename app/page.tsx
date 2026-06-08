@@ -33,6 +33,15 @@ function calcCountdown(d: string) {
   return `Noch ${days} Tage`;
 }
 
+function formatDate(d: string) {
+  if (!d) return "";
+  try {
+    return new Date(d + "T00:00:00").toLocaleDateString("de-DE", {
+      weekday: "short", day: "numeric", month: "long", year: "numeric"
+    });
+  } catch { return d; }
+}
+
 function getStartingPrice(event: EventItem): string {
   if (event.tickets && event.tickets.length > 0) return parseFloat(event.tickets[0].price || "0").toFixed(2);
   return parseFloat(event.price || "0").toFixed(2);
@@ -55,7 +64,7 @@ function EventCard({ event }: { event: EventItem }) {
       </div>
       <div className="p-7">
         <div className="flex items-center justify-between">
-          <p className="text-yellow-400 text-sm font-medium tracking-wide">{event.date}{event.time && ` · ${event.time}`}</p>
+          <p className="text-yellow-400 text-sm font-medium tracking-wide">{formatDate(event.date)}{event.time && ` · ${event.time}`}</p>
           {calcCountdown(event.date) && <span className="bg-yellow-400 text-black text-xs font-bold px-2 py-0.5 rounded-full whitespace-nowrap">{calcCountdown(event.date)}</span>}
         </div>
         <h3 className="text-2xl font-bold mt-3 leading-tight">{event.title}</h3>
