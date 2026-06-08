@@ -56,10 +56,22 @@ function EventCard({ event }: { event: EventItem }) {
 
 function EmptyState() {
   return (
-    <div className="col-span-3 py-24 flex flex-col items-center justify-center text-center gap-4">
-      <div className="w-16 h-16 rounded-full border border-white/10 flex items-center justify-center mb-2"><span className="text-2xl">🎉</span></div>
-      <p className="text-zinc-400 text-lg">Aktuell sind keine Events geplant.</p>
-      <p className="text-zinc-600 text-sm">Schau bald wieder vorbei – neue Events kommen in Kürze!</p>
+    <div className="col-span-3 py-20 flex flex-col items-center justify-center text-center gap-4">
+      <div className="w-20 h-20 rounded-full border border-yellow-400/20 bg-yellow-400/5 flex items-center justify-center mb-2">
+        <span className="text-4xl">🎉</span>
+      </div>
+      <h3 className="text-2xl font-black text-white">Neue Events kommen bald!</h3>
+      <p className="text-zinc-400 text-sm max-w-sm leading-relaxed">Aktuell sind keine Events geplant. Folge uns auf Instagram um als Erstes von neuen Events zu erfahren!</p>
+      <div className="flex gap-3 mt-2">
+        <a href="https://www.instagram.com/wolnaa_event" target="_blank" rel="noopener noreferrer"
+          className="rounded-2xl bg-yellow-400 px-6 py-3 text-sm font-black text-black hover:bg-yellow-300 transition-colors">
+          📸 Instagram folgen
+        </a>
+        <a href="mailto:kontakt@wolnaa.de"
+          className="rounded-2xl border border-white/15 px-6 py-3 text-sm font-black text-white hover:border-yellow-400 hover:text-yellow-400 transition-colors">
+          ✉️ Benachrichtigung
+        </a>
+      </div>
     </div>
   );
 }
