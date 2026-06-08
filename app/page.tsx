@@ -40,7 +40,7 @@ function getStartingPrice(event: EventItem): string {
 
 function EventCard({ event }: { event: EventItem }) {
   return (
-    <a href={createEventLink(event)} className="group block rounded-[32px] overflow-hidden border border-white/10 bg-gradient-to-b from-zinc-950 to-black hover:border-yellow-400 transition-all duration-300 shadow-2xl hover:shadow-yellow-400/10 hover:-translate-y-1">
+    <a href={createEventLink(event)} className="group block rounded-[32px] overflow-hidden border border-white/10 bg-gradient-to-b from-zinc-950 to-black hover:border-yellow-400 transition-all duration-300 shadow-2xl hover:shadow-[0_0_30px_rgba(250,204,21,0.3)] hover:-translate-y-2">
       <div className="relative h-56 flex items-center justify-center bg-[radial-gradient(circle_at_top,#2b1b00_0%,#111_38%,#000_100%)] overflow-hidden">
         {event.image_url ? (
           <img src={event.image_url} alt={event.title} className="w-full h-56 object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" decoding="async" />
