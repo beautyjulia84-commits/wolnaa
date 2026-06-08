@@ -91,11 +91,11 @@ function EmptyState() {
       <p className="text-zinc-400 text-sm max-w-sm leading-relaxed">Aktuell sind keine Events geplant. Folge uns auf Instagram um als Erstes von neuen Events zu erfahren!</p>
       <div className="flex gap-3 mt-2">
         <a href="https://www.instagram.com/wolnaa_event" target="_blank" rel="noopener noreferrer"
-          className="rounded-2xl bg-yellow-400 px-6 py-3 text-sm font-black text-black hover:bg-yellow-300 transition-colors">
+          className="rounded-2xl bg-yellow-400 px-6 py-3 text-sm font-black text-black hover:bg-yellow-300 active:bg-yellow-300 active:scale-95 transition-all">
           📸 Instagram folgen
         </a>
         <a href="mailto:kontakt@wolnaa.de"
-          className="rounded-2xl border border-white/15 px-6 py-3 text-sm font-black text-white hover:border-yellow-400 hover:text-yellow-400 transition-colors">
+          className="rounded-2xl border border-white/15 px-6 py-3 text-sm font-black text-white hover:border-yellow-400 hover:text-yellow-400 active:border-yellow-400 active:text-yellow-400 active:scale-95 transition-all">
           ✉️ Benachrichtigung
         </a>
       </div>
@@ -241,7 +241,7 @@ export default function Home() {
             target="_blank"
             rel="noopener noreferrer"
             aria-label="WOLNAA TikTok"
-            className="text-yellow-400 hover:text-yellow-300 transition-all duration-200 hover:drop-shadow-[0_0_10px_rgba(250,204,21,0.8)]"
+            className="text-yellow-400 hover:text-yellow-300 active:text-yellow-300 transition-all duration-200 hover:drop-shadow-[0_0_10px_rgba(250,204,21,0.8)] active:drop-shadow-[0_0_10px_rgba(250,204,21,0.8)]"
           >
             <svg viewBox="0 0 24 24" className="w-6 h-6 md:w-7 md:h-7 fill-current" aria-hidden="true">
               <path d="M16.6 5.82c1.05.78 2.32 1.24 3.66 1.27v3.15a7.8 7.8 0 0 1-3.7-.93v5.45c0 3.55-2.88 6.43-6.43 6.43A6.43 6.43 0 0 1 3.7 14.76c0-3.55 2.88-6.43 6.43-6.43.39 0 .77.04 1.14.1v3.28a3.15 3.15 0 1 0 2.23 3.01V2.8h3.1c.17 1.22.88 2.31 2 3.02z"/>
@@ -253,7 +253,7 @@ export default function Home() {
             target="_blank"
             rel="noopener noreferrer"
             aria-label="WOLNAA Instagram"
-            className="text-yellow-400 hover:text-yellow-300 transition-all duration-200 hover:drop-shadow-[0_0_10px_rgba(250,204,21,0.8)]"
+            className="text-yellow-400 hover:text-yellow-300 active:text-yellow-300 transition-all duration-200 hover:drop-shadow-[0_0_10px_rgba(250,204,21,0.8)] active:drop-shadow-[0_0_10px_rgba(250,204,21,0.8)]"
           >
             <svg viewBox="0 0 24 24" className="w-6 h-6 md:w-7 md:h-7 fill-current" aria-hidden="true">
               <path d="M7.75 2h8.5A5.76 5.76 0 0 1 22 7.75v8.5A5.76 5.76 0 0 1 16.25 22h-8.5A5.76 5.76 0 0 1 2 16.25v-8.5A5.76 5.76 0 0 1 7.75 2zm0 2A3.75 3.75 0 0 0 4 7.75v8.5A3.75 3.75 0 0 0 7.75 20h8.5A3.75 3.75 0 0 0 20 16.25v-8.5A3.75 3.75 0 0 0 16.25 4h-8.5zM12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10zm0 2a3 3 0 1 0 0 6 3 3 0 0 0 0-6zm5.25-2.25a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5z"/>
@@ -302,7 +302,7 @@ export default function Home() {
               href="https://www.tiktok.com/@wolnaa_event?_r=1&_t=ZG-96mDjgLge8H"
               target="_blank"
               rel="noopener noreferrer"
-              className="rounded-2xl bg-yellow-400 px-6 py-4 text-sm font-black text-black hover:bg-yellow-300 transition-colors"
+              className="rounded-2xl bg-yellow-400 px-6 py-4 text-sm font-black text-black hover:bg-yellow-300 active:bg-yellow-300 active:scale-95 transition-all"
             >
               TikTok folgen
             </a>
@@ -311,7 +311,7 @@ export default function Home() {
               href="https://www.instagram.com/wolnaa_event?igsh=MWExbHJlcms3ZXp4MQ=="
               target="_blank"
               rel="noopener noreferrer"
-              className="rounded-2xl border border-white/15 px-6 py-4 text-sm font-black text-white hover:border-yellow-400 hover:text-yellow-400 transition-colors"
+              className="rounded-2xl border border-white/15 px-6 py-4 text-sm font-black text-white hover:border-yellow-400 hover:text-yellow-400 active:border-yellow-400 active:text-yellow-400 active:scale-95 transition-all"
             >
               Instagram folgen
             </a>
@@ -354,11 +354,11 @@ export default function Home() {
           </p>
           <div className="flex flex-wrap items-center justify-center gap-4">
             <a href="https://www.instagram.com/wolnaa_event" target="_blank" rel="noopener noreferrer"
-              className="rounded-2xl bg-yellow-400 px-6 py-4 text-sm font-black text-black hover:bg-yellow-300 transition-colors flex items-center gap-2">
+              className="rounded-2xl bg-yellow-400 px-6 py-4 text-sm font-black text-black hover:bg-yellow-300 active:bg-yellow-300 active:scale-95 transition-all flex items-center gap-2">
               📸 Instagram DM
             </a>
             <a href="mailto:kontakt@wolnaa.de"
-              className="rounded-2xl border border-white/15 px-6 py-4 text-sm font-black text-white hover:border-yellow-400 hover:text-yellow-400 transition-colors flex items-center gap-2">
+              className="rounded-2xl border border-white/15 px-6 py-4 text-sm font-black text-white hover:border-yellow-400 hover:text-yellow-400 active:border-yellow-400 active:text-yellow-400 active:scale-95 transition-all flex items-center gap-2">
               ✉️ kontakt@wolnaa.de
             </a>
           </div>
@@ -368,7 +368,7 @@ export default function Home() {
       <footer className="border-t border-white/10 pt-8 pb-6 text-center">
         <div className="flex flex-wrap items-center justify-center gap-4 text-sm text-zinc-400 mb-4">
           {legalLinks.map(([key, label]) => (
-            <button key={key!} onClick={() => setShowLegal(key)} className="hover:text-yellow-400 transition-colors underline-offset-4 hover:underline">{label}</button>
+            <button key={key!} onClick={() => setShowLegal(key)} className="hover:text-yellow-400 active:text-yellow-400 transition-colors underline-offset-4 hover:underline active:underline">{label}</button>
           ))}
         </div>
         <p className="text-zinc-500 text-sm mb-3">© {new Date().getFullYear()} WOLNAA</p>
