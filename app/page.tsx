@@ -40,7 +40,7 @@ function getStartingPrice(event: EventItem): string {
 
 function EventCard({ event }: { event: EventItem }) {
   return (
-    <a href={createEventLink(event)} className="group block rounded-[32px] overflow-hidden border border-white/10 bg-gradient-to-b from-zinc-950 to-black hover:border-yellow-400 active:border-yellow-400 transition-all duration-300 shadow-2xl hover:shadow-[0_0_30px_rgba(250,204,21,0.3)] active:shadow-[0_0_30px_rgba(250,204,21,0.3)] hover:-translate-y-2 active:scale-95">
+    <a href={createEventLink(event)} className="group block rounded-[32px] overflow-hidden border border-white/10 bg-gradient-to-b from-zinc-950 to-black hover:border-yellow-400 active:border-yellow-400 transition-all duration-300 shadow-2xl hover:shadow-[0_0_30px_rgba(250,204,21,0.3)] active:shadow-[0_0_30px_rgba(250,204,21,0.3)] hover:-translate-y-2 active:scale-95 active:duration-75">
       <div className="relative h-56 flex items-center justify-center bg-[radial-gradient(circle_at_top,#2b1b00_0%,#111_38%,#000_100%)] overflow-hidden">
         {event.image_url ? (
           <img src={event.image_url} alt={event.title} className="w-full h-56 object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" decoding="async" />
@@ -61,7 +61,7 @@ function EventCard({ event }: { event: EventItem }) {
             <span className="text-xs text-zinc-400 border border-zinc-700 rounded-full px-3 py-1">Lounge</span>
           )}
         </div>
-        <div className="mt-6 w-full rounded-2xl bg-white py-4 text-center text-black text-sm font-bold tracking-wide group-hover:bg-yellow-400 transition-colors duration-200">Event öffnen</div>
+        <div className="mt-6 w-full rounded-2xl bg-white py-4 text-center text-black text-sm font-bold tracking-wide group-hover:bg-yellow-400 group-active:bg-yellow-400 transition-colors duration-200">Event öffnen</div>
       </div>
     </a>
   );
