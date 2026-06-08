@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 
 async function getEvent(slug: string) {
-  const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/events?slug=eq.${slug}&select=*`;
+  const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/events?slug=eq.${slug}&select=title,description,image_url`;
   const res = await fetch(url, {
     headers: {
-      "apikey": process.env.SUPABASE_SERVICE_ROLE_KEY!,
-      "Authorization": `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY!}`,
+      "apikey": process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      "Authorization": `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!}`,
     },
     cache: "no-store",
   });
