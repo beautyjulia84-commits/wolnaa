@@ -344,7 +344,7 @@ export default function Home() {
             <button key={key!} onClick={() => setShowLegal(key)} className="hover:text-yellow-400 transition-colors underline-offset-4 hover:underline">{label}</button>
           ))}
         </div>
-        <p className="text-zinc-500 text-sm mb-3">© 2026 WOLNAA</p>
+        <p className="text-zinc-500 text-sm mb-3">© {new Date().getFullYear()} WOLNAA</p>
 
       </footer>
 
