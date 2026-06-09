@@ -234,7 +234,7 @@ export default function Home() {
 
   return (
     <main className="min-h-screen text-white overflow-hidden">
-      <section style={{position:"relative", minHeight:"70vh", display:"flex", alignItems:"center", justifyContent:"center", padding:"40px 24px", overflow:"hidden", backgroundImage:"url(https://madogmrscesiikbhrcid.supabase.co/storage/v1/object/public/hero/hero-bg.png)", backgroundSize:"cover", backgroundPosition:"center"}}>
+      <section style={{position:"relative", minHeight:"70vh", display:"flex", alignItems:"center", justifyContent:"center", padding:"40px 24px", overflow:"hidden", backgroundImage:"url(https://madogmrscesiikbhrcid.supabase.co/storage/v1/object/public/hero/hero-bg.png)", backgroundSize:"cover", backgroundPosition:"center", backgroundColor:"#000"}}>
         <div className="absolute right-5 top-12 md:right-10 md:top-16 z-20 flex items-center gap-4">
           <a
             href="https://www.tiktok.com/@wolnaa_event?_r=1&_t=ZG-96mDjgLge8H"
@@ -262,8 +262,8 @@ export default function Home() {
         </div>
 
         <div style={{position:"absolute",inset:0,zIndex:0,overflow:"hidden"}}>
-          <img src="https://madogmrscesiikbhrcid.supabase.co/storage/v1/object/public/hero/hero-bg.png" alt="" style={{width:"100%",height:"100%",objectFit:"cover",opacity:0.4}} />
-          <div style={{position:"absolute",inset:0,background:"linear-gradient(to bottom, rgba(0,0,0,0.7), rgba(0,0,0,0.5), #000)"}} />
+          <img src="https://madogmrscesiikbhrcid.supabase.co/storage/v1/object/public/hero/hero-bg.png" alt="" style={{width:"100%",height:"100%",objectFit:"cover",opacity:0.6}} />
+          <div style={{position:"absolute",inset:0,background:"linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.2), rgba(0,0,0,0.8))"}} />
         </div>
         <div className="relative z-10 max-w-7xl mx-auto text-center">
           <div className="flex justify-center mb-10">
