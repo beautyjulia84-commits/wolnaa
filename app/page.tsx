@@ -261,7 +261,6 @@ export default function Home() {
           </a>
         </div>
 
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/10 to-black" />
         <div className="absolute inset-0 z-0">
           <img src="/hero-bg.png" alt="" className="w-full h-full object-cover opacity-40" />
           <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black" />
