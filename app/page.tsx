@@ -261,9 +261,9 @@ export default function Home() {
           </a>
         </div>
 
-        <div className="absolute inset-0 z-0">
-          <img src="/hero-bg.png" alt="" className="w-full h-full object-cover opacity-40" />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black" />
+        <div style={{position:"absolute",inset:0,zIndex:0,overflow:"hidden"}}>
+          <img src="/hero-bg.png" alt="" style={{width:"100%",height:"100%",objectFit:"cover",opacity:0.4}} />
+          <div style={{position:"absolute",inset:0,background:"linear-gradient(to bottom, rgba(0,0,0,0.7), rgba(0,0,0,0.5), #000)"}} />
         </div>
         <div className="relative z-10 max-w-7xl mx-auto text-center">
           <div className="flex justify-center mb-10">
