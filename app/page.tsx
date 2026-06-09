@@ -233,7 +233,7 @@ export default function Home() {
   ];
 
   return (
-    <main className="min-h-screen bg-black text-white overflow-hidden">
+    <main className="min-h-screen text-white overflow-hidden">
       <section className="relative min-h-[70vh] flex items-center justify-center pt-10 md:pt-24 px-6 overflow-hidden">
         <div className="absolute right-5 top-12 md:right-10 md:top-16 z-20 flex items-center gap-4">
           <a
