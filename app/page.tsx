@@ -262,6 +262,10 @@ export default function Home() {
         </div>
 
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/10 to-black" />
+        <div className="absolute inset-0 -z-10">
+          <img src="/hero-bg.png" alt="" className="w-full h-full object-cover opacity-30" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black" />
+        </div>
         <div className="relative z-10 max-w-7xl mx-auto text-center">
           <div className="flex justify-center mb-10">
             <Image src="/wolnaa-logo.png" alt="WOLNAA Logo" width={720} height={240} priority className="w-[300px] md:w-[620px] h-auto object-contain drop-shadow-[0_0_45px_rgba(255,210,80,0.22)]" />
