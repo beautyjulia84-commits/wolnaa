@@ -261,10 +261,7 @@ export default function Home() {
           </a>
         </div>
 
-        <div style={{position:"absolute",inset:0,zIndex:0,overflow:"hidden"}}>
-          <img src="https://madogmrscesiikbhrcid.supabase.co/storage/v1/object/public/hero/hero-bg.png" alt="" style={{width:"100%",height:"100%",objectFit:"cover",opacity:0.6}} />
-          <div style={{position:"absolute",inset:0,background:"linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.2), rgba(0,0,0,0.8))"}} />
-        </div>
+        <div style={{position:"absolute",inset:0,zIndex:0,background:"linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.5), rgba(0,0,0,0.9))"}} />
         <div className="relative z-10 max-w-7xl mx-auto text-center">
           <div className="flex justify-center mb-10">
             <Image src="/wolnaa-logo.png" alt="WOLNAA Logo" width={720} height={240} priority className="w-[300px] md:w-[620px] h-auto object-contain drop-shadow-[0_0_45px_rgba(255,210,80,0.22)]" />
