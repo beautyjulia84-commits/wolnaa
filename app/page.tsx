@@ -262,7 +262,7 @@ export default function Home() {
         </div>
 
         <div style={{position:"absolute",inset:0,zIndex:0,overflow:"hidden"}}>
-          <img src="/hero-bg.png" alt="" style={{width:"100%",height:"100%",objectFit:"cover",opacity:0.4}} />
+          <img src="https://madogmrscesiikbhrcid.supabase.co/storage/v1/object/public/hero/hero-bg.png" alt="" style={{width:"100%",height:"100%",objectFit:"cover",opacity:0.4}} />
           <div style={{position:"absolute",inset:0,background:"linear-gradient(to bottom, rgba(0,0,0,0.7), rgba(0,0,0,0.5), #000)"}} />
         </div>
         <div className="relative z-10 max-w-7xl mx-auto text-center">
