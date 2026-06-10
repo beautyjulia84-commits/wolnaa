@@ -269,7 +269,7 @@ export default function Home() {
           <p className="relative -top-10 text-zinc-400 text-base md:text-lg tracking-wide">
             Exclusive Events&nbsp;•&nbsp;Russische Vibes&nbsp;•&nbsp;Unvergessliche Nächte.
           </p>
-          <div className="flex flex-wrap justify-center gap-4 mt-2">
+          <div className="flex flex-wrap justify-center gap-4 mt-8">
             <a href="#events" className="rounded-2xl bg-yellow-400 text-black font-black px-8 py-4 text-base hover:bg-yellow-300 active:scale-95 transition-all">🎟️ Tickets kaufen</a>
             <a href="#events" className="rounded-2xl border border-white/30 text-white font-bold px-8 py-4 text-base hover:border-yellow-400 hover:text-yellow-400 active:scale-95 transition-all">Events entdecken</a>
           </div>
