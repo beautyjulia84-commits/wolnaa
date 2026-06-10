@@ -273,7 +273,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="events" className="max-w-7xl mx-auto px-6 py-24">
+      <section id="events" className="max-w-7xl mx-auto px-6 py-10">
         <p className="text-yellow-400 uppercase tracking-[4px] text-sm mb-3">Upcoming</p>
         <h2 className="text-4xl md:text-6xl font-black mb-12">Kommende Veranstaltungen</h2>
         <div className="grid md:grid-cols-3 gap-8">
