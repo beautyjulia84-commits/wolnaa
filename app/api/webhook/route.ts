@@ -86,7 +86,7 @@ export async function POST(req: NextRequest) {
   <!-- Dankeschön Text -->
   <tr><td style="padding:0 0 32px;">
     <div style="background:#fff;border-radius:16px;padding:32px;text-align:center;border:1px solid #e5e5e5;">
-      <div style="font-size:28px;font-weight:900;letter-spacing:4px;margin-bottom:8px;">WOLNAA</div>
+      <img src="https://madogmrscesiikbhrcid.supabase.co/storage/v1/object/public/images/wolnaa-logo-black.png" alt="WOLNAA" width="200" style="margin-bottom:8px;" />
       <div style="font-size:11px;color:#999;letter-spacing:3px;margin-bottom:24px;">EXCLUSIVE EVENTS</div>
       <div style="font-size:22px;font-weight:700;margin-bottom:12px;">Vielen Dank für Ihre Bestellung!</div>
       <div style="font-size:14px;color:#666;line-height:1.6;">
