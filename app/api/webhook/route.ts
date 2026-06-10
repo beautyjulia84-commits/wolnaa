@@ -2,10 +2,149 @@ import Stripe from "stripe";
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 import QRCode from "qrcode";
+import { createCanvas, loadImage } from "canvas";
+import path from "path";
 import { supabase } from "@/lib/supabase";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 const resend = new Resend(process.env.RESEND_API_KEY!);
+
+async function generateTicketPNG(
+  ticketId: string,
+  eventTitle: string,
+  customerName: string,
+  amount: number,
+  ticketIndex: number,
+  totalTickets: number
+): Promise<Buffer> {
+  const W = 600;
+  const H = 900;
+  const canvas = createCanvas(W, H);
+  const ctx = canvas.getContext("2d");
+
+  // Hintergrund schwarz
+  ctx.fillStyle = "#000000";
+  ctx.fillRect(0, 0, W, H);
+
+  // Header-Bereich
+  ctx.fillStyle = "#111111";
+  ctx.fillRect(0, 0, W, 140);
+
+  // Logo laden
+  try {
+    const logoPath = path.join(process.cwd(), "public", "wolnaa-logo.png");
+    const logo = await loadImage(logoPath);
+    const logoW = 160;
+    const logoH = (logo.height / logo.width) * logoW;
+    ctx.drawImage(logo, 30, (140 - logoH) / 2, logoW, logoH);
+  } catch {
+    // Fallback: Text-Logo
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "bold 32px Arial";
+    ctx.letterSpacing = "6px";
+    ctx.fillText("WOLNAA", 30, 85);
+  }
+
+  // Ticket-Nummer oben rechts
+  ctx.fillStyle = "#facc15";
+  ctx.font = "bold 14px Arial";
+  ctx.textAlign = "right";
+  ctx.fillText(`Ticket ${ticketIndex + 1}/${totalTickets}`, W - 30, 75);
+
+  // EXCLUSIVE EVENTS
+  ctx.fillStyle = "#888888";
+  ctx.font = "11px Arial";
+  ctx.fillText("EXCLUSIVE EVENTS", W - 30, 95);
+  ctx.textAlign = "left";
+
+  // Trennlinie
+  ctx.strokeStyle = "#333333";
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(0, 140);
+  ctx.lineTo(W, 140);
+  ctx.stroke();
+
+  // Event-Titel
+  ctx.fillStyle = "#ffffff";
+  ctx.font = "bold 26px Arial";
+  ctx.fillText(eventTitle, 30, 195);
+
+  // Inhaber Label + Wert
+  ctx.fillStyle = "#888888";
+  ctx.font = "13px Arial";
+  ctx.fillText("Inhaber", 30, 250);
+  ctx.fillStyle = "#ffffff";
+  ctx.font = "bold 15px Arial";
+  ctx.textAlign = "right";
+  ctx.fillText(customerName, W - 30, 250);
+
+  // Betrag
+  ctx.fillStyle = "#888888";
+  ctx.font = "13px Arial";
+  ctx.textAlign = "left";
+  ctx.fillText("Betrag", 30, 290);
+  ctx.fillStyle = "#ffffff";
+  ctx.font = "bold 15px Arial";
+  ctx.textAlign = "right";
+  ctx.fillText(ticketIndex === 0 ? `${amount.toFixed(2)} €` : "–", W - 30, 290);
+
+  // Ticket-ID
+  ctx.fillStyle = "#888888";
+  ctx.font = "13px Arial";
+  ctx.textAlign = "left";
+  ctx.fillText("Ticket-ID", 30, 330);
+  ctx.fillStyle = "#ffffff";
+  ctx.font = "bold 13px Arial";
+  ctx.textAlign = "right";
+  ctx.fillText(ticketId, W - 30, 330);
+  ctx.textAlign = "left";
+
+  // Gestrichelte Trennlinie
+  ctx.strokeStyle = "#333333";
+  ctx.lineWidth = 1;
+  ctx.setLineDash([6, 4]);
+  ctx.beginPath();
+  ctx.moveTo(30, 360);
+  ctx.lineTo(W - 30, 360);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // QR-Code generieren
+  const qrDataUrl = await QRCode.toDataURL(ticketId, {
+    width: 300,
+    margin: 2,
+    color: { dark: "#000000", light: "#ffffff" },
+  });
+  const qrImage = await loadImage(qrDataUrl);
+  const qrSize = 280;
+  const qrX = (W - qrSize) / 2;
+  ctx.drawImage(qrImage, qrX, 385, qrSize, qrSize);
+
+  // "Beim Einlass vorzeigen"
+  ctx.fillStyle = "#888888";
+  ctx.font = "12px Arial";
+  ctx.textAlign = "center";
+  ctx.fillText("Beim Einlass vorzeigen", W / 2, 690);
+
+  // Untere gestrichelte Linie
+  ctx.strokeStyle = "#333333";
+  ctx.lineWidth = 1;
+  ctx.setLineDash([6, 4]);
+  ctx.beginPath();
+  ctx.moveTo(30, 715);
+  ctx.lineTo(W - 30, 715);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Footer Text
+  ctx.fillStyle = "#555555";
+  ctx.font = "11px Arial";
+  ctx.textAlign = "center";
+  ctx.fillText("Nur einmal gültig · Kein Widerruf gemäß § 312g Abs. 2 Nr. 9 BGB", W / 2, 745);
+
+  return canvas.toBuffer("image/png");
+}
 
 export async function POST(req: NextRequest) {
   const rawBody = await req.text();
@@ -28,20 +167,19 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Fehlende Metadaten." }, { status: 400 });
     }
 
-    // ── Line Items parsen ──────────────────────────────────────────────────
+    // Line Items parsen
     let lineItems: { name: string; qty: number; price: string }[] = [];
     try {
       lineItems = JSON.parse(session.metadata?.lineItems || "[]");
     } catch { lineItems = []; }
 
-    // Gesamtanzahl Tickets berechnen
     const totalTickets = lineItems.reduce((sum, item) => sum + (item.qty || 1), 0) || 1;
     const ticketIds: string[] = [];
     for (let i = 0; i < totalTickets; i++) {
       ticketIds.push(i === 0 ? ticketId : "WOLNAA-" + Math.random().toString(36).substring(2, 10).toUpperCase());
     }
 
-    // ── In Supabase speichern (ein Eintrag pro Ticket) ────────────────────
+    // In Supabase speichern
     const ticketRows = ticketIds.map((tid, i) => ({
       ticket_id: tid,
       event_title: eventTitle,
@@ -52,24 +190,19 @@ export async function POST(req: NextRequest) {
     }));
 
     const { error: dbError } = await supabase.from("tickets").insert(ticketRows);
-
     if (dbError) {
       console.error("Supabase Fehler:", JSON.stringify(dbError));
       return NextResponse.json({ error: "Datenbankfehler.", details: dbError.message, code: dbError.code }, { status: 500 });
     }
 
-    // ── QR-Codes für alle Tickets generieren ──────────────────────────────
-    const qrCodes: { id: string; base64: string }[] = [];
-    for (const tid of ticketIds) {
-      const qrDataUrl = await QRCode.toDataURL(tid, {
-        width: 300, margin: 2,
-        color: { dark: "#000000", light: "#ffffff" },
-      });
-      qrCodes.push({ id: tid, base64: qrDataUrl.replace("data:image/png;base64,", "") });
+    // Ticket-PNGs generieren
+    const ticketBuffers: { id: string; buffer: Buffer }[] = [];
+    for (let i = 0; i < ticketIds.length; i++) {
+      const buf = await generateTicketPNG(ticketIds[i], eventTitle, customerName, amount, i, ticketIds.length);
+      ticketBuffers.push({ id: ticketIds[i], buffer: buf });
     }
-    const qrBase64 = qrCodes[0].base64;
 
-    // ── Email senden ──────────────────────────────────────────────────────
+    // Email senden
     await resend.emails.send({
       from: "WOLNAA Tickets <kontakt@wolnaa.de>",
       to: customerEmail,
@@ -82,65 +215,31 @@ export async function POST(req: NextRequest) {
 <table width="100%" cellpadding="0" cellspacing="0" style="background:#f5f5f5;padding:40px 20px;">
 <tr><td align="center">
 <table width="100%" style="max-width:520px;">
-
-  <!-- Dankeschön Text -->
   <tr><td style="padding:0 0 32px;">
-    <div style="background:#fff;border-radius:16px;padding:32px;text-align:center;border:1px solid #e5e5e5;">
-      <div style="font-size:28px;font-weight:900;letter-spacing:4px;margin-bottom:8px;color:#000;">WOLNAA</div>
-      <div style="font-size:11px;color:#999;letter-spacing:3px;margin-bottom:24px;">EXCLUSIVE EVENTS</div>
-      <div style="font-size:22px;font-weight:700;margin-bottom:12px;">Vielen Dank für Ihre Bestellung!</div>
-      <div style="font-size:14px;color:#666;line-height:1.6;">
-        Hallo <strong>${customerName}</strong>,<br>
-        Ihre ${qrCodes.length} Ticket${qrCodes.length > 1 ? "s" : ""} für <strong>${eventTitle}</strong> ${qrCodes.length > 1 ? "sind" : "ist"} bereit.<br>
-        Anbei ${qrCodes.length > 1 ? "finden Sie Ihre Tickets" : "finden Sie Ihr Ticket"} als Anhang.
+    <div style="background:#0a0a0a;border-radius:16px;padding:40px 32px;text-align:center;">
+      <img src="https://wolnaa.de/wolnaa-logo.png" alt="WOLNAA" width="160" style="display:block;margin:0 auto 16px;" />
+      <div style="font-size:11px;color:#888;letter-spacing:3px;margin-bottom:28px;">EXCLUSIVE EVENTS</div>
+      <div style="font-size:24px;font-weight:700;color:#fff;margin-bottom:12px;">Vielen Dank für deine Bestellung!</div>
+      <div style="font-size:14px;color:#aaa;line-height:1.7;">
+        Hallo <strong style="color:#fff;">${customerName}</strong>,<br>
+        dein${totalTickets > 1 ? "e " + totalTickets : ""} Ticket${totalTickets > 1 ? "s" : ""} für <strong style="color:#fff;">${eventTitle}</strong> ${totalTickets > 1 ? "sind" : "ist"} bereit.<br><br>
+        Im Anhang findest du dein${totalTickets > 1 ? "e Tickets" : " Ticket"} als PNG-Datei${totalTickets > 1 ? "en" : ""}.<br>
+        Zeige den QR-Code beim Einlass vor.
       </div>
     </div>
   </td></tr>
-
-  <!-- Tickets -->
-  ${qrCodes.map((qr, i) => `
-  <tr><td style="padding:0 0 24px;">
-    <div style="background:#fff;border-radius:16px;overflow:hidden;border:1px solid #e5e5e5;">
-      <!-- Ticket Header -->
-      <div style="background:#000;padding:20px 24px;display:flex;align-items:center;justify-content:space-between;">
-        <div>
-          <div style="font-size:22px;font-weight:900;color:#fff;letter-spacing:4px;">WOLNAA</div>
-          <div style="font-size:10px;color:#888;letter-spacing:2px;">EXCLUSIVE EVENTS</div>
-        </div>
-        <div style="font-size:12px;color:#facc15;font-weight:700;">Ticket ${i + 1}/${qrCodes.length}</div>
-      </div>
-      <!-- Event Info -->
-      <div style="padding:20px 24px;border-bottom:1px dashed #ddd;">
-        <div style="font-size:18px;font-weight:900;color:#000;margin-bottom:16px;">${eventTitle}</div>
-        <table width="100%" style="font-size:13px;color:#000;">
-          <tr><td style="color:#888;padding-bottom:8px;">Inhaber</td><td style="font-weight:700;text-align:right;padding-bottom:8px;">${customerName}</td></tr>
-          <tr><td style="color:#888;padding-bottom:8px;">Betrag</td><td style="font-weight:700;text-align:right;padding-bottom:8px;">${i === 0 ? amount.toFixed(2) + " €" : "–"}</td></tr>
-          <tr><td style="color:#888;">Ticket-ID</td><td style="font-weight:700;text-align:right;font-family:monospace;font-size:11px;">${qr.id}</td></tr>
-        </table>
-      </div>
-      <!-- QR Code -->
-      <div style="padding:24px;text-align:center;background:#fff;">
-        <img src="cid:qrcode${i}" alt="QR-Code" width="220" height="220" style="display:block;margin:0 auto;" />
-        <div style="margin-top:8px;font-size:10px;color:#999;">Beim Einlass vorzeigen</div>
-      </div>
-      <!-- Ticket Footer -->
-      <div style="background:#f9f9f9;padding:12px 24px;border-top:1px dashed #ddd;text-align:center;">
-        <div style="font-size:10px;color:#bbb;">Nur einmal gültig · Kein Widerruf gemäß § 312g Abs. 2 Nr. 9 BGB</div>
-      </div>
-    </div>
+  <tr><td style="text-align:center;padding:16px 0 0;">
+    <div style="font-size:11px;color:#aaa;">Bei Fragen: kontakt@wolnaa.de</div>
   </td></tr>
-  `).join("")}
-
 </table>
 </td></tr>
 </table>
 </body>
 </html>`,
-      attachments: qrCodes.map((qr, i) => ({
-        filename: `ticket-${qr.id}.png`,
-        content: qr.base64,
+      attachments: ticketBuffers.map((t) => ({
+        filename: `wolnaa-ticket-${t.id}.png`,
+        content: t.buffer.toString("base64"),
         contentType: "image/png",
-        cid: `qrcode${i}`,
       })),
     });
   }
