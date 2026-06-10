@@ -71,7 +71,7 @@ export async function POST(req: NextRequest) {
 
     // ── Email senden ──────────────────────────────────────────────────────
     await resend.emails.send({
-      from: process.env.RESEND_FROM_EMAIL!,
+      from: `WOLNAA Tickets <${process.env.RESEND_FROM_EMAIL}>` ,
       to: customerEmail,
       subject: `Deine Tickets – ${eventTitle}`,
       html: `
