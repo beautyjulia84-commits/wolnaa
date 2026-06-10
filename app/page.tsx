@@ -359,7 +359,7 @@ export default function Home() {
           <div className="flex flex-wrap items-center justify-center gap-4">
             <a href="https://www.instagram.com/wolnaa_event" target="_blank" rel="noopener noreferrer"
               className="rounded-2xl bg-yellow-400 px-6 py-4 text-sm font-black text-black hover:bg-yellow-300 active:bg-yellow-300 active:scale-95 transition-all flex items-center gap-2">
-              📸 Instagram DM
+              Instagram DM
             </a>
             <a href="mailto:kontakt@wolnaa.de"
               className="rounded-2xl border border-white/15 px-6 py-4 text-sm font-black text-white hover:border-yellow-400 hover:text-yellow-400 active:border-yellow-400 active:text-yellow-400 active:scale-95 transition-all flex items-center gap-2">
