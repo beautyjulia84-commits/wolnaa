@@ -2,8 +2,8 @@ import Stripe from "stripe";
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 import QRCode from "qrcode";
-import { createCanvas, loadImage } from "canvas";
-import path from "path";
+import { ImageResponse } from "@vercel/og";
+import { WOLNAA_LOGO_BASE64 } from "@/lib/logo-base64";
 import { supabase } from "@/lib/supabase";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
@@ -17,133 +17,83 @@ async function generateTicketPNG(
   ticketIndex: number,
   totalTickets: number
 ): Promise<Buffer> {
-  const W = 600;
-  const H = 900;
-  const canvas = createCanvas(W, H);
-  const ctx = canvas.getContext("2d");
-
-  // Hintergrund schwarz
-  ctx.fillStyle = "#000000";
-  ctx.fillRect(0, 0, W, H);
-
-  // Header-Bereich
-  ctx.fillStyle = "#111111";
-  ctx.fillRect(0, 0, W, 140);
-
-  // Logo laden
-  try {
-    const logoPath = path.join(process.cwd(), "public", "wolnaa-logo.png");
-    const logo = await loadImage(logoPath);
-    const logoW = 160;
-    const logoH = (logo.height / logo.width) * logoW;
-    ctx.drawImage(logo, 30, (140 - logoH) / 2, logoW, logoH);
-  } catch {
-    // Fallback: Text-Logo
-    ctx.fillStyle = "#ffffff";
-    ctx.font = "bold 32px Arial";
-    ctx.letterSpacing = "6px";
-    ctx.fillText("WOLNAA", 30, 85);
-  }
-
-  // Ticket-Nummer oben rechts
-  ctx.fillStyle = "#facc15";
-  ctx.font = "bold 14px Arial";
-  ctx.textAlign = "right";
-  ctx.fillText(`Ticket ${ticketIndex + 1}/${totalTickets}`, W - 30, 75);
-
-  // EXCLUSIVE EVENTS
-  ctx.fillStyle = "#888888";
-  ctx.font = "11px Arial";
-  ctx.fillText("EXCLUSIVE EVENTS", W - 30, 95);
-  ctx.textAlign = "left";
-
-  // Trennlinie
-  ctx.strokeStyle = "#333333";
-  ctx.lineWidth = 1;
-  ctx.beginPath();
-  ctx.moveTo(0, 140);
-  ctx.lineTo(W, 140);
-  ctx.stroke();
-
-  // Event-Titel
-  ctx.fillStyle = "#ffffff";
-  ctx.font = "bold 26px Arial";
-  ctx.fillText(eventTitle, 30, 195);
-
-  // Inhaber Label + Wert
-  ctx.fillStyle = "#888888";
-  ctx.font = "13px Arial";
-  ctx.fillText("Inhaber", 30, 250);
-  ctx.fillStyle = "#ffffff";
-  ctx.font = "bold 15px Arial";
-  ctx.textAlign = "right";
-  ctx.fillText(customerName, W - 30, 250);
-
-  // Betrag
-  ctx.fillStyle = "#888888";
-  ctx.font = "13px Arial";
-  ctx.textAlign = "left";
-  ctx.fillText("Betrag", 30, 290);
-  ctx.fillStyle = "#ffffff";
-  ctx.font = "bold 15px Arial";
-  ctx.textAlign = "right";
-  ctx.fillText(ticketIndex === 0 ? `${amount.toFixed(2)} €` : "–", W - 30, 290);
-
-  // Ticket-ID
-  ctx.fillStyle = "#888888";
-  ctx.font = "13px Arial";
-  ctx.textAlign = "left";
-  ctx.fillText("Ticket-ID", 30, 330);
-  ctx.fillStyle = "#ffffff";
-  ctx.font = "bold 13px Arial";
-  ctx.textAlign = "right";
-  ctx.fillText(ticketId, W - 30, 330);
-  ctx.textAlign = "left";
-
-  // Gestrichelte Trennlinie
-  ctx.strokeStyle = "#333333";
-  ctx.lineWidth = 1;
-  ctx.setLineDash([6, 4]);
-  ctx.beginPath();
-  ctx.moveTo(30, 360);
-  ctx.lineTo(W - 30, 360);
-  ctx.stroke();
-  ctx.setLineDash([]);
-
-  // QR-Code generieren
   const qrDataUrl = await QRCode.toDataURL(ticketId, {
-    width: 300,
+    width: 400,
     margin: 2,
     color: { dark: "#000000", light: "#ffffff" },
   });
-  const qrImage = await loadImage(qrDataUrl);
-  const qrSize = 280;
-  const qrX = (W - qrSize) / 2;
-  ctx.drawImage(qrImage, qrX, 385, qrSize, qrSize);
 
-  // "Beim Einlass vorzeigen"
-  ctx.fillStyle = "#888888";
-  ctx.font = "12px Arial";
-  ctx.textAlign = "center";
-  ctx.fillText("Beim Einlass vorzeigen", W / 2, 690);
+  const img = new ImageResponse(
+    <div
+      style={{
+        width: "600px",
+        height: "900px",
+        background: "#000000",
+        display: "flex",
+        flexDirection: "column",
+        fontFamily: "Arial, sans-serif",
+      }}
+    >
+      {/* Header */}
+      <div style={{
+        background: "#111111",
+        padding: "20px 30px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        borderBottom: "1px solid #333",
+      }}>
+        <img src={WOLNAA_LOGO_BASE64} style={{ height: "60px", objectFit: "contain" }} />
+        <div style={{ color: "#facc15", fontSize: "14px", fontWeight: "bold" }}>
+          Ticket {ticketIndex + 1}/{totalTickets}
+        </div>
+      </div>
 
-  // Untere gestrichelte Linie
-  ctx.strokeStyle = "#333333";
-  ctx.lineWidth = 1;
-  ctx.setLineDash([6, 4]);
-  ctx.beginPath();
-  ctx.moveTo(30, 715);
-  ctx.lineTo(W - 30, 715);
-  ctx.stroke();
-  ctx.setLineDash([]);
+      {/* Event Info */}
+      <div style={{ padding: "30px", display: "flex", flexDirection: "column", gap: "0px" }}>
+        <div style={{ color: "#ffffff", fontSize: "26px", fontWeight: "bold", marginBottom: "24px" }}>
+          {eventTitle}
+        </div>
 
-  // Footer Text
-  ctx.fillStyle = "#555555";
-  ctx.font = "11px Arial";
-  ctx.textAlign = "center";
-  ctx.fillText("Nur einmal gültig · Kein Widerruf gemäß § 312g Abs. 2 Nr. 9 BGB", W / 2, 745);
+        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "14px" }}>
+          <span style={{ color: "#888888", fontSize: "13px" }}>Inhaber</span>
+          <span style={{ color: "#ffffff", fontSize: "14px", fontWeight: "bold" }}>{customerName}</span>
+        </div>
 
-  return canvas.toBuffer("image/png");
+        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "14px" }}>
+          <span style={{ color: "#888888", fontSize: "13px" }}>Betrag</span>
+          <span style={{ color: "#ffffff", fontSize: "14px", fontWeight: "bold" }}>
+            {ticketIndex === 0 ? `${amount.toFixed(2)} €` : "–"}
+          </span>
+        </div>
+
+        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "14px" }}>
+          <span style={{ color: "#888888", fontSize: "13px" }}>Ticket-ID</span>
+          <span style={{ color: "#ffffff", fontSize: "12px", fontWeight: "bold", fontFamily: "monospace" }}>{ticketId}</span>
+        </div>
+
+        {/* Gestrichelte Linie */}
+        <div style={{ borderTop: "1px dashed #333333", margin: "16px 0" }} />
+
+        {/* QR Code */}
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "12px" }}>
+          <img src={qrDataUrl} style={{ width: "280px", height: "280px" }} />
+          <div style={{ color: "#888888", fontSize: "12px" }}>Beim Einlass vorzeigen</div>
+        </div>
+
+        {/* Untere Linie */}
+        <div style={{ borderTop: "1px dashed #333333", margin: "16px 0" }} />
+
+        <div style={{ color: "#555555", fontSize: "11px", textAlign: "center" }}>
+          Nur einmal gültig · Kein Widerruf gemäß § 312g Abs. 2 Nr. 9 BGB
+        </div>
+      </div>
+    </div>,
+    { width: 600, height: 900 }
+  );
+
+  const arrayBuffer = await img.arrayBuffer();
+  return Buffer.from(arrayBuffer);
 }
 
 export async function POST(req: NextRequest) {
@@ -167,7 +117,6 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Fehlende Metadaten." }, { status: 400 });
     }
 
-    // Line Items parsen
     let lineItems: { name: string; qty: number; price: string }[] = [];
     try {
       lineItems = JSON.parse(session.metadata?.lineItems || "[]");
@@ -179,7 +128,6 @@ export async function POST(req: NextRequest) {
       ticketIds.push(i === 0 ? ticketId : "WOLNAA-" + Math.random().toString(36).substring(2, 10).toUpperCase());
     }
 
-    // In Supabase speichern
     const ticketRows = ticketIds.map((tid, i) => ({
       ticket_id: tid,
       event_title: eventTitle,
@@ -195,14 +143,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Datenbankfehler.", details: dbError.message, code: dbError.code }, { status: 500 });
     }
 
-    // Ticket-PNGs generieren
     const ticketBuffers: { id: string; buffer: Buffer }[] = [];
     for (let i = 0; i < ticketIds.length; i++) {
       const buf = await generateTicketPNG(ticketIds[i], eventTitle, customerName, amount, i, ticketIds.length);
       ticketBuffers.push({ id: ticketIds[i], buffer: buf });
     }
 
-    // Email senden
     await resend.emails.send({
       from: "WOLNAA Tickets <kontakt@wolnaa.de>",
       to: customerEmail,
@@ -217,7 +163,7 @@ export async function POST(req: NextRequest) {
 <table width="100%" style="max-width:520px;">
   <tr><td style="padding:0 0 32px;">
     <div style="background:#0a0a0a;border-radius:16px;padding:40px 32px;text-align:center;">
-      <img src="https://wolnaa.de/wolnaa-logo.png" alt="WOLNAA" width="160" style="display:block;margin:0 auto 16px;" />
+      <img src="${WOLNAA_LOGO_BASE64}" alt="WOLNAA" width="160" style="display:block;margin:0 auto 16px;" />
       <div style="font-size:11px;color:#888;letter-spacing:3px;margin-bottom:28px;">EXCLUSIVE EVENTS</div>
       <div style="font-size:24px;font-weight:700;color:#fff;margin-bottom:12px;">Vielen Dank für deine Bestellung!</div>
       <div style="font-size:14px;color:#aaa;line-height:1.7;">
