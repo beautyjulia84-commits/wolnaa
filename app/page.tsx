@@ -234,7 +234,7 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-black text-white overflow-hidden">
-      <section style={{position:"relative", minHeight:"70vh", display:"flex", alignItems:"center", justifyContent:"center", padding:"40px 24px", overflow:"hidden", backgroundImage:"url(https://madogmrscesiikbhrcid.supabase.co/storage/v1/object/public/hero/hero-bg.png)", backgroundSize:"cover", backgroundPosition:"center", backgroundColor:"#000"}}>
+      <section style={{position:"relative", minHeight:"90vh", display:"flex", alignItems:"center", justifyContent:"center", padding:"40px 24px", overflow:"hidden", backgroundImage:"url(https://madogmrscesiikbhrcid.supabase.co/storage/v1/object/public/hero/hero-bg.png)", backgroundSize:"cover", backgroundPosition:"center", backgroundColor:"#000"}}>
         <div className="absolute right-5 top-12 md:right-10 md:top-16 z-20 flex items-center gap-4">
           <a
             href="https://www.tiktok.com/@wolnaa_event?_r=1&_t=ZG-96mDjgLge8H"
