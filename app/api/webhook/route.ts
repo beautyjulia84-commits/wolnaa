@@ -28,28 +28,46 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Fehlende Metadaten." }, { status: 400 });
     }
 
-    // ── In Supabase speichern ──────────────────────────────────────────────
-    const { error: dbError } = await supabase.from("tickets").insert({
-      ticket_id: ticketId,
+    // ── Line Items parsen ──────────────────────────────────────────────────
+    let lineItems: { name: string; qty: number; price: string }[] = [];
+    try {
+      lineItems = JSON.parse(session.metadata?.lineItems || "[]");
+    } catch { lineItems = []; }
+
+    // Gesamtanzahl Tickets berechnen
+    const totalTickets = lineItems.reduce((sum, item) => sum + (item.qty || 1), 0) || 1;
+    const ticketIds: string[] = [];
+    for (let i = 0; i < totalTickets; i++) {
+      ticketIds.push(i === 0 ? ticketId : "WOLNAA-" + Math.random().toString(36).substring(2, 10).toUpperCase());
+    }
+
+    // ── In Supabase speichern (ein Eintrag pro Ticket) ────────────────────
+    const ticketRows = ticketIds.map((tid, i) => ({
+      ticket_id: tid,
       event_title: eventTitle,
       customer_name: customerName,
       customer_email: customerEmail,
-      amount,
+      amount: i === 0 ? amount : 0,
       status: "paid",
-    });
+    }));
+
+    const { error: dbError } = await supabase.from("tickets").insert(ticketRows);
 
     if (dbError) {
       console.error("Supabase Fehler:", JSON.stringify(dbError));
       return NextResponse.json({ error: "Datenbankfehler.", details: dbError.message, code: dbError.code }, { status: 500 });
     }
 
-    // ── QR-Code generieren ────────────────────────────────────────────────
-    const qrDataUrl = await QRCode.toDataURL(ticketId, {
-      width: 300,
-      margin: 2,
-      color: { dark: "#000000", light: "#ffffff" },
-    });
-    const qrBase64 = qrDataUrl.replace("data:image/png;base64,", "");
+    // ── QR-Codes für alle Tickets generieren ──────────────────────────────
+    const qrCodes: { id: string; base64: string }[] = [];
+    for (const tid of ticketIds) {
+      const qrDataUrl = await QRCode.toDataURL(tid, {
+        width: 300, margin: 2,
+        color: { dark: "#000000", light: "#ffffff" },
+      });
+      qrCodes.push({ id: tid, base64: qrDataUrl.replace("data:image/png;base64,", "") });
+    }
+    const qrBase64 = qrCodes[0].base64;
 
     // ── Email senden ──────────────────────────────────────────────────────
     await resend.emails.send({
@@ -91,11 +109,13 @@ export async function POST(req: NextRequest) {
             </tr>
           </table>
 
-          <!-- QR Code -->
-          <div style="text-align:center;background:#fff;border-radius:16px;padding:24px;margin:0 0 24px;">
-            <img src="cid:qrcode" alt="QR-Code" width="220" height="220" style="display:block;margin:0 auto;" />
-            <p style="margin:12px 0 0;color:#000;font-size:11px;font-family:monospace;">${ticketId}</p>
-          </div>
+          <!-- QR Codes -->
+          ${qrCodes.map((qr, i) => `
+          <div style="text-align:center;background:#fff;border-radius:16px;padding:24px;margin:0 0 16px;">
+            <p style="margin:0 0 12px;color:#000;font-size:12px;font-weight:700;">Ticket ${i + 1} von ${qrCodes.length}</p>
+            <img src="cid:qrcode${i}" alt="QR-Code ${i+1}" width="200" height="200" style="display:block;margin:0 auto;" />
+            <p style="margin:12px 0 0;color:#000;font-size:11px;font-family:monospace;">${qr.id}</p>
+          </div>`).join("")}
 
           <p style="margin:0;color:#52525b;font-size:12px;line-height:1.6;text-align:center;">
             Dieses Ticket ist nur einmal gültig. Bitte zeige den QR-Code beim Einlass vor.<br>
@@ -113,13 +133,12 @@ export async function POST(req: NextRequest) {
   </table>
 </body>
 </html>`,
-      attachments: [
-        {
-          filename: `ticket-${ticketId}.png`,
-          content: qrBase64,
-          contentType: "image/png",
-        },
-      ],
+      attachments: qrCodes.map((qr, i) => ({
+        filename: `ticket-${qr.id}.png`,
+        content: qr.base64,
+        contentType: "image/png",
+        cid: `qrcode${i}`,
+      })),
     });
   }
 
