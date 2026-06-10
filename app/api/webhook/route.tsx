@@ -26,8 +26,8 @@ async function generateTicketPNG(
   const img = new ImageResponse(
     <div
       style={{
-        width: "600px",
-        height: "900px",
+        width: 600,
+        height: 900,
         background: "#000000",
         display: "flex",
         flexDirection: "column",
