@@ -70,45 +70,6 @@ export async function POST(req: NextRequest) {
     const qrBase64 = qrCodes[0].base64;
 
     // ── Email senden ──────────────────────────────────────────────────────
-    const ticketHtml = qrCodes.map((qr, i) => `
-      <div style="background:#fff;border:2px solid #000;border-radius:16px;max-width:400px;margin:0 auto 32px;font-family:Arial,sans-serif;overflow:hidden;page-break-after:always;">
-        <!-- Ticket Header -->
-        <div style="background:#000;padding:24px;text-align:center;">
-          <div style="font-size:32px;font-weight:900;color:#fff;letter-spacing:6px;margin-bottom:4px;">WOLNAA</div>
-          <div style="font-size:11px;color:#999;letter-spacing:3px;">EXCLUSIVE EVENTS</div>
-        </div>
-        <!-- Trennlinie mit Perforierung -->
-        <div style="border-top:2px dashed #ccc;margin:0;"></div>
-        <!-- Event Info -->
-        <div style="padding:20px 24px;border-bottom:1px solid #eee;">
-          <div style="font-size:18px;font-weight:900;color:#000;margin-bottom:12px;">${eventTitle}</div>
-          <table width="100%" style="font-size:12px;">
-            <tr>
-              <td style="color:#666;padding-bottom:6px;">Name</td>
-              <td style="color:#000;font-weight:700;text-align:right;padding-bottom:6px;">${customerName}</td>
-            </tr>
-            <tr>
-              <td style="color:#666;padding-bottom:6px;">Ticket</td>
-              <td style="color:#000;font-weight:700;text-align:right;padding-bottom:6px;">${i + 1} von ${qrCodes.length}</td>
-            </tr>
-            <tr>
-              <td style="color:#666;">Betrag</td>
-              <td style="color:#000;font-weight:700;text-align:right;">${i === 0 ? amount.toFixed(2) + " €" : "–"}</td>
-            </tr>
-          </table>
-        </div>
-        <!-- QR Code -->
-        <div style="padding:24px;text-align:center;background:#fff;">
-          <img src="cid:qrcode${i}" alt="QR-Code" width="200" height="200" style="display:block;margin:0 auto;" />
-          <div style="margin-top:12px;font-size:10px;font-family:monospace;color:#666;letter-spacing:1px;">${qr.id}</div>
-        </div>
-        <!-- Ticket Footer -->
-        <div style="background:#f5f5f5;padding:12px 24px;border-top:2px dashed #ccc;">
-          <p style="margin:0;font-size:10px;color:#999;text-align:center;">Nur einmal gültig · Beim Einlass vorzeigen · Kein Widerruf gemäß § 312g Abs. 2 Nr. 9 BGB</p>
-        </div>
-      </div>
-    `).join("");
-
     await resend.emails.send({
       from: process.env.RESEND_FROM_EMAIL!,
       to: customerEmail,
@@ -116,14 +77,63 @@ export async function POST(req: NextRequest) {
       html: `
 <!DOCTYPE html>
 <html lang="de">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<style>@media print { .no-print { display:none; } }</style>
-</head>
-<body style="margin:0;padding:40px 20px;background:#f0f0f0;font-family:Arial,sans-serif;">
-  <div class="no-print" style="max-width:400px;margin:0 auto 24px;text-align:center;">
-    <p style="color:#666;font-size:14px;">Deine ${qrCodes.length} Ticket${qrCodes.length > 1 ? "s" : ""} für <strong>${eventTitle}</strong>.<br>Du kannst diese E-Mail ausdrucken.</p>
-  </div>
-  ${ticketHtml}
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#f5f5f5;font-family:Arial,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#f5f5f5;padding:40px 20px;">
+<tr><td align="center">
+<table width="100%" style="max-width:520px;">
+
+  <!-- Dankeschön Text -->
+  <tr><td style="padding:0 0 32px;">
+    <div style="background:#fff;border-radius:16px;padding:32px;text-align:center;border:1px solid #e5e5e5;">
+      <div style="font-size:28px;font-weight:900;letter-spacing:4px;margin-bottom:8px;">WOLNAA</div>
+      <div style="font-size:11px;color:#999;letter-spacing:3px;margin-bottom:24px;">EXCLUSIVE EVENTS</div>
+      <div style="font-size:22px;font-weight:700;margin-bottom:12px;">Vielen Dank für Ihre Bestellung!</div>
+      <div style="font-size:14px;color:#666;line-height:1.6;">
+        Hallo <strong>${customerName}</strong>,<br>
+        Ihre ${qrCodes.length} Ticket${qrCodes.length > 1 ? "s" : ""} für <strong>${eventTitle}</strong> ${qrCodes.length > 1 ? "sind" : "ist"} bereit.<br>
+        Anbei ${qrCodes.length > 1 ? "finden Sie Ihre Tickets" : "finden Sie Ihr Ticket"} als Anhang.
+      </div>
+    </div>
+  </td></tr>
+
+  <!-- Tickets -->
+  ${qrCodes.map((qr, i) => `
+  <tr><td style="padding:0 0 24px;">
+    <div style="background:#fff;border-radius:16px;overflow:hidden;border:1px solid #e5e5e5;">
+      <!-- Ticket Header -->
+      <div style="background:#000;padding:20px 24px;display:flex;align-items:center;justify-content:space-between;">
+        <div>
+          <div style="font-size:22px;font-weight:900;color:#fff;letter-spacing:4px;">WOLNAA</div>
+          <div style="font-size:10px;color:#888;letter-spacing:2px;">EXCLUSIVE EVENTS</div>
+        </div>
+        <div style="font-size:12px;color:#facc15;font-weight:700;">Ticket ${i + 1}/${qrCodes.length}</div>
+      </div>
+      <!-- Event Info -->
+      <div style="padding:20px 24px;border-bottom:1px dashed #ddd;">
+        <div style="font-size:18px;font-weight:900;color:#000;margin-bottom:16px;">${eventTitle}</div>
+        <table width="100%" style="font-size:13px;color:#000;">
+          <tr><td style="color:#888;padding-bottom:8px;">Inhaber</td><td style="font-weight:700;text-align:right;padding-bottom:8px;">${customerName}</td></tr>
+          <tr><td style="color:#888;padding-bottom:8px;">Betrag</td><td style="font-weight:700;text-align:right;padding-bottom:8px;">${i === 0 ? amount.toFixed(2) + " €" : "–"}</td></tr>
+          <tr><td style="color:#888;">Ticket-ID</td><td style="font-weight:700;text-align:right;font-family:monospace;font-size:11px;">${qr.id}</td></tr>
+        </table>
+      </div>
+      <!-- QR Code -->
+      <div style="padding:24px;text-align:center;background:#fff;">
+        <img src="cid:qrcode${i}" alt="QR-Code" width="220" height="220" style="display:block;margin:0 auto;" />
+        <div style="margin-top:8px;font-size:10px;color:#999;">Beim Einlass vorzeigen</div>
+      </div>
+      <!-- Ticket Footer -->
+      <div style="background:#f9f9f9;padding:12px 24px;border-top:1px dashed #ddd;text-align:center;">
+        <div style="font-size:10px;color:#bbb;">Nur einmal gültig · Kein Widerruf gemäß § 312g Abs. 2 Nr. 9 BGB</div>
+      </div>
+    </div>
+  </td></tr>
+  `).join("")}
+
+</table>
+</td></tr>
+</table>
 </body>
 </html>`,
       attachments: qrCodes.map((qr, i) => ({
