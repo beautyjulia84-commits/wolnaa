@@ -529,6 +529,12 @@ export default function AdminPage() {
             <ScannerView adminPw={adminPw} />
           </div>
         )}
+
+        {tab === "veranstalter" && (
+          <div className="p-5">
+            <VeranstalterEinladen />
+          </div>
+        )}
       </main>
 
       {/* Mobile Bottom Nav */}
