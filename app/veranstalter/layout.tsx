@@ -1,13 +1,13 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { createBrowserClient } from '@supabase/ssr';
 import Link from 'next/link';
 
 export default function VeranstalterLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
-  const supabase = createClientComponentClient();
+  const supabase = createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
   const [loading, setLoading] = useState(true);
   const [veranstalter, setVeranstalter] = useState<any>(null);
 
@@ -41,7 +41,7 @@ export default function VeranstalterLayout({ children }: { children: React.React
 
 function Nav({ veranstalter, pathname }: { veranstalter: any; pathname: string }) {
   const router = useRouter();
-  const supabase = createClientComponentClient();
+  const supabase = createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
   const logout = async () => { await supabase.auth.signOut(); router.push('/veranstalter/login'); };
   const links = [
     { href:'/veranstalter/dashboard', label:'Dashboard', icon:'📊' },
