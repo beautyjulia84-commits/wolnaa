@@ -1,9 +1,10 @@
 'use client';
+import { Suspense } from 'react';
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { createBrowserClient } from '@supabase/ssr';
 
-export default function VeranstalterLogin() {
+function LoginForm() {
   const supabase = createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
   const searchParams = useSearchParams();
   const [email, setEmail] = useState('');
@@ -64,5 +65,13 @@ export default function VeranstalterLogin() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function VeranstalterLogin() {
+  return (
+    <Suspense fallback={<div style={{minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center'}}>Laden...</div>}>
+      <LoginForm />
+    </Suspense>
   );
 }
