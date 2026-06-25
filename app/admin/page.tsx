@@ -10,7 +10,7 @@ const sb = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-type Tab = "events" | "tickets" | "rechtliches" | "scanner";
+type Tab = "events" | "tickets" | "rechtliches" | "scanner" | "veranstalter";
 type LegalKey = "impressum" | "datenschutz" | "agb" | "teilnahme" | "widerruf";
 type TicketType = { name: string; price: string; quantity: string };
 type Lounge = { name: string; persons: string; price: string };
@@ -181,6 +181,48 @@ function ScannerView({ adminPw }: { adminPw: string }) {
   );
 }
 
+
+function VeranstalterEinladen() {
+  const [email, setEmail] = useState("");
+  const [firmenname, setFirmenname] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [msg, setMsg] = useState("");
+  const [error, setError] = useState("");
+
+  const handleSubmit = async () => {
+    if (!email || !firmenname) { setError("E-Mail und Firmenname sind Pflichtfelder."); return; }
+    setLoading(true); setError(""); setMsg("");
+    const res = await fetch("/api/admin/veranstalter/einladen", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, firmenname }),
+    });
+    const data = await res.json();
+    if (data.error) setError(data.error);
+    else { setMsg("✅ Einladung an " + email + " gesendet!"); setEmail(""); setFirmenname(""); }
+    setLoading(false);
+  };
+
+  return (
+    <div>
+      <h1 className="text-lg font-bold mb-5">Veranstalter einladen</h1>
+      {msg && <div className="bg-green-950 border border-green-700 rounded-xl p-3 mb-4 text-green-400 text-sm">{msg}</div>}
+      {error && <div className="bg-red-950 border border-red-700 rounded-xl p-3 mb-4 text-red-400 text-sm">{error}</div>}
+      <div className="mb-4">
+        <label className="block text-xs text-zinc-500 mb-1">Firmenname</label>
+        <input value={firmenname} onChange={e => setFirmenname(e.target.value)} placeholder="z.B. Event GmbH" className="w-full p-3 bg-zinc-800 border border-zinc-700 rounded-xl text-white text-sm" />
+      </div>
+      <div className="mb-5">
+        <label className="block text-xs text-zinc-500 mb-1">E-Mail Adresse</label>
+        <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="veranstalter@email.de" className="w-full p-3 bg-zinc-800 border border-zinc-700 rounded-xl text-white text-sm" />
+      </div>
+      <button onClick={handleSubmit} disabled={loading} className="w-full py-3 bg-yellow-400 text-black font-bold rounded-xl text-sm disabled:opacity-50">
+        {loading ? "Sende..." : "✉️ Einladung senden"}
+      </button>
+    </div>
+  );
+}
+
 export default function AdminPage() {
   const [authed, setAuthed] = useState(false);
   const [pw, setPw] = useState(""); const [pwErr, setPwErr] = useState(""); const [adminPw, setAdminPw] = useState("");
@@ -334,6 +376,7 @@ export default function AdminPage() {
     { key: "tickets", label: "Tickets" },
     { key: "rechtliches", label: "Rechtliches" },
     { key: "scanner", label: "Scanner" },
+    { key: "veranstalter", label: "Veranstalter" },
   ];
 
   if (!authed) {
