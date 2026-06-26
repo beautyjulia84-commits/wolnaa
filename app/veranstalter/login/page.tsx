@@ -1,32 +1,32 @@
 'use client';
-export const dynamic = 'force-dynamic';
-import { Suspense } from 'react';
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 
-function LoginForm() {
-  const router = useRouter();
-  const [email, setEmail] = useState('');
+export default function VeranstalterLogin() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [email, setEmail] = useState('');
 
-  const handleLogin = async () => {
+  const handleSubmit = async () => {
     if (!email.trim()) return;
-    setLoading(true); setError('');
-    const res = await fetch('/api/veranstalter/check-access', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: email.trim() }),
-    });
-    const data = await res.json();
-    if (data.error) { setError(data.error); setLoading(false); }
-    else if (data.success) {
-      localStorage.setItem('veranstalter_id', data.veranstalter_id);
-      document.cookie = 'veranstalter_id=' + data.veranstalter_id + '; path=/; max-age=86400; SameSite=Lax';
-      // Wait for cookie to be set then redirect
-      await new Promise(resolve => setTimeout(resolve, 500));
-      window.location.replace('/veranstalter/dashboard');
+    setLoading(true);
+    setError('');
+    try {
+      const res = await fetch('/api/veranstalter/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.trim() }),
+        credentials: 'include',
+      });
+      if (res.redirected) {
+        window.location.href = res.url;
+        return;
+      }
+      const data = await res.json();
+      if (data.error) setError(data.error);
+    } catch(e) {
+      setError('Fehler beim Einloggen.');
     }
+    setLoading(false);
   };
 
   return (
@@ -41,12 +41,14 @@ function LoginForm() {
           {error && <div style={{background:'#fef2f2',border:'1px solid #fecaca',borderRadius:'8px',padding:'12px',marginBottom:'20px'}}><p style={{color:'#dc2626',fontSize:'14px',margin:0}}>{error}</p></div>}
           <div style={{marginBottom:'16px'}}>
             <label style={{display:'block',fontWeight:'500',fontSize:'14px',color:'#374151',marginBottom:'6px'}}>E-Mail Adresse</label>
-            <input type="email" value={email} onChange={e => setEmail(e.target.value)} onKeyDown={e => e.key==='Enter' && handleLogin()} placeholder="deine@email.de"
-              style={{width:'100%',padding:'12px 14px',border:'1px solid #d1d5db',borderRadius:'8px',fontSize:'15px',outline:'none',color:'#111'}} />
+            <input type="email" value={email} onChange={e => setEmail(e.target.value)}
+              onKeyDown={e => e.key==='Enter' && handleSubmit()}
+              placeholder="deine@email.de"
+              style={{width:'100%',padding:'12px 14px',border:'1px solid #d1d5db',borderRadius:'8px',fontSize:'15px',outline:'none',color:'#111',boxSizing:'border-box' as const}} />
           </div>
-          <button onClick={handleLogin} disabled={loading || !email.trim()}
+          <button onClick={handleSubmit} disabled={loading || !email.trim()}
             style={{width:'100%',padding:'13px',background:loading||!email.trim()?'#9ca3af':'#111827',color:'#fff',border:'none',borderRadius:'8px',fontSize:'15px',fontWeight:'600',cursor:loading||!email.trim()?'not-allowed':'pointer'}}>
-            {loading ? 'Prüfe Zugang...' : 'Einloggen'}
+            {loading ? 'Prüfe...' : 'Einloggen'}
           </button>
           <p style={{textAlign:'center',color:'#9ca3af',fontSize:'12px',marginTop:'20px'}}>
             Nur für eingeladene Veranstalter.
@@ -54,13 +56,5 @@ function LoginForm() {
         </div>
       </div>
     </div>
-  );
-}
-
-export default function VeranstalterLogin() {
-  return (
-    <Suspense fallback={<div>Laden...</div>}>
-      <LoginForm />
-    </Suspense>
   );
 }
