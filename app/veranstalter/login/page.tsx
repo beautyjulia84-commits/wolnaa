@@ -23,7 +23,7 @@ function LoginForm() {
       localStorage.setItem('veranstalter_email', email.trim());
       localStorage.setItem('veranstalter_id', data.veranstalter_id);
       localStorage.setItem('veranstalter_name', data.firmenname);
-      setTimeout(() => { window.location.href = '/veranstalter/dashboard'; }, 100);
+      window.location.href = '/veranstalter/dashboard?vid=' + data.veranstalter_id + '&name=' + encodeURIComponent(data.firmenname);
     }
   };
 
