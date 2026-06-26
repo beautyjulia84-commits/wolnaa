@@ -1,8 +1,10 @@
 'use client';
 import { Suspense } from 'react';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 function LoginForm() {
+  const router = useRouter();
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -21,7 +23,7 @@ function LoginForm() {
       localStorage.setItem('veranstalter_email', email.trim());
       localStorage.setItem('veranstalter_id', data.veranstalter_id);
       localStorage.setItem('veranstalter_name', data.firmenname);
-      window.location.href = '/veranstalter/dashboard';
+      router.push('/veranstalter/dashboard');
     }
   };
 
