@@ -16,7 +16,9 @@ function VeranstalterLayoutInner({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (pathname === '/veranstalter/login') { setLoading(false); return; }
     const check = async () => {
-      const vid = searchParams.get('vid') || localStorage.getItem('veranstalter_id');
+      // Try cookie first, then searchParams, then localStorage
+      const cookieVid = document.cookie.split(';').find(c => c.trim().startsWith('veranstalter_id='))?.split('=')[1];
+      const vid = cookieVid || searchParams.get('vid') || localStorage.getItem('veranstalter_id');
       if (!vid) { router.push('/veranstalter/login'); return; }
       const res = await fetch('/api/veranstalter/data?vid=' + vid);
       const json = await res.json();
