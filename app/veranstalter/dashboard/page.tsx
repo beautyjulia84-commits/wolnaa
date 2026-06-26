@@ -17,6 +17,7 @@ export default function VeranstalterDashboard() {
       const vid = params.get('vid') || cookieVid || localStorage.getItem('veranstalter_id');
       if (!vid) { setLoading(false); return; }
       localStorage.setItem('veranstalter_id', vid);
+      localStorage.setItem('veranstalter_name', json.veranstalter?.firmenname || '');
       const res = await fetch('/api/veranstalter/data?vid=' + vid);
       const json = await res.json();
       if (!json.veranstalter) { setLoading(false); return; }
