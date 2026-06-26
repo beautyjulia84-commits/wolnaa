@@ -15,5 +15,7 @@ export async function POST(req: Request) {
   if (error || !data) return NextResponse.json({ error: 'Kein Zugang. Diese E-Mail ist nicht registriert.' }, { status: 403 });
   if (!data.aktiv) return NextResponse.json({ error: 'Dein Konto ist deaktiviert.' }, { status: 403 });
 
-  return NextResponse.json({ success: true, veranstalter_id: data.id, firmenname: data.firmenname });
+  const response = NextResponse.json({ success: true, veranstalter_id: data.id, firmenname: data.firmenname });
+  response.cookies.set('veranstalter_id', data.id, { path: '/', maxAge: 86400, httpOnly: false });
+  return response;
 }
