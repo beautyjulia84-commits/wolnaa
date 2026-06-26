@@ -12,10 +12,11 @@ export default function VeranstalterDashboard() {
 
   useEffect(() => {
     const load = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-      const { data: v } = await supabase.from('veranstalter').select('*').eq('user_id', user.id).single();
-      if (!v) return;
+      const veranstalter_id = localStorage.getItem('veranstalter_id');
+      const veranstalter_email = localStorage.getItem('veranstalter_email');
+      if (!veranstalter_id && !veranstalter_email) { window.location.href = '/veranstalter/login'; return; }
+      const { data: v } = await supabase.from('veranstalter').select('*').eq('id', veranstalter_id).single();
+      if (!v) { window.location.href = '/veranstalter/login'; return; }
       setVeranstalter(v);
       const { data: ev } = await supabase.from('events').select('id,title,date,tickets_sold,total_revenue').eq('veranstalter_id', v.id).order('date', { ascending:false }).limit(5);
       const evList = ev || [];
