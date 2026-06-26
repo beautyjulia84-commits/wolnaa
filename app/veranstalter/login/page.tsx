@@ -21,11 +21,11 @@ function LoginForm() {
     const data = await res.json();
     if (data.error) { setError(data.error); setLoading(false); }
     else if (data.success) {
-      localStorage.setItem('veranstalter_email', email.trim());
       localStorage.setItem('veranstalter_id', data.veranstalter_id);
-      localStorage.setItem('veranstalter_name', data.firmenname);
-      document.cookie = 'veranstalter_id=' + data.veranstalter_id + '; path=/; max-age=86400';
-      window.location.href = '/veranstalter/dashboard?vid=' + data.veranstalter_id + '&name=' + encodeURIComponent(data.firmenname);
+      document.cookie = 'veranstalter_id=' + data.veranstalter_id + '; path=/; max-age=86400; SameSite=Lax';
+      // Wait for cookie to be set then redirect
+      await new Promise(resolve => setTimeout(resolve, 500));
+      window.location.replace('/veranstalter/dashboard');
     }
   };
 
