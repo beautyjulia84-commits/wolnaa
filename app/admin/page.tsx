@@ -198,7 +198,7 @@ function VeranstalterEinladen() {
       body: JSON.stringify({ email, firmenname }),
     });
     const data = await res.json();
-    if (data.error) setError(data.error);
+    if (data.error) setError("API Fehler: " + data.error);
     else { setMsg("✅ Einladung an " + email + " gesendet!"); setEmail(""); setFirmenname(""); }
     setLoading(false);
   };
