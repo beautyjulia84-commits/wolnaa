@@ -18,9 +18,9 @@ function LoginForm() {
     const data = await res.json();
     if (data.error) { setError(data.error); setLoading(false); }
     else if (data.success) {
-      sessionStorage.setItem('veranstalter_email', email.trim());
-      sessionStorage.setItem('veranstalter_id', data.veranstalter_id);
-      sessionStorage.setItem('veranstalter_name', data.firmenname);
+      localStorage.setItem('veranstalter_email', email.trim());
+      localStorage.setItem('veranstalter_id', data.veranstalter_id);
+      localStorage.setItem('veranstalter_name', data.firmenname);
       window.location.href = '/veranstalter/dashboard';
     }
   };
