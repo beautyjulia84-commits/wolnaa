@@ -20,8 +20,10 @@ function VeranstalterLayoutInner({ children }: { children: React.ReactNode }) {
       const cookieVid = document.cookie.split(';').find(c => c.trim().startsWith('veranstalter_id='))?.split('=')[1];
       const vid = cookieVid || searchParams.get('vid') || localStorage.getItem('veranstalter_id');
       if (!vid) { router.push('/veranstalter/login'); return; }
+      console.log('VID:', vid);
       const res = await fetch('/api/veranstalter/data?vid=' + vid);
       const json = await res.json();
+      console.log('JSON:', JSON.stringify(json));
       if (!json.veranstalter) { router.push('/veranstalter/login'); return; }
       localStorage.setItem('veranstalter_id', vid);
       setVeranstalter(json.veranstalter);
