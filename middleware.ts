@@ -16,13 +16,6 @@ export function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
-  if (pathname.startsWith("/veranstalter/")) {
-    const vid = req.cookies.get("veranstalter_id")?.value;
-    if (!vid) {
-      return NextResponse.redirect(new URL("/veranstalter/login", req.url));
-    }
-  }
-
   return NextResponse.next();
 }
 
