@@ -14,7 +14,8 @@ export default function VeranstalterLayout({ children }: { children: React.React
   useEffect(() => {
     if (pathname === '/veranstalter/login') { setLoading(false); return; }
     const check = async () => {
-      const vid = localStorage.getItem('veranstalter_id') || new URLSearchParams(window.location.search).get('vid');
+      const urlParams = new URLSearchParams(window.location.search);
+      const vid = urlParams.get('vid') || localStorage.getItem('veranstalter_id');
       if (!vid) { router.push('/veranstalter/login'); return; }
       const res = await fetch('/api/veranstalter/data?vid=' + vid);
       const json = await res.json();
