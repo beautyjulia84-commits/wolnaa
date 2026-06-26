@@ -12,8 +12,9 @@ export default function VeranstalterDashboard() {
 
   useEffect(() => {
     const load = async () => {
+      const cookieVid = document.cookie.split(';').map(c=>c.trim()).find(c=>c.startsWith('veranstalter_id='))?.split('=')[1];
       const params = new URLSearchParams(window.location.search);
-      const vid = params.get('vid') || localStorage.getItem('veranstalter_id');
+      const vid = params.get('vid') || cookieVid || localStorage.getItem('veranstalter_id');
       if (!vid) { setLoading(false); return; }
       localStorage.setItem('veranstalter_id', vid);
       const res = await fetch('/api/veranstalter/data?vid=' + vid);
@@ -26,7 +27,7 @@ export default function VeranstalterDashboard() {
         totalEvents: evList.length,
         totalTickets: evList.reduce((s:number, e:any) => s + (e.tickets_sold||0), 0),
         totalUmsatz: evList.reduce((s:number, e:any) => s + (e.total_revenue||0), 0),
-        stripeOk: v.stripe_charges_enabled,
+        stripeOk: json.veranstalter.stripe_charges_enabled,
       });
       setLoading(false);
     };
