@@ -1,12 +1,13 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
+import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { createBrowserClient } from '@supabase/ssr';
 import Link from 'next/link';
 
 export default function VeranstalterLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const supabase = createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
   const [loading, setLoading] = useState(true);
   const [veranstalter, setVeranstalter] = useState<any>(null);
@@ -14,8 +15,7 @@ export default function VeranstalterLayout({ children }: { children: React.React
   useEffect(() => {
     if (pathname === '/veranstalter/login') { setLoading(false); return; }
     const check = async () => {
-      const urlParams = new URLSearchParams(window.location.search);
-      const vid = urlParams.get('vid') || localStorage.getItem('veranstalter_id');
+      const vid = searchParams.get('vid') || localStorage.getItem('veranstalter_id');
       if (!vid) { router.push('/veranstalter/login'); return; }
       const res = await fetch('/api/veranstalter/data?vid=' + vid);
       const json = await res.json();
