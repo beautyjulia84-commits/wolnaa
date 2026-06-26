@@ -12,9 +12,11 @@ export default function VeranstalterDashboard() {
 
   useEffect(() => {
     const load = async () => {
-      const veranstalter_id = localStorage.getItem('veranstalter_id');
-      if (!veranstalter_id) { setLoading(false); return; }
-      const { data: v } = await supabase.from('veranstalter').select('*').eq('id', veranstalter_id).single();
+      const params = new URLSearchParams(window.location.search);
+      const vid = params.get('vid') || localStorage.getItem('veranstalter_id');
+      if (!vid) { setLoading(false); return; }
+      localStorage.setItem('veranstalter_id', vid);
+      const { data: v } = await supabase.from('veranstalter').select('*').eq('id', vid).single();
       if (!v) { setLoading(false); return; }
       setVeranstalter(v);
       const { data: ev } = await supabase.from('events').select('id,title,date,tickets_sold,total_revenue').eq('veranstalter_id', v.id).order('date', { ascending:false }).limit(5);
