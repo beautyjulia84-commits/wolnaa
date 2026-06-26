@@ -23,6 +23,7 @@ function LoginForm() {
       localStorage.setItem('veranstalter_email', email.trim());
       localStorage.setItem('veranstalter_id', data.veranstalter_id);
       localStorage.setItem('veranstalter_name', data.firmenname);
+      document.cookie = 'veranstalter_id=' + data.veranstalter_id + '; path=/; max-age=86400';
       window.location.href = '/veranstalter/dashboard?vid=' + data.veranstalter_id + '&name=' + encodeURIComponent(data.firmenname);
     }
   };

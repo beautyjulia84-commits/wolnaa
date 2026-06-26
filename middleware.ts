@@ -11,9 +11,16 @@ export function middleware(req: NextRequest) {
     }
   }
 
-  // Veranstalter-Portal: Login-Seite immer zugänglich lassen
+  // Veranstalter-Portal
   if (pathname === "/veranstalter/login") {
     return NextResponse.next();
+  }
+
+  if (pathname.startsWith("/veranstalter/")) {
+    const vid = req.cookies.get("veranstalter_id")?.value;
+    if (!vid) {
+      return NextResponse.redirect(new URL("/veranstalter/login", req.url));
+    }
   }
 
   return NextResponse.next();
