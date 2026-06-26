@@ -14,11 +14,13 @@ export default function VeranstalterLayout({ children }: { children: React.React
   useEffect(() => {
     if (pathname === '/veranstalter/login') { setLoading(false); return; }
     const check = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) { router.push('/veranstalter/login'); return; }
-      const { data } = await supabase.from('veranstalter').select('*').eq('user_id', user.id).single();
-      if (!data || !data.aktiv) { await supabase.auth.signOut(); router.push('/veranstalter/login?error=kein_zugang'); return; }
-      setVeranstalter(data);
+      const vid = localStorage.getItem('veranstalter_id') || new URLSearchParams(window.location.search).get('vid');
+      if (!vid) { router.push('/veranstalter/login'); return; }
+      const res = await fetch('/api/veranstalter/data?vid=' + vid);
+      const json = await res.json();
+      if (!json.veranstalter) { router.push('/veranstalter/login'); return; }
+      localStorage.setItem('veranstalter_id', vid);
+      setVeranstalter(json.veranstalter);
       setLoading(false);
     };
     check();
