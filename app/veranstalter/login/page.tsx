@@ -23,7 +23,7 @@ function LoginForm() {
       email: email.trim(),
       options: { emailRedirectTo: `${window.location.origin}/veranstalter/dashboard` },
     });
-    if (error) setError('Fehler beim Senden. Bitte versuche es erneut.');
+    if (error) setError(error.message);
     else setSent(true);
     setLoading(false);
   };
