@@ -1,10 +1,11 @@
 'use client';
+import { Suspense } from 'react';
 import { useEffect, useState } from 'react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { createBrowserClient } from '@supabase/ssr';
 import Link from 'next/link';
 
-export default function VeranstalterLayout({ children }: { children: React.ReactNode }) {
+function VeranstalterLayoutInner({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -73,5 +74,13 @@ function Nav({ veranstalter, pathname }: { veranstalter: any; pathname: string }
         </div>
       </div>
     </nav>
+  );
+}
+
+export default function VeranstalterLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <Suspense fallback={<div style={{display:'flex',justifyContent:'center',alignItems:'center',height:'100vh',background:'#f9fafb'}}><p>Laden...</p></div>}>
+      <VeranstalterLayoutInner>{children}</VeranstalterLayoutInner>
+    </Suspense>
   );
 }
