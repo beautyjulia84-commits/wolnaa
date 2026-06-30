@@ -1,10 +1,8 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { createBrowserClient } from '@supabase/ssr';
 
 export default function Einstellungen() {
-  const supabase = createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
   const searchParams = useSearchParams();
   const [veranstalter, setVeranstalter] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -18,11 +16,29 @@ export default function Einstellungen() {
 
   useEffect(() => {
     const load = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-      const { data } = await supabase.from('veranstalter').select('*').eq('user_id', user.id).single();
-      setVeranstalter(data);
-      setLoading(false);
+      try {
+        const cookieVid = document.cookie.split(';').map(c=>c.trim()).find(c=>c.startsWith('veranstalter_id='))?.split('=')[1];
+        const vid = cookieVid || localStorage.getItem('veranstalter_id');
+
+        if (!vid) {
+          window.location.href = '/veranstalter/login';
+          return;
+        }
+
+        const res = await fetch('/api/veranstalter/data?vid=' + encodeURIComponent(vid));
+        const json = await res.json();
+
+        if (!res.ok || !json.veranstalter) {
+          window.location.href = '/veranstalter/login';
+          return;
+        }
+
+        localStorage.setItem('veranstalter_id', vid);
+        localStorage.setItem('veranstalter_name', json.veranstalter?.firmenname || '');
+        setVeranstalter(json.veranstalter);
+      } finally {
+        setLoading(false);
+      }
     };
     load();
   }, []);
