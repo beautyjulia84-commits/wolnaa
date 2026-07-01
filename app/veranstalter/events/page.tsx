@@ -19,16 +19,15 @@ export default function VeranstalterEvents() {
           return;
         }
 
-        const res = await fetch('/api/veranstalter/data?vid=' + encodeURIComponent(vid));
+        const res = await fetch('/api/veranstalter/events?vid=' + encodeURIComponent(vid));
         const json = await res.json();
 
-        if (!res.ok || !json.veranstalter) {
+        if (!res.ok) {
           window.location.href = '/veranstalter/login';
           return;
         }
 
         localStorage.setItem('veranstalter_id', vid);
-        localStorage.setItem('veranstalter_name', json.veranstalter?.firmenname || '');
         setEvents(json.events || []);
       } catch (e) {
         setError('Events konnten nicht geladen werden.');
