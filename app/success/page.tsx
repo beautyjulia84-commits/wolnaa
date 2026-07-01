@@ -24,9 +24,7 @@ function SuccessContent() {
         
         {/* Logo */}
         <div className="mb-8">
-          <div className="inline-flex items-center justify-center bg-black rounded-2xl px-5 py-4 mx-auto mb-4 border border-zinc-800">
-            <img src="/wolnaa-logo.png" alt="Wolnaa" className="h-14 w-auto" />
-          </div>
+          <img src="/wolnaa-logo.png" alt="Wolnaa" className="h-16 w-auto mx-auto mb-4" />
           <p className="text-zinc-600 text-xs tracking-widest uppercase">Wolnaa · Exclusive Events</p>
         </div>
 
