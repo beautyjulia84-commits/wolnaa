@@ -65,32 +65,6 @@ function rowToEvent(r: any): EventItem {
   };
 }
 
-// Convert EventItem → Supabase row
-function slugify(t: string) {
-  return t.toLowerCase().replace(/\s+/g, "-").replace(/[^\w-]+/g, "");
-}
-
-function eventToRow(e: EventItem) {
-  return {
-    title: e.title,
-    slug: slugify(e.title),
-    city: e.city,
-    date: e.date,
-    time: e.time,
-    online_sale_ends_at: e.onlineSaleEndsAt ? new Date(e.onlineSaleEndsAt).toISOString() : null,
-    location: e.location,
-    address: e.address,
-    image_url: e.imageUrl,
-    price: e.price,
-    description: e.description,
-    tickets: e.tickets,
-    lounges: e.lounges,
-    lounge_list: e.loungeList,
-    discount_codes: e.discountCodes,
-  };
-}
-
-
 async function uploadImage(file: File): Promise<string> {
   const ext = file.name.split(".").pop();
   const fileName = `${Date.now()}.${ext}`;
@@ -259,8 +233,16 @@ export default function AdminPage() {
 
   async function loadEvents() {
     setEvLoading(true);
-    const { data } = await sb.from("events").select("*").order("created_at", { ascending: false });
-    setEvents((data ?? []).map(rowToEvent));
+    const res = await fetch("/api/admin/events", {
+      headers: adminPw ? { "x-admin-token": adminPw } : undefined,
+    });
+    const data = await res.json().catch(() => ({}));
+    if (res.ok) {
+      setEvents((data.events ?? []).map(rowToEvent));
+    } else {
+      console.error("Events laden Fehler:", data.error);
+      setEvents([]);
+    }
     setEvLoading(false);
   }
 
@@ -334,12 +316,22 @@ export default function AdminPage() {
   async function saveEv() {
     if (!ev.title) return;
     setSaveLoading(true);
-    const row = eventToRow(ev);
-    if (evIdx) {
-      await sb.from("events").update(row).eq("id", evIdx);
-    } else {
-      await sb.from("events").insert(row);
+    const res = await fetch("/api/admin/events", {
+      method: evIdx ? "PUT" : "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(adminPw ? { "x-admin-token": adminPw } : {}),
+      },
+      body: JSON.stringify({ event: evIdx ? { ...ev, id: evIdx } : ev }),
+    });
+
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      alert("Speichern fehlgeschlagen: " + (data.error || "Unbekannter Fehler"));
+      setSaveLoading(false);
+      return;
     }
+
     await loadEvents();
     setSaveLoading(false);
     setShowForm(false);
