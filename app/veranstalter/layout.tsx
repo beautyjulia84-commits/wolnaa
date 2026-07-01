@@ -56,7 +56,8 @@ function VeranstalterLayoutInner({ children }: { children: React.ReactNode }) {
           </div>
           <div style={{display:'flex',alignItems:'center',gap:'8px',flexShrink:0}}>
             <p style={{color:'#9ca3af',fontSize:'13px',margin:0,whiteSpace:'nowrap'}}>{firmenname}</p>
-            <button onClick={() => {
+            <button onClick={async () => {
+              await fetch('/api/veranstalter/logout', { method: 'POST' });
               localStorage.removeItem('veranstalter_id');
               localStorage.removeItem('veranstalter_name');
               document.cookie='veranstalter_id=;max-age=0;path=/';

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { getAuthedVeranstalterId } from '@/lib/veranstalter-auth';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -7,16 +8,23 @@ const supabase = createClient(
 );
 
 export async function POST(req: NextRequest) {
+  const authedId = getAuthedVeranstalterId(req);
   const { ticketId, veranstalterId } = await req.json();
 
-  if (!ticketId || !veranstalterId) {
+  if (!authedId) {
+    return NextResponse.json({ valid: false, reason: 'Nicht angemeldet.' }, { status: 401 });
+  }
+  if (veranstalterId && veranstalterId !== authedId) {
+    return NextResponse.json({ valid: false, reason: 'Kein Zugriff.' }, { status: 403 });
+  }
+  if (!ticketId) {
     return NextResponse.json({ valid: false, reason: 'Ticket-ID oder Veranstalter-ID fehlt.' }, { status: 400 });
   }
 
   const { data: veranstalter } = await supabase
     .from('veranstalter')
     .select('id, aktiv')
-    .eq('id', veranstalterId)
+    .eq('id', authedId)
     .single();
 
   if (!veranstalter?.aktiv) {
@@ -35,7 +43,7 @@ export async function POST(req: NextRequest) {
 
   const event = Array.isArray(ticket.events) ? ticket.events[0] : ticket.events;
 
-  if (!event || event.veranstalter_id !== veranstalterId) {
+  if (!event || event.veranstalter_id !== authedId) {
     return NextResponse.json({ valid: false, reason: 'Ticket gehört nicht zu deinen Events.' }, { status: 403 });
   }
 

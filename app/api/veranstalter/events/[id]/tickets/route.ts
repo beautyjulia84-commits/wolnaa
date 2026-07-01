@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { getAuthedVeranstalterId } from '@/lib/veranstalter-auth';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -21,13 +22,17 @@ async function assertEventAccess(eventId: string, veranstalterId: string) {
 export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }) {
   const { id } = await ctx.params;
   const { searchParams } = new URL(req.url);
+  const authedId = getAuthedVeranstalterId(req);
   const veranstalterId = searchParams.get('vid');
 
-  if (!veranstalterId) {
-    return NextResponse.json({ error: 'Veranstalter-ID fehlt.' }, { status: 400 });
+  if (!authedId) {
+    return NextResponse.json({ error: 'Nicht angemeldet.' }, { status: 401 });
+  }
+  if (veranstalterId && veranstalterId !== authedId) {
+    return NextResponse.json({ error: 'Kein Zugriff.' }, { status: 403 });
   }
 
-  const event = await assertEventAccess(id, veranstalterId);
+  const event = await assertEventAccess(id, authedId);
   if (!event) {
     return NextResponse.json({ error: 'Kein Zugriff auf dieses Event.' }, { status: 403 });
   }
@@ -47,13 +52,20 @@ export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }
 
 export async function PATCH(req: Request, ctx: { params: Promise<{ id: string }> }) {
   const { id } = await ctx.params;
+  const authedId = getAuthedVeranstalterId(req);
   const { veranstalterId, ticketId, checkedIn } = await req.json();
 
-  if (!veranstalterId || !ticketId) {
+  if (!authedId) {
+    return NextResponse.json({ error: 'Nicht angemeldet.' }, { status: 401 });
+  }
+  if (veranstalterId && veranstalterId !== authedId) {
+    return NextResponse.json({ error: 'Kein Zugriff.' }, { status: 403 });
+  }
+  if (!ticketId) {
     return NextResponse.json({ error: 'Daten fehlen.' }, { status: 400 });
   }
 
-  const event = await assertEventAccess(id, veranstalterId);
+  const event = await assertEventAccess(id, authedId);
   if (!event) {
     return NextResponse.json({ error: 'Kein Zugriff auf dieses Event.' }, { status: 403 });
   }

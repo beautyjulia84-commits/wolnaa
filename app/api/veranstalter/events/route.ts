@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { getAuthedVeranstalterId } from '@/lib/veranstalter-auth';
 
 function slugify(text: string) {
   return text.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
@@ -47,12 +48,14 @@ async function getVeranstalter(supabase: any, id: string) {
 export async function GET(req: Request) {
   const supabase = await getSupabase();
   const { searchParams } = new URL(req.url);
+  const authedId = getAuthedVeranstalterId(req);
   const vid = searchParams.get('vid');
   const id = searchParams.get('id');
 
-  if (!vid) return NextResponse.json({ error: 'Veranstalter-ID fehlt.' }, { status: 400 });
+  if (!authedId) return NextResponse.json({ error: 'Nicht angemeldet.' }, { status: 401 });
+  if (vid && vid !== authedId) return NextResponse.json({ error: 'Kein Zugriff.' }, { status: 403 });
 
-  const veranstalter = await getVeranstalter(supabase, vid);
+  const veranstalter = await getVeranstalter(supabase, authedId);
   if (!veranstalter) return NextResponse.json({ error: 'Kein Zugriff.' }, { status: 403 });
 
   if (id) {
@@ -60,7 +63,7 @@ export async function GET(req: Request) {
       .from('events')
       .select('*')
       .eq('id', id)
-      .eq('veranstalter_id', vid)
+      .eq('veranstalter_id', authedId)
       .single();
 
     if (error || !data) return NextResponse.json({ error: 'Event nicht gefunden.' }, { status: 404 });
@@ -70,7 +73,7 @@ export async function GET(req: Request) {
   const { data, error } = await supabase
     .from('events')
     .select('*')
-    .eq('veranstalter_id', vid)
+    .eq('veranstalter_id', authedId)
     .order('date', { ascending: false });
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
@@ -81,11 +84,13 @@ export async function POST(req: Request) {
   const supabase = await getSupabase();
 
   try {
+    const authedId = getAuthedVeranstalterId(req);
     const { veranstalterId, event } = await req.json();
-    if (!veranstalterId) return NextResponse.json({ error: 'Veranstalter-ID fehlt.' }, { status: 400 });
+    if (!authedId) return NextResponse.json({ error: 'Nicht angemeldet.' }, { status: 401 });
+    if (veranstalterId && veranstalterId !== authedId) return NextResponse.json({ error: 'Kein Zugriff.' }, { status: 403 });
     if (!event?.title || !event?.date) return NextResponse.json({ error: 'Titel und Datum sind Pflichtfelder.' }, { status: 400 });
 
-    const veranstalter = await getVeranstalter(supabase, veranstalterId);
+    const veranstalter = await getVeranstalter(supabase, authedId);
     if (!veranstalter) return NextResponse.json({ error: 'Kein Zugriff.' }, { status: 403 });
 
     const row = eventToRow(event, veranstalter);
@@ -102,11 +107,14 @@ export async function PUT(req: Request) {
   const supabase = await getSupabase();
 
   try {
+    const authedId = getAuthedVeranstalterId(req);
     const { veranstalterId, event } = await req.json();
-    if (!veranstalterId || !event?.id) return NextResponse.json({ error: 'Event-ID fehlt.' }, { status: 400 });
+    if (!authedId) return NextResponse.json({ error: 'Nicht angemeldet.' }, { status: 401 });
+    if (veranstalterId && veranstalterId !== authedId) return NextResponse.json({ error: 'Kein Zugriff.' }, { status: 403 });
+    if (!event?.id) return NextResponse.json({ error: 'Event-ID fehlt.' }, { status: 400 });
     if (!event?.title || !event?.date) return NextResponse.json({ error: 'Titel und Datum sind Pflichtfelder.' }, { status: 400 });
 
-    const veranstalter = await getVeranstalter(supabase, veranstalterId);
+    const veranstalter = await getVeranstalter(supabase, authedId);
     if (!veranstalter) return NextResponse.json({ error: 'Kein Zugriff.' }, { status: 403 });
 
     const row = eventToRow(event, veranstalter);
@@ -116,7 +124,7 @@ export async function PUT(req: Request) {
       .from('events')
       .update(row)
       .eq('id', event.id)
-      .eq('veranstalter_id', veranstalterId);
+      .eq('veranstalter_id', authedId);
 
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });
     return NextResponse.json({ success: true });

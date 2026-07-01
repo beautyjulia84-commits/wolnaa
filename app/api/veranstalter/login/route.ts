@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { createVeranstalterAuthToken, VERANSTALTER_AUTH_COOKIE, veranstalterAuthCookieOptions } from '@/lib/veranstalter-auth';
 
 export async function POST(req: Request) {
   const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!);
@@ -22,5 +23,6 @@ export async function POST(req: Request) {
     httpOnly: false,
     sameSite: 'lax',
   });
+  response.cookies.set(VERANSTALTER_AUTH_COOKIE, createVeranstalterAuthToken(data.id), veranstalterAuthCookieOptions());
   return response;
 }

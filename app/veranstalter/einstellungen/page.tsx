@@ -68,7 +68,7 @@ export default function Einstellungen() {
   };
 
   const handleStripeDashboard = async () => {
-    const res = await fetch('/api/stripe/connect/manage', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ stripeAccountId:veranstalter.stripe_account_id }) });
+    const res = await fetch('/api/stripe/connect/manage', { method:'POST', headers:{'Content-Type':'application/json'} });
     const { url } = await res.json();
     window.open(url, '_blank');
   };

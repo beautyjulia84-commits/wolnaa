@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
+import { getAuthedVeranstalterId } from '@/lib/veranstalter-auth';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
@@ -11,16 +12,20 @@ export async function POST(req: Request) {
   );
 
   try {
+    const authedId = getAuthedVeranstalterId(req);
     const { veranstalterId } = await req.json();
 
-    if (!veranstalterId) {
-      return NextResponse.json({ error: 'Veranstalter-ID fehlt.' }, { status: 400 });
+    if (!authedId) {
+      return NextResponse.json({ error: 'Nicht angemeldet.' }, { status: 401 });
+    }
+    if (veranstalterId && veranstalterId !== authedId) {
+      return NextResponse.json({ error: 'Kein Zugriff.' }, { status: 403 });
     }
 
     const { data: veranstalter, error } = await supabaseAdmin
       .from('veranstalter')
       .select('id, firmenname, kontakt_email, website, stripe_account_id')
-      .eq('id', veranstalterId)
+      .eq('id', authedId)
       .single();
 
     if (error || !veranstalter) {
