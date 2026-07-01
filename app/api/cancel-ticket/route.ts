@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { supabase } from "@/lib/supabase";
 import { Resend } from "resend";
+import { isAdminRequest } from "@/lib/admin-auth";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 const resend = new Resend(process.env.RESEND_API_KEY!);
@@ -23,8 +24,7 @@ function formatEuro(value: number) {
 }
 
 export async function POST(req: NextRequest) {
-  const adminToken = req.headers.get("x-admin-token");
-  if (adminToken !== process.env.ADMIN_PASSWORD) {
+  if (!isAdminRequest(req)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

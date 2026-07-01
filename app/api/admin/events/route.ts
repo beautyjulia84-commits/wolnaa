@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { isAdminRequest } from "@/lib/admin-auth";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -23,12 +24,6 @@ type AdminEvent = {
   loungeList?: unknown[];
   discountCodes?: unknown[];
 };
-
-function isAdmin(req: NextRequest) {
-  const cookieToken = req.cookies.get("wolnaa-admin-token")?.value;
-  const headerToken = req.headers.get("x-admin-token");
-  return cookieToken === process.env.ADMIN_PASSWORD || headerToken === process.env.ADMIN_PASSWORD;
-}
 
 function slugify(title: string) {
   return title.toLowerCase().replace(/\s+/g, "-").replace(/[^\w-]+/g, "");
@@ -57,7 +52,7 @@ function eventToRow(event: AdminEvent) {
 }
 
 export async function GET(req: NextRequest) {
-  if (!isAdmin(req)) {
+  if (!isAdminRequest(req)) {
     return NextResponse.json({ error: "Nicht autorisiert." }, { status: 401 });
   }
 
@@ -74,7 +69,7 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  if (!isAdmin(req)) {
+  if (!isAdminRequest(req)) {
     return NextResponse.json({ error: "Nicht autorisiert." }, { status: 401 });
   }
 
@@ -97,7 +92,7 @@ export async function POST(req: NextRequest) {
 }
 
 export async function PUT(req: NextRequest) {
-  if (!isAdmin(req)) {
+  if (!isAdminRequest(req)) {
     return NextResponse.json({ error: "Nicht autorisiert." }, { status: 401 });
   }
 

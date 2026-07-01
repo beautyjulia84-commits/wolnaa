@@ -1,14 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-
-function isAdmin(req: NextRequest) {
-  const cookieToken = req.cookies.get('wolnaa-admin-token')?.value;
-  const headerToken = req.headers.get('x-admin-token');
-  return cookieToken === process.env.ADMIN_PASSWORD || headerToken === process.env.ADMIN_PASSWORD;
-}
+import { isAdminRequest } from '@/lib/admin-auth';
 
 export async function POST(req: NextRequest) {
-  if (!isAdmin(req)) {
+  if (!isAdminRequest(req)) {
     return NextResponse.json({ error: 'Nicht autorisiert.' }, { status: 401 });
   }
 

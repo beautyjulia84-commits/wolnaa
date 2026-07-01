@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
+import { isAdminRequest } from "@/lib/admin-auth";
 
 export async function POST(req: NextRequest) {
-  // Admin-Passwort prüfen
-  const adminToken = req.headers.get("x-admin-token");
-  if (adminToken !== process.env.ADMIN_PASSWORD) {
+  if (!isAdminRequest(req)) {
     return NextResponse.json({ error: "Nicht autorisiert." }, { status: 401 });
   }
 
