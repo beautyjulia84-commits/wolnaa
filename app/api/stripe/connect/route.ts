@@ -36,14 +36,14 @@ export async function POST(req: Request) {
 
     const { data: veranstalter, error } = await supabaseAdmin
       .from('veranstalter')
-      .select('id, status')
+      .select('id, aktiv')
       .eq('id', authedId)
       .single();
 
     if (error || !veranstalter) {
       return NextResponse.json({ error: 'Veranstalter nicht gefunden.' }, { status: 404 });
     }
-    if (veranstalter.status && veranstalter.status !== 'aktiv') {
+    if (!veranstalter.aktiv) {
       return NextResponse.json({ error: 'Veranstalter ist nicht aktiv.' }, { status: 403 });
     }
 
