@@ -396,8 +396,8 @@ export default function AdminPage() {
       <main className="min-h-screen bg-zinc-950 flex items-center justify-center p-6">
         <div className="w-full max-w-sm">
           <div className="text-center mb-8">
-            <div className="w-14 h-14 rounded-2xl bg-yellow-400 flex items-center justify-center mx-auto mb-4"><span className="text-black font-black text-xl">W</span></div>
-            <h1 className="text-2xl font-bold text-white">WOLNAA Admin</h1>
+            <img src="/wolnaa-logo.png" alt="Wolnaa" className="h-16 w-auto mx-auto mb-4" />
+            <h1 className="text-2xl font-bold text-white">Admin</h1>
             <p className="text-zinc-600 text-sm mt-1">Bitte anmelden</p>
           </div>
           <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 space-y-4">
@@ -419,7 +419,7 @@ export default function AdminPage() {
       <header className="bg-zinc-900 border-b border-zinc-800 sticky top-0 z-40">
         <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between gap-4">
           <div className="flex items-center gap-2 shrink-0">
-            <div className="w-7 h-7 rounded-lg bg-yellow-400 flex items-center justify-center"><span className="text-black font-black text-xs">W</span></div>
+            <img src="/wolnaa-logo.png" alt="Wolnaa" className="h-8 w-auto" />
             <span className="font-bold text-sm hidden sm:block">Admin</span>
           </div>
           <nav className="hidden md:flex items-center gap-0.5 flex-1 justify-center">

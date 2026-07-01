@@ -26,7 +26,8 @@ export default function AdminLoginPage() {
   return (
     <main className="min-h-screen bg-black text-white flex items-center justify-center px-4">
       <form onSubmit={login} className="w-full max-w-sm rounded-3xl border border-white/10 bg-zinc-950 p-8">
-        <h1 className="text-3xl font-black text-center mb-6">WOLNAA Admin</h1>
+        <img src="/wolnaa-logo.png" alt="Wolnaa" className="h-16 w-auto mx-auto mb-4" />
+        <h1 className="text-3xl font-black text-center mb-6">Admin</h1>
         <input
           type="password"
           placeholder="Admin Passwort"
