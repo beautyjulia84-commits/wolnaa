@@ -8,17 +8,25 @@ function normalizeName(value: string) {
   return (value || "").trim().toLowerCase();
 }
 
+function toMoney(value: unknown) {
+  const normalized = String(value ?? "0").replace(",", ".").replace(/[^\d.-]/g, "");
+  const amount = Number.parseFloat(normalized);
+  return Number.isFinite(amount) ? amount : 0;
+}
+
+function toDiscountPercent(value: unknown) {
+  const normalized = String(value ?? "").replace(",", ".").replace(/[^\d.-]/g, "");
+  const percent = Number.parseFloat(normalized);
+  if (!Number.isFinite(percent)) return 0;
+  return Math.min(Math.max(percent, 0), 100);
+}
+
 export async function POST(req: Request) {
   const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!);
 
   try {
     const body = await req.json();
-    const { eventTitle, customerName, customerEmail, lineItems = [], ticketId, total, eventId } = body;
-    const totalAmount = Math.round(Number(total) * 100);
-
-    if (!Number.isFinite(totalAmount) || totalAmount < 0) {
-      return NextResponse.json({ error: "Der Gesamtbetrag ist ungültig. Bitte lade die Seite neu." }, { status: 400 });
-    }
+    const { eventTitle, customerName, customerEmail, lineItems = [], ticketId, discountCode, eventId } = body;
 
     if (!eventId) {
       return NextResponse.json({ error: "Event-ID fehlt. Bitte Seite neu laden." }, { status: 400 });
@@ -26,7 +34,7 @@ export async function POST(req: Request) {
 
     const { data: event, error: eventError } = await supabase
       .from("events")
-      .select("id,title,tickets,online_sale_ends_at,stripe_account_id,veranstalter_id,veranstalter:veranstalter_id(platform_fee_percent)")
+      .select("id,title,tickets,lounge_list,discount_codes,online_sale_ends_at,stripe_account_id,veranstalter_id,veranstalter:veranstalter_id(platform_fee_percent)")
       .eq("id", eventId)
       .single();
 
@@ -46,6 +54,49 @@ export async function POST(req: Request) {
       .filter((item: any) => item.qty > 0);
 
     const configuredTickets = Array.isArray(event.tickets) ? event.tickets : [];
+    const configuredLounges = Array.isArray(event.lounge_list) ? event.lounge_list : [];
+    const configuredDiscounts = Array.isArray(event.discount_codes) ? event.discount_codes : [];
+
+    let subtotal = 0;
+    const checkoutLineItems = (lineItems || [])
+      .map((item: any) => {
+        const name = String(item.name || "");
+        const qty = Math.max(0, Number(item.qty || 0));
+        const ticket = configuredTickets.find((entry: any) => normalizeName(entry.name) === normalizeName(name));
+        const lounge = configuredLounges.find((entry: any) => normalizeName(entry.name) === normalizeName(name));
+        const configured = ticket || lounge;
+        const price = toMoney(configured?.price ?? item.price);
+
+        if (!configured || qty <= 0) return null;
+        subtotal += price * qty;
+        return { name, price: String(price.toFixed(2)), qty };
+      })
+      .filter(Boolean);
+
+    if (checkoutLineItems.length === 0 || subtotal <= 0) {
+      return NextResponse.json({ error: "Bitte wähle mindestens ein gültiges Ticket aus." }, { status: 400 });
+    }
+
+    let discountPercent = 0;
+    let appliedDiscountCode = "";
+    if (discountCode) {
+      const foundDiscount = configuredDiscounts.find((entry: any) => normalizeName(entry.code) === normalizeName(discountCode));
+      if (!foundDiscount) {
+        return NextResponse.json({ error: "Rabattcode ist ungültig." }, { status: 400 });
+      }
+      discountPercent = toDiscountPercent(foundDiscount.percent);
+      if (discountPercent <= 0) {
+        return NextResponse.json({ error: "Rabattcode ist nicht korrekt konfiguriert." }, { status: 400 });
+      }
+      appliedDiscountCode = String(foundDiscount.code || "");
+    }
+
+    const totalAmount = Math.round(subtotal * (1 - discountPercent / 100) * 100);
+
+    if (!Number.isFinite(totalAmount) || totalAmount <= 0) {
+      return NextResponse.json({ error: "Der Gesamtbetrag ist ungültig. Bitte lade die Seite neu." }, { status: 400 });
+    }
+
     const limitedRequests = requestedTickets.filter((item: any) => {
       const configured = configuredTickets.find((ticket: any) => normalizeName(ticket.name) === normalizeName(item.name));
       return configured?.quantity !== undefined && configured?.quantity !== null && String(configured.quantity).trim() !== "";
@@ -98,13 +149,15 @@ export async function POST(req: Request) {
         customerName: customerName || "",
         customerEmail: customerEmail || "",
         ticketId: ticketId || "",
-        lineItems: JSON.stringify(lineItems || []),
+        lineItems: JSON.stringify(checkoutLineItems || []),
+        discountCode: appliedDiscountCode,
+        discountPercent: discountPercent ? String(discountPercent) : "",
       },
       line_items: [{
         quantity: 1,
         price_data: {
           currency: "eur",
-          product_data: { name: lineItems.map((i: any) => i.name).join(", ") || "Ticket" },
+          product_data: { name: checkoutLineItems.map((i: any) => i.name).join(", ") || "Ticket" },
           unit_amount: totalAmount,
         },
       }],
