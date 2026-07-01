@@ -19,6 +19,11 @@ export async function DELETE(req: NextRequest, ctx: { params: Promise<{ id: stri
 
   const { id } = await ctx.params;
 
+  await supabase
+    .from("tickets")
+    .update({ event_id: null })
+    .eq("event_id", id);
+
   const { error } = await supabase
     .from("events")
     .delete()

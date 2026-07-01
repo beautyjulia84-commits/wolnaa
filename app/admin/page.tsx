@@ -100,8 +100,8 @@ async function uploadImage(file: File): Promise<string> {
   return urlData.publicUrl;
 }
 
-const inp = "w-full rounded-xl border border-zinc-300 bg-white focus:border-yellow-400 px-4 py-3 text-black placeholder:text-zinc-500 outline-none transition-all text-sm";
-const lbl = "block text-xs font-semibold text-zinc-400 mb-1.5 uppercase tracking-wide";
+const inp = "w-full rounded-xl border border-zinc-300 bg-white focus:border-yellow-400 px-4 py-3 text-black placeholder:text-zinc-600 outline-none transition-all text-sm";
+const lbl = "block text-xs font-semibold text-zinc-700 mb-1.5 uppercase tracking-wide";
 
 function Toggle({ value, onChange, label }: { value: boolean; onChange: (v: boolean) => void; label: string }) {
   return (
@@ -175,7 +175,7 @@ function ScannerView({ adminPw }: { adminPw: string }) {
         )}
         {camError && (
           <div className="absolute inset-0 flex items-center justify-center bg-zinc-900/95 p-6 text-center">
-            <div><p className="text-zinc-400 text-sm mb-4">{camError}</p><button onClick={startCamera} className="rounded-xl bg-yellow-400 text-black font-bold px-5 py-2.5 text-sm">Erneut versuchen</button></div>
+            <div><p className="text-zinc-700 text-sm mb-4">{camError}</p><button onClick={startCamera} className="rounded-xl bg-yellow-400 text-black font-bold px-5 py-2.5 text-sm">Erneut versuchen</button></div>
           </div>
         )}
       </div>
@@ -211,11 +211,11 @@ function VeranstalterEinladen() {
       {msg && <div className="bg-green-950 border border-green-700 rounded-xl p-3 mb-4 text-green-400 text-sm">{msg}</div>}
       {error && <div className="bg-red-950 border border-red-700 rounded-xl p-3 mb-4 text-red-400 text-sm">{error}</div>}
       <div className="mb-4">
-        <label className="block text-xs text-zinc-500 mb-1">Firmenname</label>
+        <label className="block text-xs text-zinc-600 mb-1">Firmenname</label>
         <input value={firmenname} onChange={e => setFirmenname(e.target.value)} placeholder="z.B. Event GmbH" className="w-full p-3 bg-zinc-800 border border-zinc-700 rounded-xl text-white text-sm" />
       </div>
       <div className="mb-5">
-        <label className="block text-xs text-zinc-500 mb-1">E-Mail Adresse</label>
+        <label className="block text-xs text-zinc-600 mb-1">E-Mail Adresse</label>
         <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="veranstalter@email.de" className="w-full p-3 bg-zinc-800 border border-zinc-700 rounded-xl text-white text-sm" />
       </div>
       <button onClick={handleSubmit} disabled={loading} className="w-full py-3 bg-yellow-400 text-black font-bold rounded-xl text-sm disabled:opacity-50">
@@ -398,7 +398,7 @@ export default function AdminPage() {
           <div className="text-center mb-8">
             <div className="w-14 h-14 rounded-2xl bg-yellow-400 flex items-center justify-center mx-auto mb-4"><span className="text-black font-black text-xl">W</span></div>
             <h1 className="text-2xl font-bold text-white">WOLNAA Admin</h1>
-            <p className="text-zinc-500 text-sm mt-1">Bitte anmelden</p>
+            <p className="text-zinc-600 text-sm mt-1">Bitte anmelden</p>
           </div>
           <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 space-y-4">
             <div>
@@ -408,7 +408,7 @@ export default function AdminPage() {
             </div>
             <button onClick={login} className="w-full rounded-xl bg-yellow-400 text-black font-bold py-3 hover:bg-yellow-300 transition-colors">Anmelden</button>
           </div>
-          <p className="text-center mt-5"><Link href="/" className="text-zinc-600 text-sm hover:text-zinc-400">← Zurück zur Website</Link></p>
+          <p className="text-center mt-5"><Link href="/" className="text-zinc-600 text-sm hover:text-zinc-700">← Zurück zur Website</Link></p>
         </div>
       </main>
     );
@@ -424,14 +424,14 @@ export default function AdminPage() {
           </div>
           <nav className="hidden md:flex items-center gap-0.5 flex-1 justify-center">
             {tabs.map(t => (
-              <button key={t.key} onClick={() => setTab(t.key)} className={`px-5 py-2 rounded-lg text-sm font-medium transition-colors ${tab === t.key ? "bg-yellow-400 text-black" : "text-zinc-400 hover:text-white hover:bg-zinc-800"}`}>{t.label}</button>
+              <button key={t.key} onClick={() => setTab(t.key)} className={`px-5 py-2 rounded-lg text-sm font-medium transition-colors ${tab === t.key ? "bg-yellow-400 text-black" : "text-zinc-700 hover:text-white hover:bg-zinc-800"}`}>{t.label}</button>
             ))}
           </nav>
           <div className="flex items-center gap-2 shrink-0">
             <Link href="/" className="hidden sm:flex items-center gap-1.5 rounded-lg border border-zinc-700 text-zinc-300 text-xs px-3 py-1.5 hover:border-yellow-400 hover:text-yellow-400 transition-colors">
               ← Zur Website
             </Link>
-            <button onClick={logout} className="text-zinc-500 text-xs hover:text-white">Logout</button>
+            <button onClick={logout} className="text-zinc-600 text-xs hover:text-white">Logout</button>
           </div>
         </div>
       </header>
@@ -442,14 +442,14 @@ export default function AdminPage() {
         {tab === "events" && (
           <div>
             <div className="flex items-center justify-between mb-5">
-              <div><h1 className="text-lg font-bold">Events</h1><p className="text-zinc-500 text-xs mt-0.5">{events.length} gesamt</p></div>
+              <div><h1 className="text-lg font-bold">Events</h1><p className="text-zinc-600 text-xs mt-0.5">{events.length} gesamt</p></div>
               <button onClick={openNew} className="rounded-xl bg-yellow-400 text-black font-bold px-4 py-2 text-sm hover:bg-yellow-300 transition-colors">+ Neues Event</button>
             </div>
             {evLoading ? (
               <div className="flex justify-center py-12"><div className="w-6 h-6 border-2 border-yellow-400 border-t-transparent rounded-full animate-spin" /></div>
             ) : events.length === 0 ? (
               <div className="text-center py-16 rounded-2xl border-2 border-dashed border-zinc-800">
-                <p className="text-zinc-500 text-sm mb-3">Noch keine Events vorhanden.</p>
+                <p className="text-zinc-600 text-sm mb-3">Noch keine Events vorhanden.</p>
                 <button onClick={openNew} className="rounded-xl bg-yellow-400 text-black font-bold px-4 py-2 text-sm">Event erstellen</button>
               </div>
             ) : (
@@ -460,13 +460,13 @@ export default function AdminPage() {
                       {e.imageUrl ? <img src={e.imageUrl} alt="" className="w-12 h-12 rounded-xl object-cover shrink-0" /> : <div className="w-12 h-12 rounded-xl bg-zinc-800 shrink-0" />}
                       <div className="flex-1 min-w-0">
                         <p className="font-semibold text-sm truncate">{e.title}</p>
-                        <p className="text-zinc-500 text-xs">{e.city}{e.location ? ` · ${e.location}` : ""}</p>
+                        <p className="text-zinc-600 text-xs">{e.city}{e.location ? ` · ${e.location}` : ""}</p>
                         <p className="text-yellow-400 text-xs">{e.date}{e.time ? ` · ${e.time}` : ""}</p>
                       </div>
                     </div>
-                    <div className="flex gap-2 mt-3 pt-3 border-t border-zinc-800">
+                    <div className="flex gap-2 mt-3 pt-3 border-t border-zinc-200">
                       <button onClick={() => openEdit(e)} className="flex-1 rounded-xl border border-zinc-700 text-zinc-300 text-xs py-2 hover:border-yellow-400 hover:text-yellow-400 transition-colors font-medium">Bearbeiten</button>
-                      <button onClick={() => delEv(e.id!)} className="flex-1 rounded-xl border border-zinc-800 text-zinc-500 text-xs py-2 hover:border-red-500/50 hover:text-red-400 transition-colors font-medium">Löschen</button>
+                      <button onClick={() => delEv(e.id!)} className="flex-1 rounded-xl border border-zinc-800 text-zinc-600 text-xs py-2 hover:border-red-500/50 hover:text-red-400 transition-colors font-medium">Löschen</button>
                     </div>
                   </div>
                 ))}
@@ -478,18 +478,18 @@ export default function AdminPage() {
         {/* Tickets */}
         {tab === "tickets" && (
           <div>
-            <div className="mb-5"><h1 className="text-lg font-bold">Tickets</h1><p className="text-zinc-500 text-xs mt-0.5">Alle Bestellungen</p></div>
+            <div className="mb-5"><h1 className="text-lg font-bold">Tickets</h1><p className="text-zinc-600 text-xs mt-0.5">Alle Bestellungen</p></div>
             <div className="grid grid-cols-3 gap-3 mb-5">
               {[{ l: "Gesamt", v: tickets.length }, { l: "Eingecheckt", v: checkedIn }, { l: "Umsatz", v: `€${revenue.toFixed(2)}` }].map(s => (
                 <div key={s.l} className="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 text-center">
                   <p className="text-xl font-bold text-yellow-400">{s.v}</p>
-                  <p className="text-zinc-500 text-xs mt-0.5">{s.l}</p>
+                  <p className="text-zinc-600 text-xs mt-0.5">{s.l}</p>
                 </div>
               ))}
             </div>
             <div className="flex gap-2 mb-4">
               <input value={ticketFilter} onChange={e => setTicketFilter(e.target.value)} placeholder="Nach Event suchen..." className={inp + " flex-1"} />
-              <button onClick={loadTickets} className="rounded-xl border border-zinc-700 px-4 text-zinc-400 hover:text-white text-sm transition-colors">↻</button>
+              <button onClick={loadTickets} className="rounded-xl border border-zinc-700 px-4 text-zinc-700 hover:text-white text-sm transition-colors">↻</button>
             </div>
             {ticketLoading ? (
               <div className="flex justify-center py-12"><div className="w-6 h-6 border-2 border-yellow-400 border-t-transparent rounded-full animate-spin" /></div>
@@ -497,17 +497,17 @@ export default function AdminPage() {
               <div className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
-                    <thead><tr className="border-b border-zinc-800">{["Name & E-Mail", "Event", "Betrag", "Status", "Check-in", ""].map(h => <th key={h} className="text-left text-zinc-500 font-medium px-4 py-3 text-xs uppercase tracking-wide whitespace-nowrap">{h}</th>)}</tr></thead>
+                    <thead><tr className="border-b border-zinc-800">{["Name & E-Mail", "Event", "Betrag", "Status", "Check-in", ""].map(h => <th key={h} className="text-left text-zinc-600 font-medium px-4 py-3 text-xs uppercase tracking-wide whitespace-nowrap">{h}</th>)}</tr></thead>
                     <tbody>
                       {filtered.length === 0 ? <tr><td colSpan={5} className="text-center text-zinc-600 py-10 text-sm">Keine Einträge.</td></tr>
                         : filtered.map(t => (
                           <tr key={t.id} className="border-b border-zinc-800/50 hover:bg-zinc-800/20 transition-colors">
-                            <td className="px-4 py-3"><p className="font-semibold text-sm">{t.customer_name}</p><p className="text-zinc-500 text-xs">{t.customer_email}</p></td>
-                            <td className="px-4 py-3 text-zinc-400 text-xs whitespace-nowrap">{t.event_title}</td>
+                            <td className="px-4 py-3"><p className="font-semibold text-sm">{t.customer_name}</p><p className="text-zinc-600 text-xs">{t.customer_email}</p></td>
+                            <td className="px-4 py-3 text-zinc-700 text-xs whitespace-nowrap">{t.event_title}</td>
                             <td className="px-4 py-3 font-bold text-sm whitespace-nowrap">€{t.amount.toFixed(2)}</td>
                             <td className="px-4 py-3 whitespace-nowrap"><span className={`rounded-full px-2.5 py-1 text-xs font-medium ${t.status === "checked_in" ? "bg-green-400/10 text-green-400" : t.status === "cancelled" ? "bg-red-400/10 text-red-400" : "bg-yellow-400/10 text-yellow-400"}`}>{t.status === "checked_in" ? "✓ Eingecheckt" : t.status === "cancelled" ? "✕ Storniert" : "Bezahlt"}</span></td>
                             <td className="px-4 py-3 whitespace-nowrap">{t.status !== "cancelled" && <button onClick={() => cancelTicket(t.ticket_id, t.customer_name)} className="rounded-lg border border-red-500/30 text-red-400 text-xs px-3 py-1.5 hover:bg-red-500/10 transition-colors font-medium">Stornieren</button>}</td>
-                            <td className="px-4 py-3 text-zinc-500 text-xs whitespace-nowrap">{t.checked_in_at ? new Date(t.checked_in_at).toLocaleString("de-DE") : "—"}</td>
+                            <td className="px-4 py-3 text-zinc-600 text-xs whitespace-nowrap">{t.checked_in_at ? new Date(t.checked_in_at).toLocaleString("de-DE") : "—"}</td>
                           </tr>
                         ))}
                     </tbody>
@@ -522,12 +522,12 @@ export default function AdminPage() {
         {tab === "rechtliches" && (
           <div>
             <div className="flex items-center justify-between mb-5">
-              <div><h1 className="text-lg font-bold">Rechtliches</h1><p className="text-zinc-500 text-xs mt-0.5">Texte verwalten</p></div>
+              <div><h1 className="text-lg font-bold">Rechtliches</h1><p className="text-zinc-600 text-xs mt-0.5">Texte verwalten</p></div>
               <button onClick={saveLegal} className={`rounded-xl font-bold px-4 py-2 text-sm transition-colors ${legalSaved ? "bg-green-500 text-white" : "bg-yellow-400 text-black hover:bg-yellow-300"}`}>{legalSaved ? "✓ Gespeichert" : "Speichern"}</button>
             </div>
             <div className="flex gap-1 mb-4 bg-zinc-900 border border-zinc-800 rounded-xl p-1 overflow-x-auto">
               {(Object.keys(LEGAL_LABELS) as LegalKey[]).map(k => (
-                <button key={k} onClick={() => setLegalTab(k)} className={`shrink-0 text-xs font-medium px-3 py-2 rounded-lg transition-colors ${legalTab === k ? "bg-yellow-400 text-black" : "text-zinc-500 hover:text-white"}`}>{LEGAL_LABELS[k]}</button>
+                <button key={k} onClick={() => setLegalTab(k)} className={`shrink-0 text-xs font-medium px-3 py-2 rounded-lg transition-colors ${legalTab === k ? "bg-yellow-400 text-black" : "text-zinc-600 hover:text-white"}`}>{LEGAL_LABELS[k]}</button>
               ))}
             </div>
             <textarea value={legal[legalTab]} onChange={e => setLegal(p => ({ ...p, [legalTab]: e.target.value }))} placeholder={`${LEGAL_LABELS[legalTab]} hier eingeben...`} rows={20} className={inp + " resize-none"} />
@@ -537,7 +537,7 @@ export default function AdminPage() {
         {/* Scanner */}
         {tab === "scanner" && (
           <div>
-            <div className="mb-5"><h1 className="text-lg font-bold">Check-In Scanner</h1><p className="text-zinc-500 text-xs mt-0.5">QR-Codes scannen</p></div>
+            <div className="mb-5"><h1 className="text-lg font-bold">Check-In Scanner</h1><p className="text-zinc-600 text-xs mt-0.5">QR-Codes scannen</p></div>
             <ScannerView adminPw={adminPw} />
           </div>
         )}
@@ -550,7 +550,7 @@ export default function AdminPage() {
       </main>
 
       {/* Mobile Bottom Nav */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-zinc-900 border-t border-zinc-800">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-zinc-200">
         <div className="flex">
           {tabs.map(t => (
             <button key={t.key} onClick={() => setTab(t.key)} className={`flex-1 py-3.5 text-center text-xs font-semibold transition-colors border-t-2 ${tab === t.key ? "text-yellow-400 border-yellow-400 bg-zinc-800/50" : "text-zinc-600 border-transparent"}`}>{t.label}</button>
@@ -561,15 +561,15 @@ export default function AdminPage() {
       {/* Event Form */}
       {showForm && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-end md:items-center justify-center" onClick={() => setShowForm(false)}>
-          <div className="w-full md:max-w-2xl bg-zinc-900 border border-zinc-800 rounded-t-3xl md:rounded-3xl max-h-[95vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
-            <div className="sticky top-0 bg-zinc-900 border-b border-zinc-800 px-5 py-4 flex items-center justify-between z-10">
+          <div className="w-full md:max-w-2xl bg-white border border-zinc-200 rounded-t-3xl md:rounded-3xl max-h-[95vh] overflow-y-auto text-black" onClick={e => e.stopPropagation()}>
+            <div className="sticky top-0 bg-white border-b border-zinc-200 px-5 py-4 flex items-center justify-between z-10">
               <h2 className="font-bold text-base">{evIdx ? "Event bearbeiten" : "Neues Event erstellen"}</h2>
-              <button onClick={() => setShowForm(false)} className="w-8 h-8 rounded-lg border border-zinc-700 text-zinc-400 hover:text-white flex items-center justify-center">✕</button>
+              <button onClick={() => setShowForm(false)} className="w-8 h-8 rounded-lg border border-zinc-300 text-zinc-600 hover:text-black flex items-center justify-center">✕</button>
             </div>
 
             <div className="p-5 space-y-4">
-              <div className="bg-zinc-950 rounded-2xl border border-zinc-800 overflow-hidden">
-                <div className="px-4 py-3 border-b border-zinc-800 bg-zinc-900"><p className={lbl + " mb-0"}>Allgemein</p></div>
+              <div className="bg-white rounded-2xl border border-zinc-200 overflow-hidden">
+                <div className="px-4 py-3 border-b border-zinc-200 bg-zinc-50"><p className={lbl + " mb-0"}>Allgemein</p></div>
                 <div className="p-4 space-y-3">
                   <div><label className={lbl}>Event-Name *</label><input value={ev.title} onChange={e => f("title", e.target.value)} placeholder="z.B. Wolna Berlin" className={inp} /></div>
                   <div className="grid grid-cols-2 gap-3">
@@ -591,8 +591,8 @@ export default function AdminPage() {
                 </div>
               </div>
 
-              <div className="bg-zinc-950 rounded-2xl border border-zinc-800 overflow-hidden">
-                <div className="px-4 py-3 border-b border-zinc-800 bg-zinc-900"><p className={lbl + " mb-0"}>Adresse & Bild</p></div>
+              <div className="bg-white rounded-2xl border border-zinc-200 overflow-hidden">
+                <div className="px-4 py-3 border-b border-zinc-200 bg-zinc-50"><p className={lbl + " mb-0"}>Adresse & Bild</p></div>
                 <div className="p-4 space-y-3">
                   <div>
                     <label className={lbl}>Adresse (Google Maps)</label>
@@ -603,8 +603,8 @@ export default function AdminPage() {
                     <label className={lbl}>Bild hochladen</label>
                     <div className="space-y-2">
                       <label className="flex items-center justify-center gap-2 w-full rounded-xl border-2 border-dashed border-zinc-700 hover:border-yellow-400 py-4 cursor-pointer transition-colors bg-zinc-950">
-                        <svg className="w-5 h-5 text-zinc-400" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
-                        <span className="text-zinc-400 text-sm">{uploadingImage ? "Wird hochgeladen..." : "Bild auswählen"}</span>
+                        <svg className="w-5 h-5 text-zinc-700" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
+                        <span className="text-zinc-700 text-sm">{uploadingImage ? "Wird hochgeladen..." : "Bild auswählen"}</span>
                         <input type="file" accept="image/*" className="hidden" onChange={async (e) => {
                           const file = e.target.files?.[0];
                           if (!file) return;
@@ -623,20 +623,20 @@ export default function AdminPage() {
                 </div>
               </div>
 
-              <div className="bg-zinc-950 rounded-2xl border border-zinc-800 overflow-hidden">
-                <div className="px-4 py-3 border-b border-zinc-800 bg-zinc-900"><p className={lbl + " mb-0"}>Beschreibung</p></div>
+              <div className="bg-white rounded-2xl border border-zinc-200 overflow-hidden">
+                <div className="px-4 py-3 border-b border-zinc-200 bg-zinc-50"><p className={lbl + " mb-0"}>Beschreibung</p></div>
                 <div className="p-4"><textarea value={ev.description} onChange={e => f("description", e.target.value)} placeholder="Beschreibe das Event..." rows={4} className={inp + " resize-none"} /></div>
               </div>
 
-              <div className="bg-zinc-950 rounded-2xl border border-zinc-800 overflow-hidden">
-                <div className="px-4 py-3 border-b border-zinc-800 bg-zinc-900 flex items-center justify-between">
+              <div className="bg-white rounded-2xl border border-zinc-200 overflow-hidden">
+                <div className="px-4 py-3 border-b border-zinc-200 bg-zinc-50 flex items-center justify-between">
                   <p className={lbl + " mb-0"}>Ticket-Typen</p>
                   <button onClick={() => f("tickets", [...ev.tickets, { name: "", price: "", quantity: "" }])} className="text-yellow-400 text-xs font-bold hover:text-yellow-300">+ Hinzufügen</button>
                 </div>
                 <div className="p-4 space-y-3">
                   {ev.tickets.map((t, i) => (
                     <div key={i} className="space-y-2">
-                      <div className="flex justify-between"><p className="text-xs text-zinc-500">Ticket {i + 1}</p><button onClick={() => f("tickets", ev.tickets.filter((_, j) => j !== i))} className="text-zinc-600 hover:text-red-400 text-xs transition-colors">Entfernen</button></div>
+                      <div className="flex justify-between"><p className="text-xs text-zinc-600">Ticket {i + 1}</p><button onClick={() => f("tickets", ev.tickets.filter((_, j) => j !== i))} className="text-zinc-600 hover:text-red-600 text-xs transition-colors">Entfernen</button></div>
                       <div className="grid grid-cols-3 gap-2">
                         <input placeholder="Name" value={t.name} onChange={e => setTix(i, "name", e.target.value)} className={inp} />
                         <input placeholder="Preis €" value={t.price} onChange={e => setTix(i, "price", e.target.value)} inputMode="decimal" className={inp} />
@@ -647,15 +647,15 @@ export default function AdminPage() {
                 </div>
               </div>
 
-              <div className="bg-zinc-950 rounded-2xl border border-zinc-800 overflow-hidden">
-                <div className="px-4 py-3 border-b border-zinc-800 bg-zinc-900"><p className={lbl + " mb-0"}>Lounge</p></div>
+              <div className="bg-white rounded-2xl border border-zinc-200 overflow-hidden">
+                <div className="px-4 py-3 border-b border-zinc-200 bg-zinc-50"><p className={lbl + " mb-0"}>Lounge</p></div>
                 <div className="p-4 space-y-3">
                   <Toggle value={ev.lounges} onChange={v => f("lounges", v)} label="Lounges anbieten" />
                   {ev.lounges && (
-                    <div className="space-y-3 pt-3 border-t border-zinc-800">
+                    <div className="space-y-3 pt-3 border-t border-zinc-200">
                       {ev.loungeList.map((l, i) => (
                         <div key={i} className="space-y-2">
-                          <div className="flex justify-between"><p className="text-xs text-zinc-500">Lounge {i + 1}</p><button onClick={() => f("loungeList", ev.loungeList.filter((_, j) => j !== i))} className="text-zinc-600 hover:text-red-400 text-xs transition-colors">Entfernen</button></div>
+                          <div className="flex justify-between"><p className="text-xs text-zinc-600">Lounge {i + 1}</p><button onClick={() => f("loungeList", ev.loungeList.filter((_, j) => j !== i))} className="text-zinc-600 hover:text-red-600 text-xs transition-colors">Entfernen</button></div>
                           <div className="grid grid-cols-3 gap-2">
                             <input placeholder="Name" value={l.name} onChange={e => setLng(i, "name", e.target.value)} className={inp} />
                             <input placeholder="Personen" value={l.persons} onChange={e => setLng(i, "persons", e.target.value)} inputMode="numeric" className={inp} />
@@ -669,8 +669,8 @@ export default function AdminPage() {
                 </div>
               </div>
 
-              <div className="bg-zinc-950 rounded-2xl border border-zinc-800 overflow-hidden">
-                <div className="px-4 py-3 border-b border-zinc-800 bg-zinc-900 flex items-center justify-between">
+              <div className="bg-white rounded-2xl border border-zinc-200 overflow-hidden">
+                <div className="px-4 py-3 border-b border-zinc-200 bg-zinc-50 flex items-center justify-between">
                   <p className={lbl + " mb-0"}>Rabattcodes</p>
                   <button onClick={() => f("discountCodes", [...ev.discountCodes, { code: "", percent: "" }])} className="text-yellow-400 text-xs font-bold hover:text-yellow-300">+ Hinzufügen</button>
                 </div>
@@ -678,7 +678,7 @@ export default function AdminPage() {
                   {ev.discountCodes.length === 0 && <p className="text-zinc-600 text-xs">Keine Rabattcodes konfiguriert.</p>}
                   {ev.discountCodes.map((d, i) => (
                     <div key={i} className="space-y-2">
-                      <div className="flex justify-between"><p className="text-xs text-zinc-500">Code {i + 1}</p><button onClick={() => f("discountCodes", ev.discountCodes.filter((_, j) => j !== i))} className="text-zinc-600 hover:text-red-400 text-xs transition-colors">Entfernen</button></div>
+                      <div className="flex justify-between"><p className="text-xs text-zinc-600">Code {i + 1}</p><button onClick={() => f("discountCodes", ev.discountCodes.filter((_, j) => j !== i))} className="text-zinc-600 hover:text-red-600 text-xs transition-colors">Entfernen</button></div>
                       <div className="grid grid-cols-2 gap-2">
                         <input placeholder="CODE (z.B. WOLNAA10)" value={d.code} onChange={e => setDC(i, "code", e.target.value.toUpperCase())} className={inp + " font-mono uppercase"} />
                         <input placeholder="Rabatt in % (z.B. 10)" value={d.percent} onChange={e => setDC(i, "percent", e.target.value)} inputMode="numeric" className={inp} />
@@ -689,8 +689,8 @@ export default function AdminPage() {
               </div>
             </div>
 
-            <div className="sticky bottom-0 bg-zinc-900 border-t border-zinc-800 px-5 py-4 flex gap-3">
-              <button onClick={() => setShowForm(false)} className="flex-1 rounded-xl border border-zinc-700 py-3.5 text-sm font-semibold text-zinc-400 hover:text-white transition-colors">Abbrechen</button>
+            <div className="sticky bottom-0 bg-white border-t border-zinc-200 px-5 py-4 flex gap-3">
+              <button onClick={() => setShowForm(false)} className="flex-1 rounded-xl border border-zinc-300 py-3.5 text-sm font-semibold text-zinc-600 hover:text-black transition-colors">Abbrechen</button>
               <button onClick={saveEv} disabled={!ev.title || saveLoading} className="flex-1 rounded-xl bg-yellow-400 text-black font-bold py-3.5 text-sm hover:bg-yellow-300 transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2">
                 {saveLoading ? <><div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />Speichern...</> : (evIdx ? "Änderungen speichern" : "Event erstellen")}
               </button>
