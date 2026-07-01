@@ -386,9 +386,18 @@ export default function AdminPage() {
     else { const d = await res.json(); alert("Fehler: " + d.error); }
   }
 
-  const filtered = ticketFilter ? tickets.filter(t => t.event_title.toLowerCase().includes(ticketFilter.toLowerCase())) : tickets;
-  const revenue = tickets.reduce((s, t) => s + t.amount, 0);
-  const checkedIn = tickets.filter(t => t.status === "checked_in").length;
+  const filtered = ticketFilter ? tickets.filter(t => t.event_title.toLowerCase().includes(ticketFilter.toLowerCase())) : [];
+  const selectedRevenue = filtered.reduce((s, t) => s + t.amount, 0);
+  const selectedCheckedIn = filtered.filter(t => t.status === "checked_in").length;
+  const eventTicketStats = events.map(event => {
+    const eventTickets = tickets.filter(t => t.event_title === event.title);
+    return {
+      event,
+      total: eventTickets.length,
+      checkedIn: eventTickets.filter(t => t.status === "checked_in").length,
+      revenue: eventTickets.reduce((sum, ticket) => sum + ticket.amount, 0),
+    };
+  });
 
   const tabs: { key: Tab; label: string }[] = [
     { key: "events", label: "Events" },
@@ -486,9 +495,12 @@ export default function AdminPage() {
         {/* Tickets */}
         {tab === "tickets" && (
           <div>
-            <div className="mb-5"><h1 className="text-lg font-bold">Tickets</h1><p className="text-zinc-600 text-xs mt-0.5">Alle Bestellungen</p></div>
+            <div className="mb-5">
+              <h1 className="text-lg font-bold">Tickets</h1>
+              <p className="text-zinc-600 text-xs mt-0.5">{ticketFilter ? `Kundendaten für ${ticketFilter}` : "Bitte Veranstaltung auswählen"}</p>
+            </div>
             <div className="grid grid-cols-3 gap-3 mb-5">
-              {[{ l: "Gesamt", v: tickets.length }, { l: "Eingecheckt", v: checkedIn }, { l: "Umsatz", v: `€${revenue.toFixed(2)}` }].map(s => (
+              {[{ l: "Tickets", v: filtered.length }, { l: "Eingecheckt", v: selectedCheckedIn }, { l: "Umsatz", v: `€${selectedRevenue.toFixed(2)}` }].map(s => (
                 <div key={s.l} className="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 text-center">
                   <p className="text-xl font-bold text-yellow-400">{s.v}</p>
                   <p className="text-zinc-600 text-xs mt-0.5">{s.l}</p>
@@ -496,18 +508,39 @@ export default function AdminPage() {
               ))}
             </div>
             <div className="flex gap-2 mb-4">
-              <input value={ticketFilter} onChange={e => setTicketFilter(e.target.value)} placeholder="Nach Event suchen..." className={inp + " flex-1"} />
+              <input value={ticketFilter} onChange={e => setTicketFilter(e.target.value)} placeholder="Veranstaltung suchen oder auswählen..." className={inp + " flex-1"} />
+              {ticketFilter && <button onClick={() => setTicketFilter("")} className="rounded-xl border border-zinc-700 px-4 text-zinc-700 hover:text-white text-sm transition-colors">Wechseln</button>}
               <button onClick={loadTickets} className="rounded-xl border border-zinc-700 px-4 text-zinc-700 hover:text-white text-sm transition-colors">↻</button>
             </div>
             {ticketLoading ? (
               <div className="flex justify-center py-12"><div className="w-6 h-6 border-2 border-yellow-400 border-t-transparent rounded-full animate-spin" /></div>
+            ) : !ticketFilter ? (
+              <div className="space-y-2">
+                {eventTicketStats.length === 0 ? (
+                  <div className="text-center py-12 rounded-2xl border border-zinc-800 text-zinc-600 text-sm">Keine Veranstaltungen vorhanden.</div>
+                ) : eventTicketStats.map(({ event, total, checkedIn, revenue }) => (
+                  <button key={event.id || event.title} onClick={() => setTicketFilter(event.title)} className="w-full bg-zinc-900 border border-zinc-800 rounded-2xl p-4 hover:border-yellow-400 transition-colors text-left">
+                    <div className="flex items-center justify-between gap-4">
+                      <div className="min-w-0">
+                        <p className="font-semibold text-sm truncate text-white">{event.title}</p>
+                        <p className="text-zinc-600 text-xs mt-1">{event.date}{event.location ? ` · ${event.location}` : ""}</p>
+                      </div>
+                      <div className="flex items-center gap-5 shrink-0 text-right">
+                        <div><p className="text-yellow-400 font-bold text-sm">{total}</p><p className="text-zinc-600 text-xs">Tickets</p></div>
+                        <div><p className="text-green-400 font-bold text-sm">{checkedIn}</p><p className="text-zinc-600 text-xs">Check-in</p></div>
+                        <div><p className="text-white font-bold text-sm">€{revenue.toFixed(2)}</p><p className="text-zinc-600 text-xs">Umsatz</p></div>
+                      </div>
+                    </div>
+                  </button>
+                ))}
+              </div>
             ) : (
               <div className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead><tr className="border-b border-zinc-800">{["Name & E-Mail", "Event", "Betrag", "Status", "Check-in", ""].map(h => <th key={h} className="text-left text-zinc-600 font-medium px-4 py-3 text-xs uppercase tracking-wide whitespace-nowrap">{h}</th>)}</tr></thead>
                     <tbody>
-                      {filtered.length === 0 ? <tr><td colSpan={5} className="text-center text-zinc-600 py-10 text-sm">Keine Einträge.</td></tr>
+                      {filtered.length === 0 ? <tr><td colSpan={6} className="text-center text-zinc-600 py-10 text-sm">Keine Einträge für diese Veranstaltung.</td></tr>
                         : filtered.map(t => (
                           <tr key={t.id} className="border-b border-zinc-800/50 hover:bg-zinc-800/20 transition-colors">
                             <td className="px-4 py-3"><p className="font-semibold text-sm">{t.customer_name}</p><p className="text-zinc-600 text-xs">{t.customer_email}</p></td>
