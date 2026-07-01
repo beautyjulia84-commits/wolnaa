@@ -12,13 +12,44 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Nicht autorisiert." }, { status: 401 });
   }
 
-  const { data, error } = await supabase
+  const { searchParams } = new URL(req.url);
+  const eventId = searchParams.get("eventId");
+  const eventTitle = searchParams.get("eventTitle");
+
+  if (!eventId && !eventTitle) {
+    return NextResponse.json({ tickets: [] });
+  }
+
+  let query = supabase
     .from("tickets")
     .select("*")
     .order("created_at", { ascending: false });
 
+  if (eventId) {
+    query = query.eq("event_id", eventId);
+  } else if (eventTitle) {
+    query = query.eq("event_title", eventTitle);
+  }
+
+  let { data, error } = await query;
+
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  if (eventId && eventTitle && (!data || data.length === 0)) {
+    const fallback = await supabase
+      .from("tickets")
+      .select("*")
+      .eq("event_title", eventTitle)
+      .order("created_at", { ascending: false });
+
+    data = fallback.data;
+    error = fallback.error;
+
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
   }
 
   const tickets = (data ?? []).map((ticket: any) => ({

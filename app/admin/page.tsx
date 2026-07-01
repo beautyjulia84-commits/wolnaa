@@ -16,6 +16,7 @@ type EventItem = {
   location: string; address: string; imageUrl: string; price: string;
   description: string; tickets: TicketType[];
   lounges: boolean; loungeList: Lounge[]; discountCodes: DiscountCode[];
+  ticketsSold?: number; totalRevenue?: number;
 };
 
 type TicketRow = {
@@ -56,6 +57,8 @@ function rowToEvent(r: any): EventItem {
     lounges: r.lounges ?? false,
     loungeList: r.lounge_list ?? [],
     discountCodes: r.discount_codes ?? [],
+    ticketsSold: Number(r.tickets_sold || 0),
+    totalRevenue: Number(r.total_revenue || 0),
   };
 }
 
@@ -230,10 +233,6 @@ export default function AdminPage() {
     if (authed) { loadEvents(); loadLegal(); }
   }, [authed]);
 
-  useEffect(() => {
-    if (authed && tab === "tickets") loadTickets();
-  }, [authed, tab]);
-
   async function loadEvents() {
     setEvLoading(true);
     const res = await fetch("/api/admin/events", {
@@ -290,10 +289,20 @@ export default function AdminPage() {
     setTimeout(() => setLegalSaved(false), 2000);
   }
 
-  async function loadTickets() {
+  async function loadTickets(event?: EventItem) {
     setTicketLoading(true);
 
-    const res = await fetch("/api/admin/tickets", {
+    if (!event) {
+      setTickets([]);
+      setTicketLoading(false);
+      return;
+    }
+
+    const params = new URLSearchParams();
+    if (event.id) params.set("eventId", event.id);
+    params.set("eventTitle", event.title);
+
+    const res = await fetch(`/api/admin/tickets?${params.toString()}`, {
       headers: adminPw ? { "x-admin-token": adminPw } : undefined,
     });
     const data = await res.json().catch(() => ({}));
@@ -363,9 +372,10 @@ export default function AdminPage() {
   }
 
   function showEventTickets(id?: string) {
+    const event = events.find(e => e.id === id);
     setSelectedTicketEventId(id || "");
     setTab("tickets");
-    if (tickets.length === 0) loadTickets();
+    loadTickets(event);
   }
 
   function openNew() { setEv(JSON.parse(JSON.stringify(EMPTY))); setEvIdx(null); setShowForm(true); }
@@ -382,7 +392,7 @@ export default function AdminPage() {
       headers: { "Content-Type": "application/json", "x-admin-token": adminPw },
       body: JSON.stringify({ ticketId }),
     });
-    if (res.ok) { alert("✅ Storniert! Kunde wird per E-Mail informiert."); loadTickets(); }
+    if (res.ok) { alert("✅ Storniert! Kunde wird per E-Mail informiert."); loadTickets(selectedTicketEvent); }
     else { const d = await res.json(); alert("Fehler: " + d.error); }
   }
 
@@ -395,12 +405,11 @@ export default function AdminPage() {
   const selectedRevenue = filtered.reduce((s, t) => s + t.amount, 0);
   const selectedCheckedIn = filtered.filter(t => t.status === "checked_in").length;
   const eventTicketStats = events.map(event => {
-    const eventTickets = tickets.filter(ticket => ticketBelongsToEvent(ticket, event));
     return {
       event,
-      total: eventTickets.length,
-      checkedIn: eventTickets.filter(t => t.status === "checked_in").length,
-      revenue: eventTickets.reduce((sum, ticket) => sum + ticket.amount, 0),
+      total: event.ticketsSold || 0,
+      checkedIn: 0,
+      revenue: (event.totalRevenue || 0) / 100,
     };
   });
 
@@ -523,7 +532,7 @@ export default function AdminPage() {
                 </div>
               )}
               {selectedTicketEvent && <button onClick={() => setSelectedTicketEventId("")} className="rounded-xl border border-zinc-700 px-4 text-zinc-700 hover:text-white text-sm transition-colors">Wechseln</button>}
-              <button onClick={loadTickets} className="rounded-xl border border-zinc-700 px-4 text-zinc-700 hover:text-white text-sm transition-colors">↻</button>
+              <button onClick={() => loadTickets(selectedTicketEvent)} className="rounded-xl border border-zinc-700 px-4 text-zinc-700 hover:text-white text-sm transition-colors">↻</button>
             </div>
             {ticketLoading ? (
               <div className="flex justify-center py-12"><div className="w-6 h-6 border-2 border-yellow-400 border-t-transparent rounded-full animate-spin" /></div>
@@ -532,7 +541,7 @@ export default function AdminPage() {
                 {eventTicketStats.length === 0 ? (
                   <div className="text-center py-12 rounded-2xl border border-zinc-800 text-zinc-600 text-sm">Keine Veranstaltungen vorhanden.</div>
                 ) : eventTicketStats.map(({ event, total, checkedIn, revenue }) => (
-                  <button key={event.id || event.title} onClick={() => setSelectedTicketEventId(event.id || "")} className="w-full bg-zinc-900 border border-zinc-800 rounded-2xl p-4 hover:border-yellow-400 transition-colors text-left">
+                  <button key={event.id || event.title} onClick={() => { setSelectedTicketEventId(event.id || ""); loadTickets(event); }} className="w-full bg-zinc-900 border border-zinc-800 rounded-2xl p-4 hover:border-yellow-400 transition-colors text-left">
                     <div className="flex items-center justify-between gap-4">
                       <div className="min-w-0">
                         <p className="font-semibold text-sm truncate text-white">{event.title}</p>
