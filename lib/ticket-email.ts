@@ -44,7 +44,7 @@ export function buildTicketEmailHtml({
           <tr>
             <td style="font-size:16px;line-height:1.7;color:#111827;">
               <p style="margin:0 0 16px;">Hallo <strong>${safeCustomerName}</strong>,</p>
-              <p style="margin:0 0 16px;">vielen Dank für deine Bestellung.</p>
+              <p style="margin:0 0 16px;">vielen Dank f&uuml;r deine Bestellung.</p>
               <p style="margin:0 0 16px;">
                 ${plural ? 'Deine Tickets sind' : 'Dein Ticket ist'} im Anhang dieser E-Mail als druckbares PDF hinterlegt.
               </p>

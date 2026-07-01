@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
     await resend.emails.send({
       from: process.env.RESEND_FROM_EMAIL || "WOLNAA Tickets <kontakt@wolnaa.de>",
       to: customerEmail,
-      subject: `Dein Ticket – ${eventTitle}`,
+      subject: `Dein Ticket - ${eventTitle}`,
       html: buildTicketEmailHtml({
         eventTitle,
         customerName,

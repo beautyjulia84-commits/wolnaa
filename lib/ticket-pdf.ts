@@ -10,7 +10,7 @@ type TicketPdfData = {
 };
 
 function wrapText(ctx: any, text: string, maxWidth: number) {
-  const words = String(text || '').split(/\s+/);
+  const words = pdfText(text).split(/\s+/);
   const lines: string[] = [];
   let line = '';
 
@@ -28,14 +28,29 @@ function wrapText(ctx: any, text: string, maxWidth: number) {
   return lines;
 }
 
+function pdfText(value: string) {
+  return String(value || '')
+    .replace(/Ä/g, 'Ae')
+    .replace(/Ö/g, 'Oe')
+    .replace(/Ü/g, 'Ue')
+    .replace(/ä/g, 'ae')
+    .replace(/ö/g, 'oe')
+    .replace(/ü/g, 'ue')
+    .replace(/ß/g, 'ss')
+    .replace(/€/g, 'EUR')
+    .replace(/[–—]/g, '-')
+    .replace(/[“”„]/g, '"')
+    .replace(/[’]/g, "'");
+}
+
 function drawLabelValue(ctx: any, label: string, value: string, x: number, y: number) {
   ctx.fillStyle = '#6b7280';
   ctx.font = 'bold 18px Arial';
-  ctx.fillText(label.toUpperCase(), x, y);
+  ctx.fillText(pdfText(label).toUpperCase(), x, y);
 
   ctx.fillStyle = '#111827';
   ctx.font = 'bold 28px Arial';
-  ctx.fillText(value || '-', x, y + 36);
+  ctx.fillText(pdfText(value || '-'), x, y + 36);
 }
 
 export async function generateTicketPdf(data: TicketPdfData) {
@@ -85,7 +100,7 @@ export async function generateTicketPdf(data: TicketPdfData) {
   ctx.fillText('TICKET-ID', 62, detailsTop + 312);
   ctx.fillStyle = '#111827';
   ctx.font = 'bold 18px Courier New';
-  ctx.fillText(data.ticketId, 62, detailsTop + 348);
+  ctx.fillText(pdfText(data.ticketId), 62, detailsTop + 348);
 
   const qrImage = await loadImage(`data:image/png;base64,${data.qrBase64}`);
   const qrSize = 210;
@@ -106,7 +121,7 @@ export async function generateTicketPdf(data: TicketPdfData) {
 
   ctx.fillStyle = '#6b7280';
   ctx.font = '14px Arial';
-  ctx.fillText('Dieses Ticket ist nur einmal gültig. Bitte digital oder ausgedruckt mitbringen.', 62, height - 98);
+  ctx.fillText('Dieses Ticket ist nur einmal gueltig. Bitte digital oder ausgedruckt mitbringen.', 62, height - 98);
   ctx.fillText('Kontakt: kontakt@wolnaa.de', 62, height - 76);
 
   return canvas.toBuffer('application/pdf');
