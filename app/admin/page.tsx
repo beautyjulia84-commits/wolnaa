@@ -247,10 +247,13 @@ export default function AdminPage() {
   }
 
   async function loadLegal() {
-    const { data } = await sb.from("settings").select("*");
-    if (data) {
+    const res = await fetch("/api/admin/settings", {
+      headers: adminPw ? { "x-admin-token": adminPw } : undefined,
+    });
+    const data = await res.json().catch(() => ({}));
+    if (res.ok) {
       const map: Record<string, string> = {};
-      data.forEach(r => { map[r.key] = r.value; });
+      (data.settings ?? []).forEach((r: any) => { map[r.key] = r.value; });
       setLegal({
         impressum: map.impressum ?? "",
         datenschutz: map.datenschutz ?? "",
@@ -258,13 +261,28 @@ export default function AdminPage() {
         teilnahme: map.teilnahme ?? "",
         widerruf: map.widerruf ?? "",
       });
+    } else {
+      console.error("Rechtliches laden Fehler:", data.error);
     }
   }
 
   async function saveLegal() {
     setLegalSaved(false);
-    const upserts = Object.entries(legal).map(([key, value]) => ({ key, value }));
-    await sb.from("settings").upsert(upserts, { onConflict: "key" });
+    const res = await fetch("/api/admin/settings", {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        ...(adminPw ? { "x-admin-token": adminPw } : {}),
+      },
+      body: JSON.stringify({ settings: legal }),
+    });
+
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      alert("Speichern fehlgeschlagen: " + (data.error || "Unbekannter Fehler"));
+      return;
+    }
+
     setLegalSaved(true);
     setTimeout(() => setLegalSaved(false), 2000);
   }
