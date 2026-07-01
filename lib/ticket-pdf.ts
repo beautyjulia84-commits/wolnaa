@@ -1,4 +1,5 @@
-import { createCanvas, loadImage } from 'canvas';
+import path from 'path';
+import { createCanvas, loadImage, registerFont } from 'canvas';
 
 type TicketPdfData = {
   ticketId: string;
@@ -8,6 +9,16 @@ type TicketPdfData = {
   amountText?: string;
   qrBase64: string;
 };
+
+const ticketFontFamily = 'GeistTicket';
+
+try {
+  registerFont(path.join(process.cwd(), 'node_modules/@vercel/og/dist/Geist-Regular.ttf'), {
+    family: ticketFontFamily,
+  });
+} catch {
+  // If the font is already registered, canvas throws. The fallback below still keeps rendering alive.
+}
 
 function wrapText(ctx: any, text: string, maxWidth: number) {
   const words = pdfText(text).split(/\s+/);
@@ -45,11 +56,11 @@ function pdfText(value: string) {
 
 function drawLabelValue(ctx: any, label: string, value: string, x: number, y: number) {
   ctx.fillStyle = '#6b7280';
-  ctx.font = 'bold 18px Arial';
+  ctx.font = `18px "${ticketFontFamily}"`;
   ctx.fillText(pdfText(label).toUpperCase(), x, y);
 
   ctx.fillStyle = '#111827';
-  ctx.font = 'bold 28px Arial';
+  ctx.font = `28px "${ticketFontFamily}"`;
   ctx.fillText(pdfText(value || '-'), x, y + 36);
 }
 
@@ -78,13 +89,13 @@ function drawTicket(ctx: any, width: number, height: number, data: TicketPdfData
   ctx.strokeRect(38, 38, width - 76, height - 76);
 
   ctx.fillStyle = '#111827';
-  ctx.font = 'bold 34px Arial';
+  ctx.font = `34px "${ticketFontFamily}"`;
   ctx.fillText('WOLNAA', 62, 92);
 
   ctx.fillStyle = '#facc15';
   ctx.fillRect(width - 178, 60, 116, 34);
   ctx.fillStyle = '#111827';
-  ctx.font = 'bold 15px Arial';
+  ctx.font = `15px "${ticketFontFamily}"`;
   ctx.fillText('E-TICKET', width - 148, 82);
 
   ctx.strokeStyle = '#e5e7eb';
@@ -95,7 +106,7 @@ function drawTicket(ctx: any, width: number, height: number, data: TicketPdfData
   ctx.stroke();
 
   ctx.fillStyle = '#111827';
-  ctx.font = 'bold 40px Arial';
+  ctx.font = `40px "${ticketFontFamily}"`;
   const titleLines = wrapText(ctx, data.eventTitle, width - 124);
   titleLines.slice(0, 3).forEach((line, index) => {
     ctx.fillText(line, 62, 180 + index * 46);
@@ -107,10 +118,10 @@ function drawTicket(ctx: any, width: number, height: number, data: TicketPdfData
   drawLabelValue(ctx, 'Preis', data.amountText || '-', 62, detailsTop + 208);
 
   ctx.fillStyle = '#6b7280';
-  ctx.font = 'bold 18px Arial';
+  ctx.font = `18px "${ticketFontFamily}"`;
   ctx.fillText('TICKET-ID', 62, detailsTop + 312);
   ctx.fillStyle = '#111827';
-  ctx.font = 'bold 18px Courier New';
+  ctx.font = `18px "${ticketFontFamily}"`;
   ctx.fillText(pdfText(data.ticketId), 62, detailsTop + 348);
 
   const qrSize = 210;
@@ -126,11 +137,11 @@ function drawTicket(ctx: any, width: number, height: number, data: TicketPdfData
   ctx.drawImage(qrImage, qrX, qrY, qrSize, qrSize);
 
   ctx.fillStyle = '#374151';
-  ctx.font = 'bold 13px Arial';
+  ctx.font = `13px "${ticketFontFamily}"`;
   ctx.fillText('QR-Code am Einlass vorzeigen', qrX + 10, qrY + qrSize + 34);
 
   ctx.fillStyle = '#6b7280';
-  ctx.font = '14px Arial';
+  ctx.font = `14px "${ticketFontFamily}"`;
   ctx.fillText('Dieses Ticket ist nur einmal gueltig. Bitte digital oder ausgedruckt mitbringen.', 62, height - 98);
   ctx.fillText('Kontakt: kontakt@wolnaa.de', 62, height - 76);
 }
