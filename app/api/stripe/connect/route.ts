@@ -1,9 +1,6 @@
 import { NextResponse } from 'next/server';
-import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
 import { getAuthedVeranstalterId } from '@/lib/veranstalter-auth';
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 export async function POST(req: Request) {
   const supabaseAdmin = createClient(
@@ -13,7 +10,8 @@ export async function POST(req: Request) {
 
   try {
     const authedId = getAuthedVeranstalterId(req);
-    const { veranstalterId } = await req.json();
+    const body = await req.json().catch(() => ({}));
+    const veranstalterId = body?.veranstalterId;
 
     if (!authedId) {
       return NextResponse.json({ error: 'Nicht angemeldet.' }, { status: 401 });
@@ -22,64 +20,39 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Kein Zugriff.' }, { status: 403 });
     }
 
+    const connectClientId = process.env.STRIPE_CONNECT_CLIENT_ID;
+    if (!connectClientId) {
+      return NextResponse.json(
+        { error: 'STRIPE_CONNECT_CLIENT_ID fehlt in Vercel.' },
+        { status: 500 }
+      );
+    }
+
     const { data: veranstalter, error } = await supabaseAdmin
       .from('veranstalter')
-      .select('id, firmenname, kontakt_email, website, stripe_account_id')
+      .select('id, status')
       .eq('id', authedId)
       .single();
 
     if (error || !veranstalter) {
       return NextResponse.json({ error: 'Veranstalter nicht gefunden.' }, { status: 404 });
     }
-
-    let accountId = veranstalter.stripe_account_id;
-
-    if (!accountId) {
-      const account = await stripe.accounts.create({
-        country: 'DE',
-        email: veranstalter.kontakt_email || undefined,
-        business_type: 'company',
-        business_profile: {
-          name: veranstalter.firmenname,
-          url: veranstalter.website || undefined,
-        },
-        controller: {
-          fees: {
-            payer: 'account',
-          },
-          losses: {
-            payments: 'stripe',
-          },
-          requirement_collection: 'stripe',
-          stripe_dashboard: {
-            type: 'express',
-          },
-        },
-      });
-
-      accountId = account.id;
-
-      await supabaseAdmin
-        .from('veranstalter')
-        .update({
-          stripe_account_id: accountId,
-          stripe_charges_enabled: account.charges_enabled,
-        })
-        .eq('id', veranstalter.id);
+    if (veranstalter.status && veranstalter.status !== 'aktiv') {
+      return NextResponse.json({ error: 'Veranstalter ist nicht aktiv.' }, { status: 403 });
     }
 
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || new URL(req.url).origin;
+    const redirectUri = `${appUrl}/api/stripe/connect/callback`;
+    const authUrl = new URL('https://connect.stripe.com/oauth/authorize');
+    authUrl.searchParams.set('response_type', 'code');
+    authUrl.searchParams.set('client_id', connectClientId);
+    authUrl.searchParams.set('scope', 'read_write');
+    authUrl.searchParams.set('state', authedId);
+    authUrl.searchParams.set('redirect_uri', redirectUri);
 
-    const accountLink = await stripe.accountLinks.create({
-      account: accountId,
-      type: 'account_onboarding',
-      refresh_url: `${appUrl}/veranstalter/einstellungen`,
-      return_url: `${appUrl}/api/stripe/connect/callback?account_id=${accountId}`,
-    });
-
-    return NextResponse.json({ url: accountLink.url });
+    return NextResponse.json({ url: authUrl.toString() });
   } catch (err: any) {
-    console.error('Stripe Express connect error:', err);
+    console.error('Stripe Standard connect error:', err);
     return NextResponse.json(
       { error: err?.message || 'Stripe-Verbindung fehlgeschlagen.' },
       { status: 500 }

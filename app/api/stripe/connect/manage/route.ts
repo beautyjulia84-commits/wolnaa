@@ -1,9 +1,6 @@
 import { NextResponse } from 'next/server';
-import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
 import { getAuthedVeranstalterId } from '@/lib/veranstalter-auth';
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 export async function POST(req: Request) {
   try {
@@ -27,8 +24,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Kein Stripe-Konto verbunden.' }, { status: 400 });
     }
 
-    const link = await stripe.accounts.createLoginLink(veranstalter.stripe_account_id);
-    return NextResponse.json({ url: link.url });
+    return NextResponse.json({ url: 'https://dashboard.stripe.com/' });
   } catch (err) {
     return NextResponse.json({ error: 'Fehler' }, { status: 500 });
   }
