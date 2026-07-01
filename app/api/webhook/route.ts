@@ -4,6 +4,7 @@ import { Resend } from "resend";
 import QRCode from "qrcode";
 import { supabase } from "@/lib/supabase";
 import { buildTicketEmailHtml, formatEuro } from "@/lib/ticket-email";
+import { generateTicketPdf } from "@/lib/ticket-pdf";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 const resend = new Resend(process.env.RESEND_API_KEY!);
@@ -76,18 +77,23 @@ export async function POST(req: NextRequest) {
         .eq("id", eventId);
     }
 
-    const qrAttachments = [];
-    const emailTickets = [];
+    const ticketAttachments = [];
     for (const [index, tid] of ticketIds.entries()) {
       const qrDataUrl = await QRCode.toDataURL(tid, { width: 400, margin: 2, color: { dark: "#000000", light: "#ffffff" } });
       const qrBase64 = qrDataUrl.replace("data:image/png;base64,", "");
-      const qrContentId = `ticket-qr-${index}`;
-      qrAttachments.push({ filename: `ticket-${tid}.png`, content: qrBase64, contentType: "image/png", contentId: qrContentId });
-      emailTickets.push({
+      const amountText = expandedItems[index]?.price ? `${expandedItems[index].price} €` : (index === 0 ? formatEuro(amount) : "");
+      const ticketPdf = await generateTicketPdf({
         ticketId: tid,
+        eventTitle,
+        customerName,
         ticketName: expandedItems[index]?.name || "Standard Ticket",
-        amountText: expandedItems[index]?.price ? `${expandedItems[index].price} €` : (index === 0 ? formatEuro(amount) : ""),
-        qrContentId,
+        amountText,
+        qrBase64,
+      });
+      ticketAttachments.push({
+        filename: `wolnaa-ticket-${index + 1}-${tid}.pdf`,
+        content: ticketPdf.toString("base64"),
+        contentType: "application/pdf",
       });
     }
 
@@ -98,9 +104,9 @@ export async function POST(req: NextRequest) {
       html: buildTicketEmailHtml({
         eventTitle,
         customerName,
-        tickets: emailTickets,
+        ticketCount: ticketAttachments.length,
       }),
-      attachments: qrAttachments,
+      attachments: ticketAttachments,
     });
   }
 

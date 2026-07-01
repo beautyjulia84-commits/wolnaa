@@ -3,6 +3,7 @@ import { Resend } from "resend";
 import QRCode from "qrcode";
 import { createClient } from "@supabase/supabase-js";
 import { buildTicketEmailHtml } from "@/lib/ticket-email";
+import { generateTicketPdf } from "@/lib/ticket-pdf";
 
 const resend = new Resend(process.env.RESEND_API_KEY!);
 
@@ -38,6 +39,14 @@ export async function POST(req: NextRequest) {
       color: { dark: "#000000", light: "#ffffff" },
     });
     const qrBase64 = qrDataUrl.replace("data:image/png;base64,", "");
+    const ticketPdf = await generateTicketPdf({
+      ticketId,
+      eventTitle,
+      customerName,
+      ticketName: "Freiticket",
+      amountText: "0,00 €",
+      qrBase64,
+    });
 
     // Email senden
     await resend.emails.send({
@@ -47,18 +56,12 @@ export async function POST(req: NextRequest) {
       html: buildTicketEmailHtml({
         eventTitle,
         customerName,
-        tickets: [{
-          ticketId,
-          ticketName: "Freiticket",
-          amountText: "0,00 €",
-          qrContentId: "ticket-qr-0",
-        }],
+        ticketCount: 1,
       }),
       attachments: [{
-        filename: `ticket-${ticketId}.png`,
-        content: qrBase64,
-        contentType: "image/png",
-        contentId: "ticket-qr-0",
+        filename: `wolnaa-ticket-${ticketId}.pdf`,
+        content: ticketPdf.toString("base64"),
+        contentType: "application/pdf",
       }],
     });
 
