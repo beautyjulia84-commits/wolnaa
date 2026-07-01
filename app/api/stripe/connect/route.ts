@@ -31,7 +31,6 @@ export async function POST(req: Request) {
 
     if (!accountId) {
       const account = await stripe.accounts.create({
-        type: 'express',
         country: 'DE',
         email: veranstalter.kontakt_email || undefined,
         business_type: 'company',
@@ -39,9 +38,17 @@ export async function POST(req: Request) {
           name: veranstalter.firmenname,
           url: veranstalter.website || undefined,
         },
-        capabilities: {
-          card_payments: { requested: true },
-          transfers: { requested: true },
+        controller: {
+          fees: {
+            payer: 'account',
+          },
+          losses: {
+            payments: 'stripe',
+          },
+          requirement_collection: 'stripe',
+          stripe_dashboard: {
+            type: 'express',
+          },
         },
       });
 
