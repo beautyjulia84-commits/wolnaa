@@ -184,7 +184,7 @@ function ScannerView({ adminPw }: { adminPw: string }) {
 }
 
 
-function VeranstalterEinladen() {
+function VeranstalterEinladen({ adminPw }: { adminPw: string }) {
   const [email, setEmail] = useState("");
   const [firmenname, setFirmenname] = useState("");
   const [loading, setLoading] = useState(false);
@@ -196,7 +196,7 @@ function VeranstalterEinladen() {
     setLoading(true); setError(""); setMsg("");
     const res = await fetch("/api/admin/veranstalter/einladen", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", "x-admin-token": adminPw },
       body: JSON.stringify({ email, firmenname }),
     });
     const data = await res.json();
@@ -544,7 +544,7 @@ export default function AdminPage() {
 
         {tab === "veranstalter" && (
           <div className="p-5">
-            <VeranstalterEinladen />
+            <VeranstalterEinladen adminPw={adminPw} />
           </div>
         )}
       </main>

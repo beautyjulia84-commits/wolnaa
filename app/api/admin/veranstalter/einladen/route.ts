@@ -1,7 +1,17 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
-export async function POST(req: Request) {
+function isAdmin(req: NextRequest) {
+  const cookieToken = req.cookies.get('wolnaa-admin-token')?.value;
+  const headerToken = req.headers.get('x-admin-token');
+  return cookieToken === process.env.ADMIN_PASSWORD || headerToken === process.env.ADMIN_PASSWORD;
+}
+
+export async function POST(req: NextRequest) {
+  if (!isAdmin(req)) {
+    return NextResponse.json({ error: 'Nicht autorisiert.' }, { status: 401 });
+  }
+
   const supabaseAdmin = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!);
   const { email, firmenname, telefon, website, platformFeePercent } = await req.json();
   if (!email || !firmenname) return NextResponse.json({ error: 'E-Mail und Firmenname sind Pflichtfelder.' }, { status: 400 });
