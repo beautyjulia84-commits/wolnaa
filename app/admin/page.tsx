@@ -18,7 +18,7 @@ type DiscountCode = { code: string; percent: string };
 
 type EventItem = {
   id?: string;
-  title: string; city: string; date: string; time: string;
+  title: string; city: string; date: string; time: string; onlineSaleEndsAt: string;
   location: string; address: string; imageUrl: string; price: string;
   description: string; tickets: TicketType[];
   lounges: boolean; loungeList: Lounge[]; discountCodes: DiscountCode[];
@@ -38,7 +38,7 @@ const LEGAL_LABELS: Record<LegalKey, string> = {
 };
 
 const EMPTY: EventItem = {
-  title: "", city: "", date: "", time: "", location: "", address: "",
+  title: "", city: "", date: "", time: "", onlineSaleEndsAt: "", location: "", address: "",
   imageUrl: "", price: "", description: "",
   tickets: [{ name: "Standard", price: "", quantity: "" }],
   lounges: false, loungeList: [], discountCodes: [],
@@ -52,6 +52,7 @@ function rowToEvent(r: any): EventItem {
     city: r.city ?? "",
     date: r.date ?? "",
     time: r.time ?? "",
+    onlineSaleEndsAt: r.online_sale_ends_at ? new Date(r.online_sale_ends_at).toISOString().slice(0, 16) : "",
     location: r.location ?? "",
     address: r.address ?? "",
     imageUrl: r.image_url ?? "",
@@ -76,6 +77,7 @@ function eventToRow(e: EventItem) {
     city: e.city,
     date: e.date,
     time: e.time,
+    online_sale_ends_at: e.onlineSaleEndsAt ? new Date(e.onlineSaleEndsAt).toISOString() : null,
     location: e.location,
     address: e.address,
     image_url: e.imageUrl,
@@ -570,6 +572,11 @@ export default function AdminPage() {
                       <label className={lbl}>Uhrzeit (z.B. 22:00)</label>
                       <input type="text" inputMode="numeric" value={ev.time} onChange={e => { let v = e.target.value.replace(/[^0-9:]/g, ""); if (v.length === 2 && !v.includes(":") && ev.time.length < 2) v += ":"; if (v.length <= 5) f("time", v); }} placeholder="22:00" maxLength={5} className={inp} />
                     </div>
+                  </div>
+                  <div>
+                    <label className={lbl}>Online-Verkauf bis</label>
+                    <input type="datetime-local" value={ev.onlineSaleEndsAt} onChange={e => f("onlineSaleEndsAt", e.target.value)} className={inp} />
+                    <p className="text-zinc-600 text-xs mt-1">Nach diesem Zeitpunkt können online keine Tickets mehr gekauft werden.</p>
                   </div>
                 </div>
               </div>

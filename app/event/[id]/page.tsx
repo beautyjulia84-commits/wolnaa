@@ -134,12 +134,12 @@ export default function EventPage() {
       if (selectedLounge !== null && n.loungeList[selectedLounge]) lineItems.push({ name: n.loungeList[selectedLounge].name, price: n.loungeList[selectedLounge].price, qty: 1 });
       const res = await fetch("/api/create-checkout-session", {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ eventTitle: event?.title || "", customerName, customerEmail, lineItems, total, ticketId, discountCode: appliedDiscount?.code ?? null }),
+        body: JSON.stringify({ eventId: event?.id, eventTitle: event?.title || "", customerName, customerEmail, lineItems, total, ticketId, discountCode: appliedDiscount?.code ?? null }),
       });
-      if (!res.ok) throw new Error();
       const data = await res.json();
-      if (data.url) window.location.href = data.url; else throw new Error();
-    } catch { setCheckoutError("Fehler aufgetreten. Bitte erneut versuchen."); }
+      if (!res.ok) throw new Error(data.error || "Fehler aufgetreten.");
+      if (data.url) window.location.href = data.url; else throw new Error("Fehler aufgetreten.");
+    } catch (err: any) { setCheckoutError(err?.message || "Fehler aufgetreten. Bitte erneut versuchen."); }
     finally { setLoading(false); }
   }
 

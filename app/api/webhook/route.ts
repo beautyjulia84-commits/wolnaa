@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
 
   if (event.type === "checkout.session.completed") {
     const session = event.data.object as Stripe.Checkout.Session;
-    const { eventTitle, customerName, ticketId } = session.metadata ?? {};
+    const { eventId, eventTitle, customerName, ticketId } = session.metadata ?? {};
     const customerEmail = session.customer_details?.email ?? session.customer_email ?? session.metadata?.customerEmail ?? "";
     const amount = (session.amount_total ?? 0) / 100;
 
@@ -37,8 +37,15 @@ export async function POST(req: NextRequest) {
       ticketIds.push(i === 0 ? ticketId : "WOLNAA-" + Math.random().toString(36).substring(2, 10).toUpperCase());
     }
 
+    const expandedItems = lineItems.flatMap((item) =>
+      Array.from({ length: item.qty || 1 }, () => item)
+    );
+
     const ticketRows = ticketIds.map((tid, i) => ({
       ticket_id: tid,
+      event_id: eventId || null,
+      ticket_name: expandedItems[i]?.name || "",
+      quantity: 1,
       event_title: eventTitle,
       customer_name: customerName,
       customer_email: customerEmail,
@@ -50,6 +57,22 @@ export async function POST(req: NextRequest) {
     if (dbError) {
       console.error("Supabase Fehler:", JSON.stringify(dbError));
       return NextResponse.json({ error: "Datenbankfehler.", details: dbError.message, code: dbError.code }, { status: 500 });
+    }
+
+    if (eventId) {
+      const { data: currentEvent } = await supabase
+        .from("events")
+        .select("tickets_sold,total_revenue")
+        .eq("id", eventId)
+        .single();
+
+      await supabase
+        .from("events")
+        .update({
+          tickets_sold: Number(currentEvent?.tickets_sold || 0) + totalTickets,
+          total_revenue: Number(currentEvent?.total_revenue || 0) + Math.round(amount * 100),
+        })
+        .eq("id", eventId);
     }
 
     const qrAttachments = [];
