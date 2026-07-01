@@ -451,6 +451,7 @@ export default function AdminPage() {
           <div className="flex items-center gap-2 shrink-0">
             <img src="/wolnaa-logo.png" alt="Wolnaa" className="h-8 w-auto" />
             <span className="font-bold text-sm hidden sm:block">Admin</span>
+            <span className="rounded-full border border-yellow-400/40 px-2 py-0.5 text-[10px] font-bold text-yellow-400">v2</span>
           </div>
           <nav className="hidden md:flex items-center gap-0.5 flex-1 justify-center">
             {tabs.map(t => (
