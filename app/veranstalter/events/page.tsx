@@ -79,7 +79,7 @@ export default function VeranstalterEvents() {
                     <p style={{ margin:0, fontSize:'20px', fontWeight:'700', color:'#111' }}>{e.tickets_sold||0}</p>
                     <p style={{ margin:0, fontSize:'12px', color:'#9ca3af' }}>Tickets</p>
                   </div>
-                  <Link href={`/veranstalter/events/${e.id}/teilnehmer`} style={{ padding:'8px 14px', border:'1px solid #e5e7eb', borderRadius:'8px', color:'#374151', textDecoration:'none', fontSize:'13px', fontWeight:'500' }}>Teilnehmer</Link>
+                  <Link href={`/veranstalter/events/${e.id}/teilnehmer`} style={{ padding:'9px 16px', border:'1px solid #111827', borderRadius:'8px', background:'#111827', color:'#fff', textDecoration:'none', fontSize:'13px', fontWeight:'600', whiteSpace:'nowrap' }}>Tickets/Kunden ansehen</Link>
                 </div>
               </div>
             );

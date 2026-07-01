@@ -92,7 +92,7 @@ export default function VeranstalterDashboard() {
         ) : (
           <table style={{ width:'100%', borderCollapse:'collapse' }}>
             <thead><tr style={{ background:'#f9fafb' }}>
-              {['Event','Datum','Tickets','Umsatz'].map(h => <th key={h} style={{ padding:'12px 24px', textAlign:'left', fontSize:'12px', fontWeight:'600', color:'#6b7280', textTransform:'uppercase' }}>{h}</th>)}
+              {['Event','Datum','Tickets','Umsatz',''].map(h => <th key={h} style={{ padding:'12px 24px', textAlign:'left', fontSize:'12px', fontWeight:'600', color:'#6b7280', textTransform:'uppercase' }}>{h}</th>)}
             </tr></thead>
             <tbody>
               {events.map((e:any, i:number) => (
@@ -101,6 +101,9 @@ export default function VeranstalterDashboard() {
                   <td style={{ padding:'16px 24px', color:'#6b7280', fontSize:'14px' }}>{new Date(e.date).toLocaleDateString('de-DE',{day:'2-digit',month:'short',year:'numeric'})}</td>
                   <td style={{ padding:'16px 24px', color:'#111', fontSize:'14px' }}>{e.tickets_sold||0}</td>
                   <td style={{ padding:'16px 24px', color:'#111', fontSize:'14px', fontWeight:'500' }}>€{((e.total_revenue||0)/100).toFixed(2)}</td>
+                  <td style={{ padding:'16px 24px', textAlign:'right' }}>
+                    <Link href={`/veranstalter/events/${e.id}/teilnehmer`} style={{ color:'#111827', border:'1px solid #d1d5db', borderRadius:'8px', padding:'7px 12px', textDecoration:'none', fontSize:'13px', fontWeight:600, whiteSpace:'nowrap' }}>Tickets ansehen</Link>
+                  </td>
                 </tr>
               ))}
             </tbody>

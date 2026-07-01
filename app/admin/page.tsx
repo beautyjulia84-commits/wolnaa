@@ -362,6 +362,12 @@ export default function AdminPage() {
     await loadEvents();
   }
 
+  function showEventTickets(title: string) {
+    setTicketFilter(title);
+    setTab("tickets");
+    if (tickets.length === 0) loadTickets();
+  }
+
   function openNew() { setEv(JSON.parse(JSON.stringify(EMPTY))); setEvIdx(null); setShowForm(true); }
   function openEdit(e: EventItem) { setEv(JSON.parse(JSON.stringify(e))); setEvIdx(e.id ?? null); setShowForm(true); }
   function f<K extends keyof EventItem>(k: K, v: EventItem[K]) { setEv(p => ({ ...p, [k]: v })); }
@@ -467,6 +473,7 @@ export default function AdminPage() {
                     </div>
                     <div className="flex gap-2 mt-3 pt-3 border-t border-zinc-200">
                       <button onClick={() => openEdit(e)} className="flex-1 rounded-xl border border-zinc-700 text-zinc-300 text-xs py-2 hover:border-yellow-400 hover:text-yellow-400 transition-colors font-medium">Bearbeiten</button>
+                      <button onClick={() => showEventTickets(e.title)} className="flex-1 rounded-xl border border-zinc-700 text-zinc-300 text-xs py-2 hover:border-yellow-400 hover:text-yellow-400 transition-colors font-medium">Tickets</button>
                       <button onClick={() => delEv(e.id!)} className="flex-1 rounded-xl border border-zinc-800 text-zinc-600 text-xs py-2 hover:border-red-500/50 hover:text-red-400 transition-colors font-medium">Löschen</button>
                     </div>
                   </div>
