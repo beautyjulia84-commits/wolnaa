@@ -16,6 +16,8 @@ type EventItem = {
   id: string; title: string; city: string; date: string; time: string;
   location: string; address: string;
   image_url?: string; imageUrl?: string;
+  veranstalter_id?: string | null;
+  veranstalter?: { firmenname?: string | null; kontakt_email?: string | null } | null;
   price: string; description: string;
   tickets: TicketType[];
   lounges: boolean | Lounge[];
@@ -93,7 +95,11 @@ export default function EventPage() {
 
   async function loadEvent() {
     try {
-      const { data } = await sb.from("events").select("*").eq("slug", id).single();
+      const { data } = await sb
+        .from("events")
+        .select("*, veranstalter:veranstalter_id(firmenname,kontakt_email)")
+        .eq("slug", id)
+        .single();
       if (data) setEvent(data);
       else setNotFound(true);
     } catch { setNotFound(true); }
@@ -124,6 +130,7 @@ export default function EventPage() {
     return t;
   }
   const total = calcTotal();
+  const organizerName = event.veranstalter?.firmenname || event.title || "der Veranstalter";
 
   function applyDiscount() {
     setDiscountError(""); setDiscountSuccess(false);
@@ -236,13 +243,20 @@ export default function EventPage() {
                 </div>
               )}
               <div className="bg-zinc-900 border border-zinc-800 rounded-2xl px-5 py-4 space-y-3">
+                <div className="rounded-xl border border-zinc-800 bg-zinc-950 px-4 py-3">
+                  <p className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-2">Rechtlicher Hinweis</p>
+                  <p className="text-zinc-400 text-xs leading-relaxed">
+                    Vertragspartner für Veranstaltung und Ticket ist <span className="text-white font-semibold">{organizerName}</span>.
+                    Wolnaa stellt die Plattform und Tickettechnik bereit. Die Zahlung wird sicher über Stripe verarbeitet.
+                  </p>
+                </div>
                 <label className="flex items-start gap-3 cursor-pointer" onClick={() => setIsAdult(!isAdult)}>
                   <div className={`mt-0.5 w-5 h-5 rounded-lg border-2 shrink-0 flex items-center justify-center transition-all ${isAdult ? "bg-yellow-400 border-yellow-400" : "border-zinc-600"}`}>{isAdult && <span className="text-black text-[10px] font-black">✓</span>}</div>
                   <span className="text-zinc-400 text-sm leading-relaxed">Ich bin mindestens <span className="text-white font-semibold">18 Jahre alt</span>.</span>
                 </label>
                 <label className="flex items-start gap-3 cursor-pointer" onClick={() => setAcceptedLegal(!acceptedLegal)}>
                   <div className={`mt-0.5 w-5 h-5 rounded-lg border-2 shrink-0 flex items-center justify-center transition-all ${acceptedLegal ? "bg-yellow-400 border-yellow-400" : "border-zinc-600"}`}>{acceptedLegal && <span className="text-black text-[10px] font-black">✓</span>}</div>
-                  <span className="text-zinc-400 text-sm leading-relaxed">Ich akzeptiere <span className="text-yellow-400 underline underline-offset-2">AGB</span> & <span className="text-yellow-400 underline underline-offset-2">Datenschutz</span>.</span>
+                  <span className="text-zinc-400 text-sm leading-relaxed">Ich akzeptiere die <Link href="/agb" target="_blank" className="text-yellow-400 underline underline-offset-2">AGB</Link>, die <Link href="/datenschutz" target="_blank" className="text-yellow-400 underline underline-offset-2">Datenschutzerklärung</Link> und die Hinweise zum jeweiligen Veranstalter.</span>
                 </label>
               </div>
             </div>
@@ -279,6 +293,13 @@ export default function EventPage() {
               <button onClick={() => setStep("tickets")} className="w-9 h-9 rounded-full border border-zinc-700 flex items-center justify-center text-zinc-400 hover:text-white">✕</button>
             </div>
             <div className="px-6 py-5 space-y-4">
+              <div className="rounded-2xl border border-zinc-800 bg-zinc-950 px-4 py-3">
+                <p className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-2">Bestellhinweis</p>
+                <p className="text-zinc-400 text-xs leading-relaxed">
+                  Veranstalter und Vertragspartner: <span className="text-white font-semibold">{organizerName}</span>.
+                  Wolnaa ist Plattformanbieter. Die Zahlung erfolgt über Stripe; bei verbundenen Veranstalterkonten wird die Zahlung dem Stripe-Konto des Veranstalters zugeordnet.
+                </p>
+              </div>
               <div>
                 <label className="block text-xs font-bold text-zinc-400 mb-2 uppercase tracking-widest">Vollständiger Name</label>
                 <input value={customerName} onChange={e => { setCustomerName(e.target.value); setFormErrors(p => ({ ...p, name: "" })); }} placeholder="Max Mustermann" className={`w-full rounded-xl border bg-zinc-950 px-4 py-3 text-white placeholder:text-zinc-600 outline-none text-sm transition-colors ${formErrors.name ? "border-red-500" : "border-zinc-700 focus:border-yellow-400"}`} />
