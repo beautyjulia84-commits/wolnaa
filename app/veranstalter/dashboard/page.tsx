@@ -12,18 +12,7 @@ export default function VeranstalterDashboard() {
   useEffect(() => {
     const load = async () => {
       try {
-        const cookieVid = document.cookie.split(';').map(c=>c.trim()).find(c=>c.startsWith('veranstalter_id='))?.split('=')[1];
-        const params = new URLSearchParams(window.location.search);
-        const vid = params.get('vid') || cookieVid || localStorage.getItem('veranstalter_id');
-
-        if (!vid) {
-          window.location.href = '/veranstalter/login';
-          return;
-        }
-
-        localStorage.setItem('veranstalter_id', vid);
-
-        const res = await fetch('/api/veranstalter/data?vid=' + encodeURIComponent(vid));
+        const res = await fetch('/api/veranstalter/data');
         const json = await res.json();
 
         if (!res.ok || !json.veranstalter) {

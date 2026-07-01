@@ -11,15 +11,7 @@ export default function VeranstalterEvents() {
   useEffect(() => {
     const load = async () => {
       try {
-        const cookieVid = document.cookie.split(';').map(c=>c.trim()).find(c=>c.startsWith('veranstalter_id='))?.split('=')[1];
-        const vid = cookieVid || localStorage.getItem('veranstalter_id');
-
-        if (!vid) {
-          window.location.href = '/veranstalter/login';
-          return;
-        }
-
-        const res = await fetch('/api/veranstalter/events?vid=' + encodeURIComponent(vid));
+        const res = await fetch('/api/veranstalter/events');
         const json = await res.json();
 
         if (!res.ok) {
@@ -27,7 +19,6 @@ export default function VeranstalterEvents() {
           return;
         }
 
-        localStorage.setItem('veranstalter_id', vid);
         setEvents(json.events || []);
       } catch (e) {
         setError('Events konnten nicht geladen werden.');

@@ -12,15 +12,34 @@ function VeranstalterLayoutInner({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (pathname === '/veranstalter/login') { setReady(true); return; }
-    
-    const vid = document.cookie.split(';').map(c => c.trim()).find(c => c.startsWith('veranstalter_id='))?.split('=')[1]
-      || localStorage.getItem('veranstalter_id');
-    
-    if (!vid) { router.replace('/veranstalter/login'); return; }
-    
-    localStorage.setItem('veranstalter_id', vid);
-    setFirmenname(localStorage.getItem('veranstalter_name') || 'Veranstalter');
-    setReady(true);
+
+    let cancelled = false;
+
+    async function checkAccess() {
+      try {
+        const res = await fetch('/api/veranstalter/data');
+        const data = await res.json().catch(() => ({}));
+
+        if (!res.ok || !data.veranstalter) {
+          localStorage.removeItem('veranstalter_id');
+          localStorage.removeItem('veranstalter_name');
+          document.cookie = 'veranstalter_id=;max-age=0;path=/';
+          router.replace('/veranstalter/login');
+          return;
+        }
+
+        if (cancelled) return;
+        localStorage.setItem('veranstalter_name', data.veranstalter?.firmenname || '');
+        setFirmenname(data.veranstalter?.firmenname || 'Veranstalter');
+        setReady(true);
+      } catch {
+        if (!cancelled) router.replace('/veranstalter/login');
+      }
+    }
+
+    checkAccess();
+
+    return () => { cancelled = true; };
   }, [pathname]);
 
   if (!ready) return (

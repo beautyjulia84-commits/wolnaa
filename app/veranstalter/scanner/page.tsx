@@ -12,11 +12,6 @@ type ScanResult = {
   checkedInAt?: string;
 };
 
-function getVeranstalterId() {
-  const cookieVid = document.cookie.split(';').map(c => c.trim()).find(c => c.startsWith('veranstalter_id='))?.split('=')[1];
-  return cookieVid || localStorage.getItem('veranstalter_id');
-}
-
 export default function VeranstalterScanner() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -81,20 +76,17 @@ export default function VeranstalterScanner() {
   async function validate(ticketId: string) {
     setScanning(false);
 
-    const veranstalterId = getVeranstalterId();
-
-    if (!veranstalterId) {
-      window.location.href = '/veranstalter/login';
-      return;
-    }
-
     try {
       const res = await fetch('/api/veranstalter/validate-ticket', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ticketId, veranstalterId }),
+        body: JSON.stringify({ ticketId }),
       });
 
+      if (res.status === 401) {
+        window.location.href = '/veranstalter/login';
+        return;
+      }
       setResult(await res.json());
     } catch {
       setResult({ valid: false, reason: 'Ticket konnte nicht geprüft werden.' });

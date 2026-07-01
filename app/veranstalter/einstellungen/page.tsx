@@ -17,15 +17,7 @@ export default function Einstellungen() {
   useEffect(() => {
     const load = async () => {
       try {
-        const cookieVid = document.cookie.split(';').map(c=>c.trim()).find(c=>c.startsWith('veranstalter_id='))?.split('=')[1];
-        const vid = cookieVid || localStorage.getItem('veranstalter_id');
-
-        if (!vid) {
-          window.location.href = '/veranstalter/login';
-          return;
-        }
-
-        const res = await fetch('/api/veranstalter/data?vid=' + encodeURIComponent(vid));
+        const res = await fetch('/api/veranstalter/data');
         const json = await res.json();
 
         if (!res.ok || !json.veranstalter) {
@@ -33,7 +25,6 @@ export default function Einstellungen() {
           return;
         }
 
-        localStorage.setItem('veranstalter_id', vid);
         localStorage.setItem('veranstalter_name', json.veranstalter?.firmenname || '');
         setVeranstalter(json.veranstalter);
       } finally {
@@ -50,7 +41,7 @@ export default function Einstellungen() {
       const res = await fetch('/api/stripe/connect', {
         method:'POST',
         headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({ veranstalterId: veranstalter.id }),
+        body:JSON.stringify({}),
       });
       const data = await res.json();
 

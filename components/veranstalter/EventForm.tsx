@@ -60,11 +60,6 @@ const labelStyle = {
   textTransform: 'uppercase' as const,
 };
 
-function getVeranstalterId() {
-  const cookieVid = document.cookie.split(';').map(c => c.trim()).find(c => c.startsWith('veranstalter_id='))?.split('=')[1];
-  return cookieVid || localStorage.getItem('veranstalter_id');
-}
-
 function rowToForm(row: any): EventFormState {
   return {
     id: row.id,
@@ -118,16 +113,14 @@ export default function VeranstalterEventForm({ eventId }: { eventId?: string })
 
     async function load() {
       try {
-        const veranstalterId = getVeranstalterId();
-        if (!veranstalterId) {
-          window.location.href = '/veranstalter/login';
-          return;
-        }
-
-        const res = await fetch(`/api/veranstalter/events?id=${encodeURIComponent(eventId!)}&vid=${encodeURIComponent(veranstalterId)}`);
+        const res = await fetch(`/api/veranstalter/events?id=${encodeURIComponent(eventId!)}`);
         const data = await res.json();
 
         if (!res.ok) {
+          if (res.status === 401) {
+            window.location.href = '/veranstalter/login';
+            return;
+          }
           setError(data.error || 'Event konnte nicht geladen werden.');
           return;
         }
@@ -169,21 +162,19 @@ export default function VeranstalterEventForm({ eventId }: { eventId?: string })
     setError('');
 
     try {
-      const veranstalterId = getVeranstalterId();
-      if (!veranstalterId) {
-        window.location.href = '/veranstalter/login';
-        return;
-      }
-
       const res = await fetch('/api/veranstalter/events', {
         method: form.id ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ veranstalterId, event: form }),
+        body: JSON.stringify({ event: form }),
       });
 
       const data = await res.json();
 
       if (!res.ok) {
+        if (res.status === 401) {
+          window.location.href = '/veranstalter/login';
+          return;
+        }
         setError(data.error || 'Event konnte nicht gespeichert werden.');
         setSaving(false);
         return;

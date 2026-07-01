@@ -3,11 +3,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'next/navigation';
 
-function getVeranstalterId() {
-  const cookieVid = document.cookie.split(';').map(c => c.trim()).find(c => c.startsWith('veranstalter_id='))?.split('=')[1];
-  return cookieVid || localStorage.getItem('veranstalter_id');
-}
-
 export default function TeilnehmerPage() {
   const params = useParams();
   const eventId = params.id as string;
@@ -22,18 +17,15 @@ export default function TeilnehmerPage() {
     setLoading(true);
     setError('');
 
-    const veranstalterId = getVeranstalterId();
-
-    if (!veranstalterId) {
-      window.location.href = '/veranstalter/login';
-      return;
-    }
-
     try {
-      const res = await fetch(`/api/veranstalter/events/${eventId}/tickets?vid=${encodeURIComponent(veranstalterId)}`);
+      const res = await fetch(`/api/veranstalter/events/${eventId}/tickets`);
       const data = await res.json();
 
       if (!res.ok) {
+        if (res.status === 401) {
+          window.location.href = '/veranstalter/login';
+          return;
+        }
         setError(data.error || 'Teilnehmer konnten nicht geladen werden.');
         setLoading(false);
         return;
@@ -67,17 +59,18 @@ export default function TeilnehmerPage() {
   const revenue = tickets.reduce((sum, t) => sum + Number(t.amount || 0), 0);
 
   async function toggleCheckIn(ticket: any) {
-    const veranstalterId = getVeranstalterId();
-    if (!veranstalterId) return;
-
     const nextCheckedIn = ticket.status !== 'checked_in';
 
     const res = await fetch(`/api/veranstalter/events/${eventId}/tickets`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ veranstalterId, ticketId: ticket.id, checkedIn: nextCheckedIn }),
+      body: JSON.stringify({ ticketId: ticket.id, checkedIn: nextCheckedIn }),
     });
 
+    if (res.status === 401) {
+      window.location.href = '/veranstalter/login';
+      return;
+    }
     if (res.ok) load();
   }
 
