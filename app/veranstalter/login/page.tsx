@@ -34,7 +34,9 @@ export default function VeranstalterLogin() {
       <div style={{width:'100%',maxWidth:'420px',padding:'0 16px'}}>
         <div style={{background:'#fff',borderRadius:'16px',padding:'40px',boxShadow:'0 4px 24px rgba(0,0,0,0.07)',border:'1px solid #f0f0f0'}}>
           <div style={{textAlign:'center',marginBottom:'32px'}}>
-            <img src="/wolnaa-logo.png" alt="Wolnaa" style={{height:'64px',width:'auto',display:'block',margin:'0 auto 14px'}} />
+            <div style={{display:'inline-flex',alignItems:'center',justifyContent:'center',background:'#000',borderRadius:'14px',padding:'12px 18px',margin:'0 auto 14px'}}>
+              <img src="/wolnaa-logo.png" alt="Wolnaa" style={{height:'52px',width:'auto',display:'block'}} />
+            </div>
             <p style={{margin:0,color:'#6b7280',fontSize:'14px'}}>Veranstalter-Portal</p>
           </div>
           {error && <div style={{background:'#fef2f2',border:'1px solid #fecaca',borderRadius:'8px',padding:'12px',marginBottom:'20px'}}><p style={{color:'#dc2626',fontSize:'14px',margin:0}}>{error}</p></div>}
