@@ -2,13 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { createClient } from "@supabase/supabase-js";
 import jsQR from "jsqr";
-
-const sb = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
 
 type Tab = "events" | "tickets" | "rechtliches" | "scanner" | "veranstalter";
 type LegalKey = "impressum" | "datenschutz" | "agb" | "teilnahme" | "widerruf";
@@ -65,13 +59,22 @@ function rowToEvent(r: any): EventItem {
   };
 }
 
-async function uploadImage(file: File): Promise<string> {
-  const ext = file.name.split(".").pop();
-  const fileName = `${Date.now()}.${ext}`;
-  const { data, error } = await sb.storage.from("images").upload(fileName, file, { upsert: true });
-  if (error) throw error;
-  const { data: urlData } = sb.storage.from("images").getPublicUrl(fileName);
-  return urlData.publicUrl;
+async function uploadImage(file: File, adminPw: string): Promise<string> {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const res = await fetch("/api/admin/upload-image", {
+    method: "POST",
+    headers: adminPw ? { "x-admin-token": adminPw } : undefined,
+    body: formData,
+  });
+  const data = await res.json().catch(() => ({}));
+
+  if (!res.ok || !data.url) {
+    throw new Error(data.error || "Upload fehlgeschlagen.");
+  }
+
+  return data.url;
 }
 
 const inp = "w-full rounded-xl border border-zinc-300 bg-white focus:border-yellow-400 px-4 py-3 text-black placeholder:text-zinc-600 outline-none transition-all text-sm";
@@ -608,9 +611,9 @@ export default function AdminPage() {
                           if (!file) return;
                           setUploadingImage(true);
                           try {
-                            const url = await uploadImage(file);
+                            const url = await uploadImage(file, adminPw);
                             f("imageUrl", url);
-                          } catch { alert("Upload fehlgeschlagen."); }
+                          } catch (err: any) { alert(err?.message || "Upload fehlgeschlagen."); }
                           finally { setUploadingImage(false); }
                         }} />
                       </label>
