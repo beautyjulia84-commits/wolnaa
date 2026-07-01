@@ -56,9 +56,20 @@ function drawLabelValue(ctx: any, label: string, value: string, x: number, y: nu
 export async function generateTicketPdf(data: TicketPdfData) {
   const width = 595;
   const height = 842;
-  const canvas = createCanvas(width, height, 'pdf');
-  const ctx = canvas.getContext('2d');
+  const ticketCanvas = createCanvas(width, height);
+  const ctx = ticketCanvas.getContext('2d');
 
+  drawTicket(ctx, width, height, data, await loadImage(`data:image/png;base64,${data.qrBase64}`));
+
+  const pdfCanvas = createCanvas(width, height, 'pdf');
+  const pdfCtx = pdfCanvas.getContext('2d');
+  const ticketImage = await loadImage(ticketCanvas.toBuffer('image/png'));
+  pdfCtx.drawImage(ticketImage, 0, 0, width, height);
+
+  return pdfCanvas.toBuffer('application/pdf');
+}
+
+function drawTicket(ctx: any, width: number, height: number, data: TicketPdfData, qrImage: any) {
   ctx.fillStyle = '#ffffff';
   ctx.fillRect(0, 0, width, height);
 
@@ -102,7 +113,6 @@ export async function generateTicketPdf(data: TicketPdfData) {
   ctx.font = 'bold 18px Courier New';
   ctx.fillText(pdfText(data.ticketId), 62, detailsTop + 348);
 
-  const qrImage = await loadImage(`data:image/png;base64,${data.qrBase64}`);
   const qrSize = 210;
   const qrX = width - 62 - qrSize;
   const qrY = 342;
@@ -123,6 +133,4 @@ export async function generateTicketPdf(data: TicketPdfData) {
   ctx.font = '14px Arial';
   ctx.fillText('Dieses Ticket ist nur einmal gueltig. Bitte digital oder ausgedruckt mitbringen.', 62, height - 98);
   ctx.fillText('Kontakt: kontakt@wolnaa.de', 62, height - 76);
-
-  return canvas.toBuffer('application/pdf');
 }
