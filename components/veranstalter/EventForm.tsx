@@ -281,8 +281,8 @@ export default function VeranstalterEventForm({ eventId }: { eventId?: string })
         <section style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: '12px', padding: '20px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
             <h2 style={{ margin: 0, fontSize: '16px', color: '#111' }}>Lounges</h2>
-            <label style={{ display: 'flex', gap: '8px', alignItems: 'center', fontSize: '14px' }}>
-              <input type="checkbox" checked={form.lounges} onChange={e => setField('lounges', e.target.checked)} /> anbieten
+            <label style={{ display: 'flex', gap: '8px', alignItems: 'center', fontSize: '14px', color: '#111', fontWeight: 600 }}>
+              <input type="checkbox" checked={form.lounges} onChange={e => setField('lounges', e.target.checked)} style={{ width: '18px', height: '18px', accentColor: '#111827' }} /> Lounges anbieten
             </label>
           </div>
           {form.lounges && (

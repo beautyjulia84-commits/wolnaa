@@ -100,7 +100,7 @@ async function uploadImage(file: File): Promise<string> {
   return urlData.publicUrl;
 }
 
-const inp = "w-full rounded-xl border border-zinc-700 bg-zinc-950 focus:border-yellow-400 px-4 py-3 text-white placeholder:text-zinc-500 outline-none transition-all text-sm";
+const inp = "w-full rounded-xl border border-zinc-300 bg-white focus:border-yellow-400 px-4 py-3 text-black placeholder:text-zinc-500 outline-none transition-all text-sm";
 const lbl = "block text-xs font-semibold text-zinc-400 mb-1.5 uppercase tracking-wide";
 
 function Toggle({ value, onChange, label }: { value: boolean; onChange: (v: boolean) => void; label: string }) {
@@ -347,7 +347,17 @@ export default function AdminPage() {
 
   async function delEv(id: string) {
     if (!confirm("Event wirklich löschen?")) return;
-    await sb.from("events").delete().eq("id", id);
+
+    const res = await fetch(`/api/admin/events/${id}`, {
+      method: "DELETE",
+    });
+
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      alert("Löschen fehlgeschlagen: " + (data.error || "Unbekannter Fehler"));
+      return;
+    }
+
     await loadEvents();
   }
 
