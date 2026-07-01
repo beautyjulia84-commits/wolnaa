@@ -19,7 +19,7 @@ type EventItem = {
 };
 
 type TicketRow = {
-  id: string; ticket_id: string; event_title: string;
+  id: string; ticket_id: string; event_id?: string | null; event_title: string;
   customer_name: string; customer_email: string;
   amount: number; status: string; checked_in_at: string | null; created_at: string;
 };
@@ -213,7 +213,7 @@ export default function AdminPage() {
   const [evLoading, setEvLoading] = useState(false);
   const [tickets, setTickets] = useState<TicketRow[]>([]);
   const [ticketLoading, setTicketLoading] = useState(false);
-  const [ticketFilter, setTicketFilter] = useState("");
+  const [selectedTicketEventId, setSelectedTicketEventId] = useState("");
   const [legal, setLegal] = useState<Record<LegalKey, string>>({ impressum: "", datenschutz: "", agb: "", teilnahme: "", widerruf: "" });
   const [legalTab, setLegalTab] = useState<LegalKey>("impressum");
   const [legalSaved, setLegalSaved] = useState(false);
@@ -362,8 +362,8 @@ export default function AdminPage() {
     await loadEvents();
   }
 
-  function showEventTickets(title: string) {
-    setTicketFilter(title);
+  function showEventTickets(id?: string) {
+    setSelectedTicketEventId(id || "");
     setTab("tickets");
     if (tickets.length === 0) loadTickets();
   }
@@ -386,11 +386,16 @@ export default function AdminPage() {
     else { const d = await res.json(); alert("Fehler: " + d.error); }
   }
 
-  const filtered = ticketFilter ? tickets.filter(t => t.event_title.toLowerCase().includes(ticketFilter.toLowerCase())) : [];
+  function ticketBelongsToEvent(ticket: TicketRow, event: EventItem) {
+    return ticket.event_id === event.id || (!ticket.event_id && ticket.event_title === event.title);
+  }
+
+  const selectedTicketEvent = events.find(event => event.id === selectedTicketEventId);
+  const filtered = selectedTicketEvent ? tickets.filter(ticket => ticketBelongsToEvent(ticket, selectedTicketEvent)) : [];
   const selectedRevenue = filtered.reduce((s, t) => s + t.amount, 0);
   const selectedCheckedIn = filtered.filter(t => t.status === "checked_in").length;
   const eventTicketStats = events.map(event => {
-    const eventTickets = tickets.filter(t => t.event_title === event.title);
+    const eventTickets = tickets.filter(ticket => ticketBelongsToEvent(ticket, event));
     return {
       event,
       total: eventTickets.length,
@@ -482,7 +487,7 @@ export default function AdminPage() {
                     </div>
                     <div className="flex gap-2 mt-3 pt-3 border-t border-zinc-200">
                       <button onClick={() => openEdit(e)} className="flex-1 rounded-xl border border-zinc-700 text-zinc-300 text-xs py-2 hover:border-yellow-400 hover:text-yellow-400 transition-colors font-medium">Bearbeiten</button>
-                      <button onClick={() => showEventTickets(e.title)} className="flex-1 rounded-xl border border-zinc-700 text-zinc-300 text-xs py-2 hover:border-yellow-400 hover:text-yellow-400 transition-colors font-medium">Tickets</button>
+                      <button onClick={() => showEventTickets(e.id)} className="flex-1 rounded-xl border border-zinc-700 text-zinc-300 text-xs py-2 hover:border-yellow-400 hover:text-yellow-400 transition-colors font-medium">Tickets</button>
                       <button onClick={() => delEv(e.id!)} className="flex-1 rounded-xl border border-zinc-800 text-zinc-600 text-xs py-2 hover:border-red-500/50 hover:text-red-400 transition-colors font-medium">Löschen</button>
                     </div>
                   </div>
@@ -497,7 +502,7 @@ export default function AdminPage() {
           <div>
             <div className="mb-5">
               <h1 className="text-lg font-bold">Tickets</h1>
-              <p className="text-zinc-600 text-xs mt-0.5">{ticketFilter ? `Kundendaten für ${ticketFilter}` : "Bitte Veranstaltung auswählen"}</p>
+              <p className="text-zinc-600 text-xs mt-0.5">{selectedTicketEvent ? `Kundendaten für ${selectedTicketEvent.title}` : "Bitte Veranstaltung auswählen"}</p>
             </div>
             <div className="grid grid-cols-3 gap-3 mb-5">
               {[{ l: "Tickets", v: filtered.length }, { l: "Eingecheckt", v: selectedCheckedIn }, { l: "Umsatz", v: `€${selectedRevenue.toFixed(2)}` }].map(s => (
@@ -508,18 +513,26 @@ export default function AdminPage() {
               ))}
             </div>
             <div className="flex gap-2 mb-4">
-              <input value={ticketFilter} onChange={e => setTicketFilter(e.target.value)} placeholder="Veranstaltung suchen oder auswählen..." className={inp + " flex-1"} />
-              {ticketFilter && <button onClick={() => setTicketFilter("")} className="rounded-xl border border-zinc-700 px-4 text-zinc-700 hover:text-white text-sm transition-colors">Wechseln</button>}
+              {selectedTicketEvent ? (
+                <div className="flex-1 rounded-xl border border-zinc-700 px-4 py-3 text-sm text-zinc-300">
+                  {selectedTicketEvent.title}
+                </div>
+              ) : (
+                <div className="flex-1 rounded-xl border border-zinc-700 px-4 py-3 text-sm text-zinc-600">
+                  Wähle unten eine Veranstaltung aus.
+                </div>
+              )}
+              {selectedTicketEvent && <button onClick={() => setSelectedTicketEventId("")} className="rounded-xl border border-zinc-700 px-4 text-zinc-700 hover:text-white text-sm transition-colors">Wechseln</button>}
               <button onClick={loadTickets} className="rounded-xl border border-zinc-700 px-4 text-zinc-700 hover:text-white text-sm transition-colors">↻</button>
             </div>
             {ticketLoading ? (
               <div className="flex justify-center py-12"><div className="w-6 h-6 border-2 border-yellow-400 border-t-transparent rounded-full animate-spin" /></div>
-            ) : !ticketFilter ? (
+            ) : !selectedTicketEvent ? (
               <div className="space-y-2">
                 {eventTicketStats.length === 0 ? (
                   <div className="text-center py-12 rounded-2xl border border-zinc-800 text-zinc-600 text-sm">Keine Veranstaltungen vorhanden.</div>
                 ) : eventTicketStats.map(({ event, total, checkedIn, revenue }) => (
-                  <button key={event.id || event.title} onClick={() => setTicketFilter(event.title)} className="w-full bg-zinc-900 border border-zinc-800 rounded-2xl p-4 hover:border-yellow-400 transition-colors text-left">
+                  <button key={event.id || event.title} onClick={() => setSelectedTicketEventId(event.id || "")} className="w-full bg-zinc-900 border border-zinc-800 rounded-2xl p-4 hover:border-yellow-400 transition-colors text-left">
                     <div className="flex items-center justify-between gap-4">
                       <div className="min-w-0">
                         <p className="font-semibold text-sm truncate text-white">{event.title}</p>
