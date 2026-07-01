@@ -48,7 +48,7 @@ export default function VeranstalterLogin() {
               style={{width:'100%',padding:'12px 14px',border:'1px solid #d1d5db',borderRadius:'8px',fontSize:'15px',outline:'none',color:'#111',boxSizing:'border-box' as const}} />
           </div>
           <button onClick={handleSubmit} disabled={loading || !email.trim()}
-            style={{width:'100%',padding:'13px',background:loading||!email.trim()?'#9ca3af':'#111827',color:'#fff',border:'none',borderRadius:'8px',fontSize:'15px',fontWeight:'600',cursor:loading||!email.trim()?'not-allowed':'pointer'}}>
+            style={{width:'100%',padding:'13px',background:loading||!email.trim()?'#d1d5db':'#facc15',color:'#111',border:'none',borderRadius:'8px',fontSize:'15px',fontWeight:'700',cursor:loading||!email.trim()?'not-allowed':'pointer'}}>
             {loading ? 'Prüfe...' : 'Einloggen'}
           </button>
           <p style={{textAlign:'center',color:'#9ca3af',fontSize:'12px',marginTop:'20px'}}>
