@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { supabaseBrowser } from '@/lib/supabase-browser';
 
 type TicketType = { name: string; price: string; quantity: string };
 type Lounge = { name: string; persons: string; price: string };
@@ -86,12 +85,20 @@ function rowToForm(row: any): EventFormState {
 }
 
 async function uploadImage(file: File): Promise<string> {
-  const ext = file.name.split('.').pop();
-  const fileName = `veranstalter-${Date.now()}.${ext}`;
-  const { error } = await supabaseBrowser.storage.from('images').upload(fileName, file, { upsert: true });
-  if (error) throw error;
-  const { data } = supabaseBrowser.storage.from('images').getPublicUrl(fileName);
-  return data.publicUrl;
+  const formData = new FormData();
+  formData.append('file', file);
+
+  const res = await fetch('/api/veranstalter/upload-image', {
+    method: 'POST',
+    body: formData,
+  });
+  const data = await res.json().catch(() => ({}));
+
+  if (!res.ok || !data.url) {
+    throw new Error(data.error || 'Bild konnte nicht hochgeladen werden.');
+  }
+
+  return data.url;
 }
 
 export default function VeranstalterEventForm({ eventId }: { eventId?: string }) {
@@ -240,8 +247,8 @@ export default function VeranstalterEventForm({ eventId }: { eventId?: string })
               try {
                 const url = await uploadImage(file);
                 setField('imageUrl', url);
-              } catch {
-                setError('Bild konnte nicht hochgeladen werden.');
+              } catch (err: any) {
+                setError(err?.message || 'Bild konnte nicht hochgeladen werden.');
               } finally {
                 setUploading(false);
               }
