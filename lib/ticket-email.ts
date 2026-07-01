@@ -38,7 +38,7 @@ export function buildTicketEmailHtml({
         <table width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#ffffff;">
           <tr>
             <td style="padding:0 0 26px;text-align:center;">
-              <div style="font-size:30px;font-weight:900;letter-spacing:2px;color:#111827;">WOLNAA</div>
+              <img src="https://wolnaa.de/wolnaa-logo.png" alt="WOLNAA" width="170" style="display:block;margin:0 auto;border:0;" />
             </td>
           </tr>
           <tr>
