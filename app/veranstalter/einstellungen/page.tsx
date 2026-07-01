@@ -45,9 +45,26 @@ export default function Einstellungen() {
 
   const handleStripeConnect = async () => {
     setConnecting(true);
-    const res = await fetch('/api/stripe/connect', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ veranstalterName:veranstalter.firmenname }) });
-    const { url } = await res.json();
-    window.location.href = url;
+    setMsg('');
+    try {
+      const res = await fetch('/api/stripe/connect', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({ veranstalterId: veranstalter.id }),
+      });
+      const data = await res.json();
+
+      if (!res.ok || !data.url) {
+        setMsg('❌ ' + (data.error || 'Stripe-Verbindung fehlgeschlagen.'));
+        setConnecting(false);
+        return;
+      }
+
+      window.location.href = data.url;
+    } catch (e) {
+      setMsg('❌ Stripe-Verbindung fehlgeschlagen.');
+      setConnecting(false);
+    }
   };
 
   const handleStripeDashboard = async () => {
