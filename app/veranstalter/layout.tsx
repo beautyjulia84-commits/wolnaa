@@ -34,6 +34,7 @@ function VeranstalterLayoutInner({ children }: { children: React.ReactNode }) {
   const links = [
     { href:'/veranstalter/dashboard', label:'Dashboard', icon:'📊' },
     { href:'/veranstalter/events', label:'Events', icon:'🎪' },
+    { href:'/veranstalter/scanner', label:'Scanner', icon:'▣' },
     { href:'/veranstalter/einstellungen', label:'Einstellungen', icon:'⚙️' },
   ];
 
