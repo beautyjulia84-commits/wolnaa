@@ -40,13 +40,15 @@ function VeranstalterLayoutInner({ children }: { children: React.ReactNode }) {
 
   return (
     <div style={{minHeight:'100vh',background:'#f9fafb',overflowX:'hidden'}}>
-      <nav style={{background:'#111827',padding:'0 16px',overflowX:'hidden'}}>
+      <nav style={{background:'#000',padding:'0 16px',overflowX:'hidden'}}>
         <div style={{maxWidth:'1100px',margin:'0 auto',display:'flex',justifyContent:'space-between',alignItems:'center',height:'64px',flexWrap:'nowrap'}}>
           <div style={{display:'flex',alignItems:'center',gap:'16px',flexShrink:0}}>
-            <span style={{color:'#fff',fontWeight:'700',fontSize:'16px',whiteSpace:'nowrap'}}>🎟 Wolnaa</span>
+            <Link href="/veranstalter/dashboard" style={{display:'flex',alignItems:'center',textDecoration:'none',flexShrink:0}}>
+              <img src="/wolnaa-logo.png" alt="Wolnaa" style={{height:'34px',width:'auto',display:'block'}} />
+            </Link>
             <div style={{display:'flex',gap:'2px'}}>
               {links.map(l => (
-                <Link key={l.href} href={l.href} style={{color:pathname===l.href?'#fff':'#9ca3af',textDecoration:'none',padding:'6px 10px',borderRadius:'8px',fontSize:'13px',background:pathname===l.href?'#1f2937':'transparent',whiteSpace:'nowrap'}}>
+                <Link key={l.href} href={l.href} style={{color:pathname===l.href?'#fff':'#cbd5e1',textDecoration:'none',padding:'6px 10px',borderRadius:'8px',fontSize:'13px',background:pathname===l.href?'#1f2937':'transparent',whiteSpace:'nowrap'}}>
                   {l.label}
                 </Link>
               ))}
