@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { getAuthedVeranstalterId } from '@/lib/veranstalter-auth';
 
+const DEFAULT_STRIPE_CONNECT_CLIENT_ID = 'ca_UnnlDkM4Md42p77mdCrB1LSvBY7gWvRh';
+
 export async function POST(req: Request) {
   const supabaseAdmin = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -20,10 +22,14 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Kein Zugriff.' }, { status: 403 });
     }
 
-    const connectClientId = process.env.STRIPE_CONNECT_CLIENT_ID;
+    const connectClientId =
+      process.env.STRIPE_CONNECT_CLIENT_ID ||
+      process.env.NEXT_PUBLIC_STRIPE_CONNECT_CLIENT_ID ||
+      DEFAULT_STRIPE_CONNECT_CLIENT_ID;
+
     if (!connectClientId) {
       return NextResponse.json(
-        { error: 'STRIPE_CONNECT_CLIENT_ID fehlt in Vercel.' },
+        { error: 'Stripe Connect Client-ID fehlt.' },
         { status: 500 }
       );
     }
