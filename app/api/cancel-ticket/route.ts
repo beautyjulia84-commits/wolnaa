@@ -6,6 +6,22 @@ import { Resend } from "resend";
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 const resend = new Resend(process.env.RESEND_API_KEY!);
 
+function escapeHtml(value: string) {
+  return String(value || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+function formatEuro(value: number) {
+  return new Intl.NumberFormat("de-DE", {
+    style: "currency",
+    currency: "EUR",
+  }).format(Number.isFinite(value) ? value : 0);
+}
+
 export async function POST(req: NextRequest) {
   const adminToken = req.headers.get("x-admin-token");
   if (adminToken !== process.env.ADMIN_PASSWORD) {
@@ -48,33 +64,48 @@ export async function POST(req: NextRequest) {
   await supabase.from("tickets").update({ status: "cancelled" }).eq("ticket_id", ticketId);
 
   // Storno-E-Mail senden
+  const customerName = escapeHtml(ticket.customer_name || "");
+  const eventTitle = escapeHtml(ticket.event_title || "");
+  const ticketAmount = formatEuro(Number(ticket.amount || 0));
+
   await resend.emails.send({
-    from: process.env.RESEND_FROM_EMAIL!,
+    from: process.env.RESEND_FROM_EMAIL || "WOLNAA Tickets <kontakt@wolnaa.de>",
     to: ticket.customer_email,
-    subject: `Stornierung – ${ticket.event_title}`,
+    subject: `Stornierung - ${ticket.event_title}`,
     html: `
 <!DOCTYPE html>
 <html lang="de">
-<body style="margin:0;padding:0;background:#000;font-family:system-ui,sans-serif;color:#fff;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:#000;padding:40px 20px;">
-    <tr><td align="center">
-      <table width="100%" style="max-width:520px;background:#111;border-radius:24px;overflow:hidden;border:1px solid #222;">
-        <tr><td style="background:linear-gradient(135deg,#2b1b00,#111);padding:40px 40px 32px;text-align:center;">
-          <h1 style="margin:0;font-size:36px;font-weight:900;color:#facc15;letter-spacing:4px;">WOLNAA</h1>
-          <p style="margin:8px 0 0;color:#a1a1aa;font-size:14px;letter-spacing:2px;">EXCLUSIVE EVENTS</p>
-        </td></tr>
-        <tr><td style="padding:36px 40px;">
-          <h2 style="margin:0 0 16px;font-size:22px;font-weight:900;">Deine Bestellung wurde storniert</h2>
-          <p style="color:#a1a1aa;font-size:14px;line-height:1.7;">Hallo ${ticket.customer_name},<br><br>
-          deine Bestellung für <strong style="color:#fff;">${ticket.event_title}</strong> wurde erfolgreich storniert.<br><br>
-          Der Betrag von <strong style="color:#facc15;">${ticket.amount.toFixed(2)} €</strong> wird in den nächsten 5-10 Werktagen auf dein Konto zurückgebucht.</p>
-          <p style="color:#52525b;font-size:12px;margin-top:24px;">Ticket-ID: ${ticketId}</p>
-        </td></tr>
-        <tr><td style="padding:20px 40px;border-top:1px solid #222;text-align:center;">
-          <p style="margin:0;color:#3f3f46;font-size:12px;">© 2026 WOLNAA · Exclusive Events</p>
-        </td></tr>
-      </table>
-    </td></tr>
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#ffffff;font-family:Arial,Helvetica,sans-serif;color:#111827;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#ffffff;padding:28px 18px;">
+    <tr>
+      <td align="center">
+        <table width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#ffffff;">
+          <tr>
+            <td style="padding:0 0 26px;text-align:center;">
+              <img src="https://wolnaa.de/wolnaa-logo.png" alt="WOLNAA" width="170" style="display:block;margin:0 auto;border:0;" />
+            </td>
+          </tr>
+          <tr>
+            <td style="font-size:16px;line-height:1.7;color:#111827;">
+              <p style="margin:0 0 16px;">Hallo <strong>${customerName}</strong>,</p>
+              <p style="margin:0 0 16px;">deine Bestellung wurde erfolgreich storniert.</p>
+              <p style="margin:0 0 16px;">Veranstaltung: <strong>${eventTitle}</strong></p>
+              <p style="margin:0 0 16px;">Betrag: <strong>${ticketAmount}</strong></p>
+              <p style="margin:0 0 22px;color:#4b5563;font-size:14px;">
+                Falls eine Zahlung erstattet wurde, kann es je nach Bank einige Werktage dauern, bis der Betrag auf deinem Konto sichtbar ist.
+              </p>
+              <p style="margin:0;color:#6b7280;font-size:12px;">Ticket-ID: ${escapeHtml(ticketId)}</p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:28px 0 0;color:#6b7280;font-size:12px;line-height:1.6;">
+              Bei Fragen erreichst du uns unter <strong>kontakt@wolnaa.de</strong>.
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
   </table>
 </body>
 </html>`,
