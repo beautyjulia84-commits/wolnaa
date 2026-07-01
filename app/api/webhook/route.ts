@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 import QRCode from "qrcode";
 import { supabase } from "@/lib/supabase";
+import { buildTicketEmailHtml, formatEuro } from "@/lib/ticket-email";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 const resend = new Resend(process.env.RESEND_API_KEY!);
@@ -76,45 +77,29 @@ export async function POST(req: NextRequest) {
     }
 
     const qrAttachments = [];
-    for (const tid of ticketIds) {
+    const emailTickets = [];
+    for (const [index, tid] of ticketIds.entries()) {
       const qrDataUrl = await QRCode.toDataURL(tid, { width: 400, margin: 2, color: { dark: "#000000", light: "#ffffff" } });
       const qrBase64 = qrDataUrl.replace("data:image/png;base64,", "");
-      qrAttachments.push({ filename: `ticket-${tid}.png`, content: qrBase64, contentType: "image/png" });
+      const qrContentId = `ticket-qr-${index}`;
+      qrAttachments.push({ filename: `ticket-${tid}.png`, content: qrBase64, contentType: "image/png", contentId: qrContentId });
+      emailTickets.push({
+        ticketId: tid,
+        ticketName: expandedItems[index]?.name || "Standard Ticket",
+        amountText: expandedItems[index]?.price ? `${expandedItems[index].price} €` : (index === 0 ? formatEuro(amount) : ""),
+        qrContentId,
+      });
     }
 
     await resend.emails.send({
       from: "WOLNAA Tickets <kontakt@wolnaa.de>",
       to: customerEmail,
       subject: `Deine Tickets – ${eventTitle}`,
-      html: `
-<!DOCTYPE html>
-<html lang="de">
-<head><meta charset="UTF-8"></head>
-<body style="margin:0;padding:0;background:#f5f5f5;font-family:Arial,sans-serif;">
-<table width="100%" cellpadding="0" cellspacing="0" style="background:#f5f5f5;padding:40px 20px;">
-<tr><td align="center">
-<table width="100%" style="max-width:520px;">
-  <tr><td>
-    <div style="background:#0a0a0a;border-radius:16px;padding:40px 32px;text-align:center;">
-      <img src="https://wolnaa.de/wolnaa-logo.png" alt="WOLNAA" width="160" style="display:block;margin:0 auto 16px;" />
-      <div style="font-size:11px;color:#888;letter-spacing:3px;margin-bottom:28px;">EXCLUSIVE EVENTS</div>
-      <div style="font-size:24px;font-weight:700;color:#fff;margin-bottom:12px;">Vielen Dank für deine Bestellung!</div>
-      <div style="font-size:14px;color:#aaa;line-height:1.7;">
-        Hallo <strong style="color:#fff;">${customerName}</strong>,<br>
-        dein${totalTickets > 1 ? "e " + totalTickets : ""} Ticket${totalTickets > 1 ? "s" : ""} für <strong style="color:#fff;">${eventTitle}</strong> ${totalTickets > 1 ? "sind" : "ist"} bereit.<br><br>
-        Im Anhang findest du den QR-Code${totalTickets > 1 ? "s" : ""}.<br>
-        Zeige ihn beim Einlass vor.
-      </div>
-    </div>
-  </td></tr>
-  <tr><td style="text-align:center;padding:16px 0 0;">
-    <div style="font-size:11px;color:#aaa;">Bei Fragen: kontakt@wolnaa.de</div>
-  </td></tr>
-</table>
-</td></tr>
-</table>
-</body>
-</html>`,
+      html: buildTicketEmailHtml({
+        eventTitle,
+        customerName,
+        tickets: emailTickets,
+      }),
       attachments: qrAttachments,
     });
   }
