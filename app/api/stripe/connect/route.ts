@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getAuthedVeranstalterId } from '@/lib/veranstalter-auth';
 
 const DEFAULT_STRIPE_CONNECT_CLIENT_ID = 'ca_UnnlDkM4Md42p77mdCrB1LSvBY7gWvRh';
+const STRIPE_CONNECT_VERSION = 'stripe-oauth-v4';
 
 export async function POST(req: Request) {
   try {
@@ -10,10 +11,10 @@ export async function POST(req: Request) {
     const veranstalterId = body?.veranstalterId;
 
     if (!authedId) {
-      return NextResponse.json({ error: 'Nicht angemeldet.' }, { status: 401 });
+      return NextResponse.json({ error: 'Nicht angemeldet.', version: STRIPE_CONNECT_VERSION }, { status: 401 });
     }
     if (veranstalterId && veranstalterId !== authedId) {
-      return NextResponse.json({ error: 'Kein Zugriff.' }, { status: 403 });
+      return NextResponse.json({ error: 'Kein Zugriff.', version: STRIPE_CONNECT_VERSION }, { status: 403 });
     }
 
     const connectClientId =
@@ -23,7 +24,7 @@ export async function POST(req: Request) {
 
     if (!connectClientId) {
       return NextResponse.json(
-        { error: 'Stripe Connect Client-ID fehlt.' },
+        { error: 'Stripe Connect Client-ID fehlt.', version: STRIPE_CONNECT_VERSION },
         { status: 500 }
       );
     }
@@ -37,11 +38,11 @@ export async function POST(req: Request) {
     authUrl.searchParams.set('state', authedId);
     authUrl.searchParams.set('redirect_uri', redirectUri);
 
-    return NextResponse.json({ url: authUrl.toString() });
+    return NextResponse.json({ url: authUrl.toString(), version: STRIPE_CONNECT_VERSION });
   } catch (err: any) {
     console.error('Stripe Standard connect error:', err);
     return NextResponse.json(
-      { error: err?.message || 'Stripe-Verbindung fehlgeschlagen.' },
+      { error: err?.message || 'Stripe-Verbindung fehlgeschlagen.', version: STRIPE_CONNECT_VERSION },
       { status: 500 }
     );
   }

@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 
 export default function Einstellungen() {
+  const stripeConnectVersion = 'stripe-oauth-v4';
   const searchParams = useSearchParams();
   const [veranstalter, setVeranstalter] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -11,7 +12,10 @@ export default function Einstellungen() {
 
   useEffect(() => {
     if (searchParams.get('success')==='stripe_connected') setMsg('✅ Stripe-Konto erfolgreich verbunden!');
-    if (searchParams.get('error')==='connect_failed') setMsg('❌ Verbindung fehlgeschlagen. Bitte versuche es erneut.');
+    if (searchParams.get('error')==='connect_failed') {
+      const reason = searchParams.get('reason');
+      setMsg('❌ Verbindung fehlgeschlagen' + (reason ? ` (${reason})` : '') + '. Bitte versuche es erneut.');
+    }
   }, [searchParams]);
 
   useEffect(() => {
@@ -41,12 +45,15 @@ export default function Einstellungen() {
       const res = await fetch('/api/stripe/connect', {
         method:'POST',
         headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({}),
+        body:JSON.stringify({
+          veranstalterId: veranstalter?.id,
+          version: stripeConnectVersion,
+        }),
       });
       const data = await res.json();
 
       if (!res.ok || !data.url) {
-        setMsg('❌ ' + (data.error || 'Stripe-Verbindung fehlgeschlagen.'));
+        setMsg('❌ ' + (data.error || 'Stripe-Verbindung fehlgeschlagen.') + ` [${res.status} / ${data.version || stripeConnectVersion}]`);
         setConnecting(false);
         return;
       }
@@ -84,6 +91,7 @@ export default function Einstellungen() {
         <div style={{ padding:'20px 24px', borderBottom:'1px solid #f3f4f6' }}>
           <h2 style={{ margin:'0 0 4px', fontSize:'16px', fontWeight:'600', color:'#111' }}>💳 Stripe Zahlungskonto</h2>
           <p style={{ margin:0, color:'#6b7280', fontSize:'13px' }}>Verbinde dein Stripe-Konto um Ticketeinnahmen direkt zu erhalten.</p>
+          <p style={{ margin:'6px 0 0', color:'#d97706', fontSize:'11px', fontWeight:600 }}>Connect-Version: {stripeConnectVersion}</p>
         </div>
         <div style={{ padding:'24px' }}>
           {veranstalter?.stripe_account_id && veranstalter?.stripe_charges_enabled ? (
