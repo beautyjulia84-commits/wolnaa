@@ -24,8 +24,8 @@ function SuccessContent() {
         
         {/* Logo */}
         <div className="mb-8">
-          <div className="w-16 h-16 rounded-2xl bg-yellow-400 flex items-center justify-center mx-auto mb-4">
-            <span className="text-black font-black text-2xl">W</span>
+          <div className="inline-flex items-center justify-center bg-black rounded-2xl px-5 py-4 mx-auto mb-4 border border-zinc-800">
+            <img src="/wolnaa-logo.png" alt="Wolnaa" className="h-14 w-auto" />
           </div>
           <p className="text-zinc-600 text-xs tracking-widest uppercase">Wolnaa · Exclusive Events</p>
         </div>
@@ -42,7 +42,7 @@ function SuccessContent() {
 
         <h1 className="text-4xl font-black mb-3 tracking-tight">Zahlung erfolgreich!</h1>
         <p className="text-zinc-400 mb-6 leading-relaxed text-sm">
-          Dein Ticket wurde bestätigt. Du erhältst gleich eine E-Mail mit deinem persönlichen QR-Code.
+          Dein Ticket wurde bestätigt. Du erhältst gleich eine E-Mail mit deinem druckbaren PDF-Ticket im Anhang.
         </p>
 
         {/* Info Box */}

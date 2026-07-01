@@ -16,6 +16,10 @@ export async function POST(req: Request) {
     const { eventTitle, customerName, customerEmail, lineItems = [], ticketId, total, eventId } = body;
     const totalAmount = Math.round(Number(total) * 100);
 
+    if (!Number.isFinite(totalAmount) || totalAmount < 0) {
+      return NextResponse.json({ error: "Der Gesamtbetrag ist ungültig. Bitte lade die Seite neu." }, { status: 400 });
+    }
+
     if (!eventId) {
       return NextResponse.json({ error: "Event-ID fehlt. Bitte Seite neu laden." }, { status: 400 });
     }

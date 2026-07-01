@@ -52,6 +52,23 @@ function normalize(e: EventItem) {
   };
 }
 
+function toMoney(value: unknown) {
+  const normalized = String(value ?? "0").replace(",", ".").replace(/[^\d.-]/g, "");
+  const amount = Number.parseFloat(normalized);
+  return Number.isFinite(amount) ? amount : 0;
+}
+
+function toDiscountPercent(value: unknown) {
+  const normalized = String(value ?? "").replace(",", ".").replace(/[^\d.-]/g, "");
+  const percent = Number.parseFloat(normalized);
+  if (!Number.isFinite(percent)) return 0;
+  return Math.min(Math.max(percent, 0), 100);
+}
+
+function formatMoney(value: number) {
+  return `${(Number.isFinite(value) ? value : 0).toFixed(2)} €`;
+}
+
 export default function EventPage() {
   const params = useParams();
   const id = params?.id as string;
@@ -101,9 +118,9 @@ export default function EventPage() {
   const hasSelection = totalTickets > 0;
 
   function calcTotal() {
-    let t = n.tickets.reduce((s, tk, i) => s + (ticketQtys[i] ?? 0) * parseFloat(tk.price || "0"), 0);
-    if (selectedLounge !== null && n.loungeList[selectedLounge]) t += parseFloat(n.loungeList[selectedLounge].price || "0");
-    if (appliedDiscount) t *= (1 - parseFloat(appliedDiscount.percent) / 100);
+    let t = n.tickets.reduce((s, tk, i) => s + (ticketQtys[i] ?? 0) * toMoney(tk.price), 0);
+    if (selectedLounge !== null && n.loungeList[selectedLounge]) t += toMoney(n.loungeList[selectedLounge].price);
+    if (appliedDiscount) t *= (1 - toDiscountPercent(appliedDiscount.percent) / 100);
     return t;
   }
   const total = calcTotal();
@@ -113,7 +130,8 @@ export default function EventPage() {
     const code = discountInput.trim().toUpperCase();
     if (!code) { setDiscountError("Bitte einen Code eingeben."); return; }
     const found = n.discountCodes.find((d: DiscountCode) => d.code.toUpperCase() === code);
-    if (found) { setAppliedDiscount(found); setDiscountSuccess(true); }
+    if (found && toDiscountPercent(found.percent) > 0) { setAppliedDiscount(found); setDiscountSuccess(true); }
+    else if (found) { setAppliedDiscount(null); setDiscountError("Rabattcode ist nicht korrekt konfiguriert."); }
     else { setAppliedDiscount(null); setDiscountError("Ungültiger Rabattcode."); }
   }
 
@@ -170,7 +188,7 @@ export default function EventPage() {
           <div className="max-w-2xl mx-auto flex items-center justify-between">
             <div>
               <p className="text-xs text-zinc-500 uppercase tracking-widest">Ab</p>
-              <p className="text-2xl font-black text-yellow-400">{n.tickets.length > 0 ? `${parseFloat(n.tickets[0].price || "0").toFixed(2)} €` : "Kostenlos"}</p>
+              <p className="text-2xl font-black text-yellow-400">{n.tickets.length > 0 ? formatMoney(toMoney(n.tickets[0].price)) : "Kostenlos"}</p>
             </div>
             <button onClick={() => setStep("tickets")} className="bg-yellow-400 text-black font-black px-8 py-4 rounded-2xl text-base hover:bg-yellow-300 transition-colors">Tickets kaufen →</button>
           </div>
@@ -187,7 +205,7 @@ export default function EventPage() {
             <div className="px-6 py-5 space-y-3">
               {n.tickets.map((ticket, i) => (
                 <div key={i} className="flex items-center justify-between bg-zinc-900 border border-zinc-800 rounded-2xl px-5 py-4">
-                  <div><p className="font-bold text-base">{ticket.name || "Ticket"}</p><p className="text-yellow-400 font-bold mt-0.5">{parseFloat(ticket.price || "0").toFixed(2)} €</p></div>
+                  <div><p className="font-bold text-base">{ticket.name || "Ticket"}</p><p className="text-yellow-400 font-bold mt-0.5">{formatMoney(toMoney(ticket.price))}</p></div>
                   <div className="flex items-center gap-2">
                     <button onClick={() => setTicketQtys(p => ({ ...p, [i]: Math.max(0, (p[i] ?? 0) - 1) }))} className="w-9 h-9 rounded-full border border-zinc-700 flex items-center justify-center font-bold hover:border-yellow-400 hover:text-yellow-400 transition-colors text-lg">−</button>
                     <span className="w-6 text-center font-bold">{ticketQtys[i] ?? 0}</span>
@@ -201,7 +219,7 @@ export default function EventPage() {
                   {n.loungeList.map((lounge, i) => (
                     <button key={i} onClick={() => setSelectedLounge(selectedLounge === i ? null : i)} className={`w-full flex items-center justify-between rounded-2xl border px-5 py-4 text-left transition-all ${selectedLounge === i ? "border-yellow-400 bg-yellow-400/10" : "border-zinc-800 bg-zinc-900"}`}>
                       <div><p className="font-bold">{lounge.name}</p><p className="text-zinc-500 text-xs mt-0.5">bis {lounge.persons} Personen</p></div>
-                      <div className="flex items-center gap-3"><span className="text-yellow-400 font-bold">{parseFloat(lounge.price || "0").toFixed(2)} €</span><div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${selectedLounge === i ? "bg-yellow-400 border-yellow-400" : "border-zinc-600"}`}>{selectedLounge === i && <span className="text-black text-xs font-black">✓</span>}</div></div>
+                      <div className="flex items-center gap-3"><span className="text-yellow-400 font-bold">{formatMoney(toMoney(lounge.price))}</span><div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${selectedLounge === i ? "bg-yellow-400 border-yellow-400" : "border-zinc-600"}`}>{selectedLounge === i && <span className="text-black text-xs font-black">✓</span>}</div></div>
                     </button>
                   ))}
                 </>
@@ -213,7 +231,7 @@ export default function EventPage() {
                     <input type="text" value={discountInput} onChange={e => { setDiscountInput(e.target.value.toUpperCase()); setDiscountError(""); setDiscountSuccess(false); setAppliedDiscount(null); }} onKeyDown={e => e.key === "Enter" && applyDiscount()} placeholder="Code eingeben" className="flex-1 bg-zinc-800 border border-zinc-700 focus:border-yellow-400 rounded-xl px-4 py-3 text-white placeholder:text-zinc-600 outline-none text-sm font-mono uppercase transition-colors" />
                     <button onClick={applyDiscount} className="bg-yellow-400 text-black font-black px-5 py-3 rounded-xl text-sm hover:bg-yellow-300 transition-colors shrink-0">Einlösen</button>
                   </div>
-                  {discountSuccess && appliedDiscount && <p className="text-green-400 text-xs mt-2">✓ {appliedDiscount.percent}% Rabatt wird angewendet</p>}
+                  {discountSuccess && appliedDiscount && <p className="text-green-400 text-xs mt-2">✓ {toDiscountPercent(appliedDiscount.percent)}% Rabatt wird angewendet</p>}
                   {discountError && <p className="text-red-400 text-xs mt-2">{discountError}</p>}
                 </div>
               )}
@@ -231,7 +249,7 @@ export default function EventPage() {
             <div className="sticky bottom-0 bg-[#111] border-t border-zinc-800 px-6 py-5">
               {hasSelection && (
                 <div className="flex items-center justify-between mb-4">
-                  <div><p className="text-zinc-500 text-xs">Gesamt</p>{appliedDiscount && <p className="text-green-400 text-xs">− {appliedDiscount.percent}% Rabatt</p>}<p className="text-2xl font-black text-yellow-400">{total.toFixed(2)} €</p></div>
+                  <div><p className="text-zinc-500 text-xs">Gesamt</p>{appliedDiscount && <p className="text-green-400 text-xs">− {toDiscountPercent(appliedDiscount.percent)}% Rabatt</p>}<p className="text-2xl font-black text-yellow-400">{formatMoney(total)}</p></div>
                   <p className="text-zinc-600 text-xs">{totalTickets} Ticket{totalTickets !== 1 ? "s" : ""}</p>
                 </div>
               )}
@@ -245,7 +263,7 @@ export default function EventPage() {
                   }
                   setStep("checkout");
                 }} disabled={!canCheckout} className={`w-full py-4 rounded-2xl font-black text-base transition-all ${canCheckout ? "bg-yellow-400 text-black hover:bg-yellow-300" : "bg-zinc-800 text-zinc-600 cursor-not-allowed"}`}>
-                {!hasSelection ? "Ticket auswählen" : !isAdult || !acceptedLegal ? "Bitte Bedingungen akzeptieren" : `Weiter · ${total.toFixed(2)} €`}
+                {!hasSelection ? "Ticket auswählen" : !isAdult || !acceptedLegal ? "Bitte Bedingungen akzeptieren" : `Weiter · ${formatMoney(total)}`}
               </button>
               <p className="text-center text-zinc-600 text-xs mt-3">🔒 Sichere Zahlung über Stripe</p>
             </div>
@@ -257,7 +275,7 @@ export default function EventPage() {
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-end justify-center" onClick={() => setStep("tickets")}>
           <div className="w-full max-w-2xl bg-[#111] border-t border-zinc-800 rounded-t-3xl" onClick={e => e.stopPropagation()}>
             <div className="px-6 pt-6 pb-4 border-b border-zinc-800 flex items-center justify-between">
-              <div><h2 className="text-lg font-black">Bestellung abschließen</h2><p className="text-zinc-500 text-sm mt-0.5">{totalTickets} Ticket{totalTickets !== 1 ? "s" : ""} · <span className="text-yellow-400 font-bold">{total.toFixed(2)} €</span></p></div>
+              <div><h2 className="text-lg font-black">Bestellung abschließen</h2><p className="text-zinc-500 text-sm mt-0.5">{totalTickets} Ticket{totalTickets !== 1 ? "s" : ""} · <span className="text-yellow-400 font-bold">{formatMoney(total)}</span></p></div>
               <button onClick={() => setStep("tickets")} className="w-9 h-9 rounded-full border border-zinc-700 flex items-center justify-center text-zinc-400 hover:text-white">✕</button>
             </div>
             <div className="px-6 py-5 space-y-4">
