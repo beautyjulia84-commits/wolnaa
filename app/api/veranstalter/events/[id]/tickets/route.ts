@@ -37,17 +37,38 @@ export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }
     return NextResponse.json({ error: 'Kein Zugriff auf dieses Event.' }, { status: 403 });
   }
 
-  const { data: tickets, error } = await supabase
+  const { data: linkedTickets, error: linkedError } = await supabase
     .from('tickets')
     .select('*')
     .eq('event_id', id)
     .order('created_at', { ascending: false });
 
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  if (linkedError) {
+    return NextResponse.json({ error: linkedError.message }, { status: 500 });
   }
 
-  return NextResponse.json({ event, tickets: tickets || [] });
+  // Older orders may have been saved only with event_title, before event_id was reliable.
+  const { data: legacyTickets, error: legacyError } = await supabase
+    .from('tickets')
+    .select('*')
+    .is('event_id', null)
+    .eq('event_title', event.title)
+    .order('created_at', { ascending: false });
+
+  if (legacyError) {
+    return NextResponse.json({ error: legacyError.message }, { status: 500 });
+  }
+
+  const byId = new Map<string, any>();
+  for (const ticket of [...(linkedTickets || []), ...(legacyTickets || [])]) {
+    byId.set(ticket.id, ticket);
+  }
+
+  const tickets = Array.from(byId.values()).sort((a, b) =>
+    new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime()
+  );
+
+  return NextResponse.json({ event, tickets });
 }
 
 export async function PATCH(req: Request, ctx: { params: Promise<{ id: string }> }) {
@@ -70,6 +91,20 @@ export async function PATCH(req: Request, ctx: { params: Promise<{ id: string }>
     return NextResponse.json({ error: 'Kein Zugriff auf dieses Event.' }, { status: 403 });
   }
 
+  const { data: ticket } = await supabase
+    .from('tickets')
+    .select('id,event_id,event_title')
+    .eq('id', ticketId)
+    .single();
+
+  const belongsToEvent =
+    ticket?.event_id === id ||
+    (!ticket?.event_id && ticket?.event_title === event.title);
+
+  if (!belongsToEvent) {
+    return NextResponse.json({ error: 'Kein Zugriff auf dieses Ticket.' }, { status: 403 });
+  }
+
   const status = checkedIn ? 'checked_in' : 'paid';
 
   const { error } = await supabase
@@ -78,8 +113,7 @@ export async function PATCH(req: Request, ctx: { params: Promise<{ id: string }>
       status,
       checked_in_at: checkedIn ? new Date().toISOString() : null,
     })
-    .eq('id', ticketId)
-    .eq('event_id', id);
+    .eq('id', ticketId);
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
