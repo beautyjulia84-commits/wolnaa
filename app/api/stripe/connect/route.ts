@@ -1,15 +1,9 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
 import { getAuthedVeranstalterId } from '@/lib/veranstalter-auth';
 
 const DEFAULT_STRIPE_CONNECT_CLIENT_ID = 'ca_UnnlDkM4Md42p77mdCrB1LSvBY7gWvRh';
 
 export async function POST(req: Request) {
-  const supabaseAdmin = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
-
   try {
     const authedId = getAuthedVeranstalterId(req);
     const body = await req.json().catch(() => ({}));
@@ -32,19 +26,6 @@ export async function POST(req: Request) {
         { error: 'Stripe Connect Client-ID fehlt.' },
         { status: 500 }
       );
-    }
-
-    const { data: veranstalter, error } = await supabaseAdmin
-      .from('veranstalter')
-      .select('id, aktiv')
-      .eq('id', authedId)
-      .single();
-
-    if (error || !veranstalter) {
-      return NextResponse.json({ error: 'Veranstalter nicht gefunden.' }, { status: 404 });
-    }
-    if (!veranstalter.aktiv) {
-      return NextResponse.json({ error: 'Veranstalter ist nicht aktiv.' }, { status: 403 });
     }
 
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || new URL(req.url).origin;
