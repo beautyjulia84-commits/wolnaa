@@ -290,31 +290,19 @@ export default function AdminPage() {
   async function loadTickets() {
     setTicketLoading(true);
 
-    const { data, error } = await sb
-      .from("tickets")
-      .select("*")
-      .order("created_at", { ascending: false });
+    const res = await fetch("/api/admin/tickets", {
+      headers: adminPw ? { "x-admin-token": adminPw } : undefined,
+    });
+    const data = await res.json().catch(() => ({}));
 
-    if (error) {
-      console.error("Tickets laden Fehler:", error);
+    if (!res.ok) {
+      console.error("Tickets laden Fehler:", data.error);
       setTickets([]);
       setTicketLoading(false);
       return;
     }
 
-    setTickets(
-      (data ?? []).map((t: any) => ({
-        ...t,
-        id: t.id,
-        ticket_id: t.ticket_id || "",
-        event_title: t.event_title || "",
-        customer_name: t.customer_name || "",
-        customer_email: t.customer_email || "",
-        amount: Number(t.total_amount || t.price || t.amount || 0),
-        status: t.status || "paid",
-        created_at: t.created_at || "",
-      }))
-    );
+    setTickets(data.tickets ?? []);
 
     setTicketLoading(false);
   }
