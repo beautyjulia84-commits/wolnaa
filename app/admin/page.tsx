@@ -569,7 +569,7 @@ export default function AdminPage() {
 
             <div className="p-5 space-y-4">
               <div className="bg-white rounded-2xl border border-zinc-200 overflow-hidden">
-                <div className="px-4 py-3 border-b border-zinc-200 bg-zinc-50"><p className={lbl + " mb-0"}>Allgemein</p></div>
+                <div className="px-4 py-3 border-b border-zinc-200 bg-zinc-50"><p className="text-base font-bold text-zinc-900 mb-0">Allgemein</p></div>
                 <div className="p-4 space-y-3">
                   <div><label className={lbl}>Event-Name *</label><input value={ev.title} onChange={e => f("title", e.target.value)} placeholder="z.B. Wolna Berlin" className={inp} /></div>
                   <div className="grid grid-cols-2 gap-3">
@@ -592,7 +592,7 @@ export default function AdminPage() {
               </div>
 
               <div className="bg-white rounded-2xl border border-zinc-200 overflow-hidden">
-                <div className="px-4 py-3 border-b border-zinc-200 bg-zinc-50"><p className={lbl + " mb-0"}>Adresse & Bild</p></div>
+                <div className="px-4 py-3 border-b border-zinc-200 bg-zinc-50"><p className="text-base font-bold text-zinc-900 mb-0">Adresse & Bild</p></div>
                 <div className="p-4 space-y-3">
                   <div>
                     <label className={lbl}>Adresse (Google Maps)</label>
@@ -602,9 +602,9 @@ export default function AdminPage() {
                   <div>
                     <label className={lbl}>Bild hochladen</label>
                     <div className="space-y-2">
-                      <label className="flex items-center justify-center gap-2 w-full rounded-xl border-2 border-dashed border-zinc-700 hover:border-yellow-400 py-4 cursor-pointer transition-colors bg-zinc-950">
-                        <svg className="w-5 h-5 text-zinc-700" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
-                        <span className="text-zinc-700 text-sm">{uploadingImage ? "Wird hochgeladen..." : "Bild auswählen"}</span>
+                      <label className="flex items-center justify-center gap-2 w-full rounded-xl border-2 border-dashed border-zinc-300 hover:border-yellow-400 py-4 cursor-pointer transition-colors bg-white">
+                        <svg className="w-5 h-5 text-zinc-900" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
+                        <span className="text-zinc-900 text-sm font-semibold">{uploadingImage ? "Wird hochgeladen..." : "Bild auswählen"}</span>
                         <input type="file" accept="image/*" className="hidden" onChange={async (e) => {
                           const file = e.target.files?.[0];
                           if (!file) return;
@@ -624,13 +624,13 @@ export default function AdminPage() {
               </div>
 
               <div className="bg-white rounded-2xl border border-zinc-200 overflow-hidden">
-                <div className="px-4 py-3 border-b border-zinc-200 bg-zinc-50"><p className={lbl + " mb-0"}>Beschreibung</p></div>
+                <div className="px-4 py-3 border-b border-zinc-200 bg-zinc-50"><p className="text-base font-bold text-zinc-900 mb-0">Beschreibung</p></div>
                 <div className="p-4"><textarea value={ev.description} onChange={e => f("description", e.target.value)} placeholder="Beschreibe das Event..." rows={4} className={inp + " resize-none"} /></div>
               </div>
 
               <div className="bg-white rounded-2xl border border-zinc-200 overflow-hidden">
                 <div className="px-4 py-3 border-b border-zinc-200 bg-zinc-50 flex items-center justify-between">
-                  <p className={lbl + " mb-0"}>Ticket-Typen</p>
+                  <p className="text-base font-bold text-zinc-900 mb-0">Ticket-Typen</p>
                   <button onClick={() => f("tickets", [...ev.tickets, { name: "", price: "", quantity: "" }])} className="text-yellow-400 text-xs font-bold hover:text-yellow-300">+ Hinzufügen</button>
                 </div>
                 <div className="p-4 space-y-3">
@@ -648,7 +648,7 @@ export default function AdminPage() {
               </div>
 
               <div className="bg-white rounded-2xl border border-zinc-200 overflow-hidden">
-                <div className="px-4 py-3 border-b border-zinc-200 bg-zinc-50"><p className={lbl + " mb-0"}>Lounge</p></div>
+                <div className="px-4 py-3 border-b border-zinc-200 bg-zinc-50"><p className="text-base font-bold text-zinc-900 mb-0">Lounge</p></div>
                 <div className="p-4 space-y-3">
                   <Toggle value={ev.lounges} onChange={v => f("lounges", v)} label="Lounges anbieten" />
                   {ev.lounges && (
@@ -671,7 +671,7 @@ export default function AdminPage() {
 
               <div className="bg-white rounded-2xl border border-zinc-200 overflow-hidden">
                 <div className="px-4 py-3 border-b border-zinc-200 bg-zinc-50 flex items-center justify-between">
-                  <p className={lbl + " mb-0"}>Rabattcodes</p>
+                  <p className="text-base font-bold text-zinc-900 mb-0">Rabattcodes</p>
                   <button onClick={() => f("discountCodes", [...ev.discountCodes, { code: "", percent: "" }])} className="text-yellow-400 text-xs font-bold hover:text-yellow-300">+ Hinzufügen</button>
                 </div>
                 <div className="p-4 space-y-3">
