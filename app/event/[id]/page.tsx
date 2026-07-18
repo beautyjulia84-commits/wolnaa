@@ -172,19 +172,19 @@ export default function EventPage() {
 
   return (
     <div className="min-h-screen bg-black text-white">
-      <div className="relative h-[68vh] min-h-[520px] overflow-hidden">
+      <div className="relative h-[46vh] min-h-[340px] overflow-hidden md:h-[56vh] md:min-h-[430px]">
         {n.imageUrl ? <img src={n.imageUrl} alt={event.title} className="w-full h-full object-cover" /> : <div className="w-full h-full bg-gradient-to-br from-zinc-900 to-black" />}
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/35 to-black/20" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/45 to-black/15" />
       </div>
 
-      <div className="max-w-3xl mx-auto px-5 -mt-40 relative z-10 pb-44">
+      <div className="max-w-3xl mx-auto px-5 -mt-20 relative z-10 pb-44 md:-mt-28">
         <Link href="/" className="mb-8 inline-flex items-center text-xs font-bold uppercase tracking-[0.18em] text-white/70 transition-colors hover:text-[#d6b36a]">
           ← Zurück
         </Link>
 
         <div className="mb-10">
           <p className="mb-4 text-xs font-bold uppercase tracking-[0.28em] text-[#d6b36a]">WOLNAA EVENT</p>
-          <h1 className="text-4xl font-semibold leading-tight mb-6 md:text-6xl">{event.title}</h1>
+          <h1 className="text-3xl font-semibold leading-tight mb-6 md:text-5xl">{event.title}</h1>
           <div className="flex flex-col gap-3">
             {event.date && <div className="flex flex-col gap-1"><div className="flex items-center gap-3"><span className="w-9 h-9 rounded-md bg-black/35 border border-white/10 flex items-center justify-center shrink-0">📅</span><span className="text-zinc-200 text-sm">{formatDate(event.date)}{event.time ? ` · ${event.time} Uhr` : ""}</span></div>{calcCountdown(event.date) && <span className="ml-12 bg-[#d6b36a] text-black text-xs font-bold px-2 py-0.5 rounded-md w-fit">{calcCountdown(event.date)}</span>}</div>}
             {event.city && <div className="flex items-center gap-3"><span className="w-9 h-9 rounded-md bg-black/35 border border-white/10 flex items-center justify-center shrink-0">📍</span><span className="text-zinc-200 text-sm">{event.city}{event.location ? ` · ${event.location}` : ""}</span></div>}
