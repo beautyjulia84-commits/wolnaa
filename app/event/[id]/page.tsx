@@ -176,7 +176,7 @@ export default function EventPage() {
       <header className="fixed left-0 right-0 top-0 z-50 border-b border-white/10 bg-black/65 backdrop-blur-xl">
         <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-5 md:px-8">
           <Link href="/" aria-label="WOLNAA Startseite" className="flex items-center">
-            <Image src="/wolnaa-logo-gold-transparent.png" alt="WOLNAA" width={260} height={96} priority className="h-20 w-auto object-contain md:h-24 -my-3" />
+            <Image src="/wolnaa-logo-gold-clean.png" alt="WOLNAA" width={260} height={96} priority className="h-11 w-auto object-contain md:h-12" />
           </Link>
           <Link href="/" className="text-xs font-bold uppercase tracking-[0.18em] text-white/70 transition-colors hover:text-[#d6b36a]">
             Zurück
