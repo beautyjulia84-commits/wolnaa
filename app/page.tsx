@@ -363,6 +363,39 @@ export default function Home() {
       </section>
 
 
+      <section className="mx-auto max-w-7xl px-6 py-20">
+        <div className="mb-10 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+          <div>
+            <p className="mb-4 text-xs font-bold uppercase tracking-[0.28em] text-[#d6b36a]">
+              Moments
+            </p>
+            <h2 className="text-4xl font-semibold leading-tight md:text-5xl">
+              Nächte, die bleiben.
+            </h2>
+          </div>
+          <p className="max-w-xl text-sm leading-7 text-zinc-400 md:text-base">
+            Eindrücke, Musik und Atmosphäre aus der Wolnaa Community.
+          </p>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-4">
+          {[0, 1, 2, 3].map((item) => (
+            <div key={item} className={`relative overflow-hidden rounded-3xl bg-zinc-950 ${item === 0 ? "md:col-span-2 md:row-span-2 min-h-[420px]" : "min-h-[260px]"}`}>
+              <video
+                className="absolute inset-0 h-full w-full object-cover"
+                src="/hero-wolnaa.mp4"
+                autoPlay
+                muted
+                loop
+                playsInline
+                preload="metadata"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+            </div>
+          ))}
+        </div>
+      </section>
+
       <section className="max-w-5xl mx-auto px-6 pb-20 text-center">
         <div className="px-6 py-10">
           <p className="text-[#d6b36a] uppercase tracking-[0.26em] text-xs mb-3">
