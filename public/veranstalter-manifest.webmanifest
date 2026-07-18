@@ -1,0 +1,18 @@
+{
+  "id": "/veranstalter/",
+  "name": "WOLNAA Veranstalter",
+  "short_name": "WOLNAA Partner",
+  "description": "Events, Ticketverkäufe und Check-in für WOLNAA Veranstalter.",
+  "lang": "de",
+  "start_url": "/veranstalter/dashboard",
+  "scope": "/veranstalter/",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "portrait-primary",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "icons": [
+    { "src": "/pwa/veranstalter-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/pwa/veranstalter-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "id": "/admin/",
+  "name": "WOLNAA Admin",
+  "short_name": "WOLNAA Admin",
+  "description": "Administration, Events, Tickets und Check-in für WOLNAA.",
+  "lang": "de",
+  "start_url": "/admin",
+  "scope": "/admin/",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "portrait-primary",
+  "background_color": "#ffffff",
+  "theme_color": "#d6b36a",
+  "icons": [
+    { "src": "/pwa/admin-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/pwa/admin-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
