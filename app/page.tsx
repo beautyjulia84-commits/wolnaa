@@ -237,7 +237,7 @@ export default function Home() {
       <header className="fixed left-0 right-0 top-0 z-50 border-b border-white/10 bg-black/90 backdrop-blur-xl">
         <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-5 md:px-8">
           <a href="/" aria-label="WOLNAA Startseite" className="flex items-center">
-            <Image src="/wolnaa-logo.png" alt="WOLNAA" width={180} height={64} priority className="h-10 w-auto object-contain md:h-12" />
+            <Image src="/wolnaa-logo.png" alt="WOLNAA" width={180} height={64} priority className="h-14 w-auto object-contain md:h-16" />
           </a>
 
           <nav className="hidden items-center gap-8 text-sm font-bold uppercase tracking-[0.22em] text-white/75 md:flex">
@@ -269,11 +269,8 @@ export default function Home() {
         <video className="absolute inset-0 z-0 h-full w-full object-cover" src="/hero-wolnaa.mp4" autoPlay muted loop playsInline preload="metadata" poster="/hero-bg.png" />
         <div style={{position:"absolute",inset:0,zIndex:0,background:"linear-gradient(to bottom, rgba(0,0,0,0.45), rgba(0,0,0,0.55), rgba(0,0,0,0.92))"}} />
         <div className="relative z-10 max-w-7xl mx-auto text-center">
-          <div className="flex justify-center mb-10">
-            <Image src="/wolnaa-logo.png" alt="WOLNAA Logo" width={720} height={240} priority className="w-[300px] md:w-[620px] h-auto object-contain drop-shadow-[0_0_45px_rgba(255,210,80,0.22)]" />
-          </div>
-          <p className="relative -top-10 text-zinc-400 text-base md:text-lg tracking-wide">
-            Exclusive Events&nbsp;•&nbsp;Russische Vibes&nbsp;•&nbsp;Unvergessliche Nächte.
+          <p className="mx-auto max-w-3xl text-xl md:text-3xl font-semibold leading-relaxed text-white drop-shadow-[0_4px_30px_rgba(0,0,0,0.8)]">
+            Erlebe exklusive Events mit authentischen russischen Vibes und genieße unvergessliche Nächte voller Musik, guter Stimmung und einzigartiger Momente.
           </p>
           <div className="flex flex-wrap justify-center gap-4 mt-8">
             <a href="#events" className="rounded-2xl bg-yellow-400 text-black font-black px-8 py-4 text-base hover:bg-yellow-300 active:scale-95 transition-all">Tickets kaufen</a>
