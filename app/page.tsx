@@ -144,7 +144,7 @@ function EventCard({ event, lang }: { event: EventItem; lang: Lang }) {
     setTimeout(() => setTapped(false), 600);
   }
   return (
-    <a href={createEventLink(event)} onTouchStart={handleTouch} className={`group block rounded-3xl overflow-hidden border transition-all duration-300 shadow-2xl hover:-translate-y-2 ${tapped ? "border-[#d6b36a] shadow-[0_0_30px_rgba(214,179,106,0.28)] scale-95" : "border-white/10 hover:border-[#d6b36a] hover:shadow-[0_0_30px_rgba(214,179,106,0.28)]"} bg-gradient-to-b from-zinc-950 to-black`}>
+    <a href={createEventLink(event)} onTouchStart={handleTouch} className={`group block rounded-md overflow-hidden border transition-all duration-300 shadow-2xl hover:-translate-y-2 ${tapped ? "border-[#d6b36a] shadow-[0_0_30px_rgba(214,179,106,0.28)] scale-95" : "border-white/10 hover:border-[#d6b36a] hover:shadow-[0_0_30px_rgba(214,179,106,0.28)]"} bg-gradient-to-b from-zinc-950 to-black`}>
       <div className="relative h-56 flex items-center justify-center bg-[radial-gradient(circle_at_top,#2b1b00_0%,#111_38%,#000_100%)] overflow-hidden">
         {event.image_url ? (
           <img src={event.image_url} alt={event.title} className="w-full h-56 object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" decoding="async" />
@@ -155,7 +155,7 @@ function EventCard({ event, lang }: { event: EventItem; lang: Lang }) {
       <div className="p-7">
         <div className="flex items-center justify-between">
           <p className="text-[#d6b36a] text-sm font-medium tracking-wide">{formatDate(event.date, lang)}{event.time && ` · ${event.time}`}</p>
-          {calcCountdown(event.date, lang) && <span className="bg-[#d6b36a] text-black text-xs font-bold px-2 py-0.5 rounded-full whitespace-nowrap">{calcCountdown(event.date, lang)}</span>}
+          {calcCountdown(event.date, lang) && <span className="bg-[#d6b36a] text-black text-xs font-bold px-2 py-0.5 rounded-md whitespace-nowrap">{calcCountdown(event.date, lang)}</span>}
         </div>
         <h3 className="text-2xl font-bold mt-3 leading-tight">{event.title}</h3>
         <p className="text-zinc-400 mt-2 text-sm">{event.city}{event.location && ` · ${event.location}`}</p>
@@ -165,10 +165,10 @@ function EventCard({ event, lang }: { event: EventItem; lang: Lang }) {
             <p className="mt-1 text-[11px] text-zinc-500">inkl. 19% MwSt.</p>
           </div>
           {event.lounges && event.lounge_list?.length > 0 && (
-            <span className="text-xs text-zinc-400 border border-zinc-700 rounded-full px-3 py-1">Lounge</span>
+            <span className="text-xs text-zinc-400 border border-zinc-700 rounded-md px-3 py-1">Lounge</span>
           )}
         </div>
-        <div className="mt-6 w-full rounded-2xl bg-white py-4 text-center text-black text-sm font-bold tracking-wide group-hover:bg-[#d6b36a] group-active:bg-[#d6b36a] transition-colors duration-200">{t.openEvent}</div>
+        <div className="mt-6 w-full rounded-md bg-white py-4 text-center text-black text-sm font-bold tracking-wide group-hover:bg-[#d6b36a] group-active:bg-[#d6b36a] transition-colors duration-200">{t.openEvent}</div>
       </div>
     </a>
   );
@@ -178,18 +178,18 @@ function EmptyState({ lang }: { lang: Lang }) {
   const t = I18N[lang];
   return (
     <div className="col-span-3 py-20 flex flex-col items-center justify-center text-center gap-4">
-      <div className="w-20 h-20 rounded-full border border-[#d6b36a]/20 bg-[#d6b36a]/5 flex items-center justify-center mb-2">
+      <div className="w-20 h-20 rounded-md border border-[#d6b36a]/20 bg-[#d6b36a]/5 flex items-center justify-center mb-2">
         <span className="text-4xl">🎉</span>
       </div>
       <h3 className="text-2xl font-bold text-white">{t.noEventsTitle}</h3>
       <p className="text-zinc-400 text-sm max-w-sm leading-relaxed">{t.noEventsText}</p>
       <div className="flex gap-3 mt-2">
         <a href="https://www.instagram.com/wolnaa_event" target="_blank" rel="noopener noreferrer"
-          className="rounded-2xl bg-[#d6b36a] px-6 py-3 text-sm font-bold text-black hover:bg-[#ead08d] active:bg-[#ead08d] active:scale-95 transition-all">
+          className="rounded-md bg-[#d6b36a] px-6 py-3 text-sm font-bold text-black hover:bg-[#ead08d] active:bg-[#ead08d] active:scale-95 transition-all">
           📸 {t.followInstagram}
         </a>
         <a href="mailto:kontakt@wolnaa.de"
-          className="rounded-2xl border border-white/15 px-6 py-3 text-sm font-bold text-white hover:border-[#d6b36a] hover:text-[#d6b36a] active:border-[#d6b36a] active:text-[#d6b36a] active:scale-95 transition-all">
+          className="rounded-md border border-white/15 px-6 py-3 text-sm font-bold text-white hover:border-[#d6b36a] hover:text-[#d6b36a] active:border-[#d6b36a] active:text-[#d6b36a] active:scale-95 transition-all">
           ✉️ {t.notification}
         </a>
       </div>
@@ -201,7 +201,7 @@ function EmptyState({ lang }: { lang: Lang }) {
 function FeaturedEvent({ event, lang }: { event: EventItem; lang: Lang }) {
   const t = I18N[lang];
   return (
-    <a href={createEventLink(event)} className="group mb-12 grid overflow-hidden rounded-3xl border border-white/10 bg-zinc-950/70 md:grid-cols-[1.15fr_0.85fr]">
+    <a href={createEventLink(event)} className="group mb-12 grid overflow-hidden rounded-md border border-white/10 bg-zinc-950/70 md:grid-cols-[1.15fr_0.85fr]">
       <div className="relative min-h-[320px] overflow-hidden bg-zinc-950 md:min-h-[420px]">
         {event.image_url ? (
           <img src={event.image_url} alt={event.title} className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy" decoding="async" />
@@ -231,7 +231,7 @@ function FeaturedEvent({ event, lang }: { event: EventItem; lang: Lang }) {
             <span className="block text-lg font-bold text-[#d6b36a]">{t.from} {getStartingPrice(event)} €</span>
             <span className="mt-1 block text-[11px] text-zinc-500">inkl. 19% MwSt.</span>
           </span>
-          <span className="inline-flex h-12 items-center justify-center rounded-full bg-[#d6b36a] px-6 text-sm font-bold text-black transition-colors group-hover:bg-[#ead08d]">
+          <span className="inline-flex h-12 items-center justify-center rounded-md bg-[#d6b36a] px-6 text-sm font-bold text-black transition-colors group-hover:bg-[#ead08d]">
             {t.viewTickets}
           </span>
         </div>
@@ -254,9 +254,9 @@ function LegalModal({ type, content, onClose }: { type: LegalType; content: stri
   if (!type) return null;
   return (
     <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4" onClick={onClose} role="dialog" aria-modal="true">
-      <div className="bg-zinc-950 border border-zinc-700 rounded-3xl p-8 max-w-3xl w-full max-h-[80vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+      <div className="bg-zinc-950 border border-zinc-700 rounded-md p-8 max-w-3xl w-full max-h-[80vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
         <div className="flex flex-col items-center mb-6 gap-3">
-          <button onClick={onClose} className="absolute top-4 left-1/2 -translate-x-1/2 bg-[#d6b36a] text-black font-bold text-sm border border-[#ead08d] rounded-full px-4 py-2 shadow-lg z-50">Schließen ✕</button>
+          <button onClick={onClose} className="absolute top-4 left-1/2 -translate-x-1/2 bg-[#d6b36a] text-black font-bold text-sm border border-[#ead08d] rounded-md px-4 py-2 shadow-lg z-50">Schließen ✕</button>
           <h2 className="text-2xl font-bold text-center">{titles[type]}</h2>
         </div>
         {content ? <div className="text-zinc-300 leading-7 text-base">{content.split("\n").map((line, i) => {
@@ -387,12 +387,12 @@ export default function Home() {
             <a href="#kontakt" className="transition-colors hover:text-[#d6b36a]">{t.navContact}</a>
           </nav>
 
-          <div className="flex items-center rounded-full border border-white/15 bg-black/25 p-1 text-xs font-bold uppercase tracking-[0.16em]">
+          <div className="flex items-center rounded-md border border-white/15 bg-black/25 p-1 text-xs font-bold uppercase tracking-[0.16em]">
             {(["de", "ru"] as Lang[]).map((item) => (
               <button
                 key={item}
                 onClick={() => setLang(item)}
-                className={`rounded-full px-3 py-2 transition-all ${lang === item ? "bg-[#d6b36a] text-black" : "text-white/70 hover:text-[#d6b36a]"}`}
+                className={`rounded-md px-3 py-2 transition-all ${lang === item ? "bg-[#d6b36a] text-black" : "text-white/70 hover:text-[#d6b36a]"}`}
               >
                 {item.toUpperCase()}
               </button>
@@ -409,8 +409,8 @@ export default function Home() {
             {t.heroText}
           </p>
           <div className="flex flex-wrap justify-center gap-4 mt-8 md:hidden">
-            <a href="#events" className="inline-flex h-14 w-56 items-center justify-center rounded-2xl bg-[#d6b36a] text-black font-bold text-base hover:bg-[#ead08d] active:scale-95 transition-all">{t.buyTickets}</a>
-            <a href="#events" className="inline-flex h-14 w-56 items-center justify-center rounded-2xl border border-white/30 text-white font-bold text-base hover:border-[#d6b36a] hover:text-[#d6b36a] active:scale-95 transition-all">{t.discoverEvents}</a>
+            <a href="#events" className="inline-flex h-14 w-56 items-center justify-center rounded-md bg-[#d6b36a] text-black font-bold text-base hover:bg-[#ead08d] active:scale-95 transition-all">{t.buyTickets}</a>
+            <a href="#events" className="inline-flex h-14 w-56 items-center justify-center rounded-md border border-white/30 text-white font-bold text-base hover:border-[#d6b36a] hover:text-[#d6b36a] active:scale-95 transition-all">{t.discoverEvents}</a>
           </div>
 
         </div>
@@ -466,7 +466,7 @@ export default function Home() {
 
         <div className="grid gap-4 md:grid-cols-4">
           {[0, 1, 2, 3].map((item) => (
-            <div key={item} className={`relative overflow-hidden rounded-3xl bg-zinc-950 ${item === 0 ? "md:col-span-2 md:row-span-2 min-h-[420px]" : "min-h-[260px]"}`}>
+            <div key={item} className={`relative overflow-hidden rounded-md bg-zinc-950 ${item === 0 ? "md:col-span-2 md:row-span-2 min-h-[420px]" : "min-h-[260px]"}`}>
               <video
                 className="absolute inset-0 h-full w-full object-cover"
                 src="/hero-wolnaa.mp4"
@@ -501,7 +501,7 @@ export default function Home() {
               href="https://www.tiktok.com/@wolnaa_event?_r=1&_t=ZG-96mDjgLge8H"
               target="_blank"
               rel="noopener noreferrer"
-              className="rounded-2xl bg-[#d6b36a] px-6 py-4 text-sm font-bold text-black hover:bg-[#ead08d] active:bg-[#ead08d] active:scale-95 transition-all"
+              className="rounded-md bg-[#d6b36a] px-6 py-4 text-sm font-bold text-black hover:bg-[#ead08d] active:bg-[#ead08d] active:scale-95 transition-all"
             >
               {t.tiktokFollow}
             </a>
@@ -510,7 +510,7 @@ export default function Home() {
               href="https://www.instagram.com/wolnaa_event?igsh=MWExbHJlcms3ZXp4MQ=="
               target="_blank"
               rel="noopener noreferrer"
-              className="rounded-2xl border border-white/15 px-6 py-4 text-sm font-bold text-white hover:border-[#d6b36a] hover:text-[#d6b36a] active:border-[#d6b36a] active:text-[#d6b36a] active:scale-95 transition-all"
+              className="rounded-md border border-white/15 px-6 py-4 text-sm font-bold text-white hover:border-[#d6b36a] hover:text-[#d6b36a] active:border-[#d6b36a] active:text-[#d6b36a] active:scale-95 transition-all"
             >
               {t.followInstagram}
             </a>
@@ -547,11 +547,11 @@ export default function Home() {
           </p>
           <div className="flex flex-wrap items-center justify-center gap-4">
             <a href="https://www.instagram.com/wolnaa_event" target="_blank" rel="noopener noreferrer"
-              className="rounded-2xl bg-[#d6b36a] px-6 py-4 text-sm font-bold text-black hover:bg-[#ead08d] active:bg-[#ead08d] active:scale-95 transition-all flex items-center gap-2">
+              className="rounded-md bg-[#d6b36a] px-6 py-4 text-sm font-bold text-black hover:bg-[#ead08d] active:bg-[#ead08d] active:scale-95 transition-all flex items-center gap-2">
               Instagram DM
             </a>
             <a href="mailto:kontakt@wolnaa.de"
-              className="rounded-2xl border border-white/15 px-6 py-4 text-sm font-bold text-white hover:border-[#d6b36a] hover:text-[#d6b36a] active:border-[#d6b36a] active:text-[#d6b36a] active:scale-95 transition-all flex items-center gap-2">
+              className="rounded-md border border-white/15 px-6 py-4 text-sm font-bold text-white hover:border-[#d6b36a] hover:text-[#d6b36a] active:border-[#d6b36a] active:text-[#d6b36a] active:scale-95 transition-all flex items-center gap-2">
               ✉️ kontakt@wolnaa.de
             </a>
           </div>
