@@ -154,14 +154,14 @@ function EventCard({ event, lang }: { event: EventItem; lang: Lang }) {
       </div>
       <div className="p-7">
         <div className="flex items-center justify-between">
-          <p className="text-[#d6b36a] text-sm font-medium tracking-wide">{formatDate(event.date, lang)}{event.time && ` · ${event.time}`}</p>
+          <p className="float-text text-[#d6b36a] text-sm font-medium tracking-wide">{formatDate(event.date, lang)}{event.time && ` · ${event.time}`}</p>
           {calcCountdown(event.date, lang) && <span className="bg-[#d6b36a] text-black text-xs font-bold px-2 py-0.5 rounded-md whitespace-nowrap">{calcCountdown(event.date, lang)}</span>}
         </div>
-        <h3 className="text-2xl font-bold mt-3 leading-tight">{event.title}</h3>
-        <p className="text-zinc-400 mt-2 text-sm">{event.city}{event.location && ` · ${event.location}`}</p>
+        <h3 className="float-text text-2xl font-bold mt-3 leading-tight">{event.title}</h3>
+        <p className="float-text text-zinc-400 mt-2 text-sm">{event.city}{event.location && ` · ${event.location}`}</p>
         <div className="mt-5 flex items-center justify-between">
           <div>
-            <p className="text-[#d6b36a] font-bold text-lg">{t.from} {getStartingPrice(event)} €</p>
+            <p className="float-text text-[#d6b36a] font-bold text-lg">{t.from} {getStartingPrice(event)} €</p>
             <p className="mt-1 text-[11px] text-zinc-500">inkl. 19% MwSt.</p>
           </div>
           {event.lounges && event.lounge_list?.length > 0 && (
@@ -216,11 +216,11 @@ function FeaturedEvent({ event, lang }: { event: EventItem; lang: Lang }) {
           {t.nextEvent}
         </p>
 
-        <h3 className="text-3xl font-semibold leading-tight md:text-5xl">
+        <h3 className="float-text text-3xl font-semibold leading-tight md:text-5xl">
           {event.title}
         </h3>
 
-        <p className="mt-5 text-sm leading-relaxed text-zinc-400 md:text-base">
+        <p className="float-text mt-5 text-sm leading-relaxed text-zinc-400 md:text-base">
           {formatDate(event.date, lang)}{event.time && ` · ${event.time}`}
           {event.city && ` · ${event.city}`}
           {event.location && ` · ${event.location}`}
@@ -401,6 +401,17 @@ export default function Home() {
           animation: wolnaaReveal 0.9s ease both;
         }
 
+        .wolnaa-page .float-text {
+          transition:
+            transform 420ms cubic-bezier(.2,.8,.2,1),
+            color 260ms ease,
+            opacity 260ms ease;
+        }
+
+        .wolnaa-page .group:hover .float-text {
+          transform: translateY(-3px);
+        }
+
         .wolnaa-page .motion-card {
           will-change: transform, box-shadow, border-color;
           transition:
@@ -411,11 +422,11 @@ export default function Home() {
         }
 
         .wolnaa-page .motion-card:hover {
-          transform: translateY(-10px) scale(1.015);
-          border-color: rgba(214, 179, 106, 0.85);
+          transform: translateY(-6px);
+          border-color: rgba(214, 179, 106, 0.34);
           box-shadow:
-            0 24px 80px rgba(0, 0, 0, 0.55),
-            0 0 42px rgba(214, 179, 106, 0.26);
+            0 18px 50px rgba(0, 0, 0, 0.46),
+            0 0 22px rgba(214, 179, 106, 0.11);
         }
 
         .wolnaa-page .wolnaa-hover-glow {
@@ -436,11 +447,10 @@ export default function Home() {
 
         .wolnaa-page .wolnaa-hover-glow:hover::before {
           opacity: 1;
-          border-color: rgba(214, 179, 106, 0.95);
+          border-color: rgba(214, 179, 106, 0.38);
           box-shadow:
-            inset 0 0 0 1px rgba(214, 179, 106, 0.38),
-            inset 0 0 38px rgba(214, 179, 106, 0.08),
-            0 0 46px rgba(214, 179, 106, 0.3);
+            inset 0 0 0 1px rgba(214, 179, 106, 0.12),
+            0 0 18px rgba(214, 179, 106, 0.1);
         }
 
         .wolnaa-page a,
