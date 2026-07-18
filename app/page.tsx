@@ -269,10 +269,10 @@ export default function Home() {
         <video className="absolute inset-0 z-0 h-full w-full object-cover" src="/hero-wolnaa.mp4" autoPlay muted loop playsInline preload="metadata" poster="/hero-bg.png" />
         <div style={{position:"absolute",inset:0,zIndex:0,background:"linear-gradient(to bottom, rgba(0,0,0,0.45), rgba(0,0,0,0.55), rgba(0,0,0,0.92))"}} />
         <div className="relative z-10 max-w-7xl mx-auto text-center pt-40 md:pt-56">
-          <p className="text-zinc-400 text-base md:text-lg tracking-wide">
+          <p className="text-zinc-400 text-base tracking-wide md:hidden">
             Erlebe exklusive Events mit authentischen russischen Vibes und genieße unvergessliche Nächte voller Musik, guter Stimmung und einzigartiger Momente.
           </p>
-          <div className="flex flex-wrap justify-center gap-4 mt-8">
+          <div className="flex flex-wrap justify-center gap-4 mt-8 md:hidden">
             <a href="#events" className="inline-flex h-14 w-56 items-center justify-center rounded-2xl bg-yellow-400 text-black font-black text-base hover:bg-yellow-300 active:scale-95 transition-all">Tickets kaufen</a>
             <a href="#events" className="inline-flex h-14 w-56 items-center justify-center rounded-2xl border border-white/30 text-white font-bold text-base hover:border-yellow-400 hover:text-yellow-400 active:scale-95 transition-all">Events entdecken</a>
           </div>
