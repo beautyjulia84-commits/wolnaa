@@ -291,7 +291,7 @@ export default function Home() {
 
 
       <section className="max-w-5xl mx-auto px-6 pb-20 text-center">
-        <div className="rounded-[32px] border border-white/10 bg-zinc-950/80 px-6 py-10">
+        <div className="px-6 py-10">
           <p className="text-yellow-400 uppercase tracking-[4px] text-xs mb-3">
             Community
           </p>
@@ -328,7 +328,7 @@ export default function Home() {
 
       {/* FAQ */}
       <section className="max-w-5xl mx-auto px-4 pb-10">
-        <div className="rounded-[32px] border border-white/10 bg-zinc-950/80 px-6 py-10">
+        <div className="px-6 py-10">
           <p className="text-yellow-400 uppercase tracking-[4px] text-xs mb-3 text-center">FAQ</p>
           <h2 className="text-3xl md:text-4xl font-black mb-8 text-center">Häufige Fragen</h2>
           <div className="space-y-4 max-w-2xl mx-auto">
@@ -353,7 +353,7 @@ export default function Home() {
 
       {/* Kontakt */}
       <section id="kontakt" className="max-w-5xl mx-auto px-4 pb-10">
-        <div className="rounded-[32px] border border-white/10 bg-zinc-950/80 px-6 py-10 text-center">
+        <div className="px-6 py-10 text-center">
           <p className="text-yellow-400 uppercase tracking-[4px] text-xs mb-3">Kontakt</p>
           <h2 className="text-3xl md:text-4xl font-black mb-4">Schreib uns</h2>
           <p className="text-zinc-400 max-w-xl mx-auto mb-8 text-sm leading-relaxed">
