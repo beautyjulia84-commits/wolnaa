@@ -11,6 +11,94 @@ const sb = createClient(
 
 type LegalType = "impressum" | "datenschutz" | "agb" | "teilnahme" | "widerruf" | null;
 
+const I18N = {
+  de: {
+    navEvents: "Events",
+    navContact: "Kontakt",
+    heroText: "{t.heroText}",
+    buyTickets: "{t.buyTickets}",
+    discoverEvents: "{t.discoverEvents}",
+    from: "ab",
+    openEvent: "Event öffnen",
+    nextEvent: "{t.nextEvent}",
+    viewTickets: "{t.viewTickets}",
+    noEventsTitle: "{t.noEventsTitle}",
+    noEventsText: "{t.noEventsText}",
+    followInstagram: "{t.followInstagram}",
+    notification: "Benachrichtigung",
+    aboutEyebrow: "WOLNAA",
+    aboutTitle: "Events mit Gefühl, Energie und echten Momenten.",
+    aboutText1: "{t.aboutText1}",
+    aboutText2: "{t.aboutText2}",
+    upcoming: "Upcoming",
+    upcomingTitle: "{t.upcomingTitle}",
+    moments: "{t.moments}",
+    momentsTitle: "{t.momentsTitle}",
+    momentsText: "{t.momentsText}",
+    community: "{t.community}",
+    followTitle: "{t.followTitle}",
+    followText: "{t.followText}",
+    tiktokFollow: "{t.tiktokFollow}",
+    faqTitle: "{t.faqTitle}",
+    contact: "Kontakt",
+    contactTitle: "{t.contactTitle}",
+    contactText: "{t.contactText}",
+    today: "Heute!",
+    tomorrow: "Morgen!",
+    daysLeft: "Noch {days} Tage",
+    faq: [
+      { q: "Wie alt muss ich sein?", a: "Unsere Events sind ausschließlich für Personen ab 18 Jahren. Ein gültiger Ausweis wird beim Einlass kontrolliert." },
+      { q: "Wie erhalte ich mein Ticket?", a: "Nach erfolgreicher Zahlung erhältst du dein Ticket mit QR-Code sofort per E-Mail." },
+      { q: "Gibt es Lounges?", a: "Bei ausgewählten Events bieten wir exklusive VIP Lounges an. Die Verfügbarkeit siehst du direkt auf der Event-Seite." },
+      { q: "Wo kann ich parken?", a: "Parkmöglichkeiten findest du in der Nähe des Veranstaltungsortes. Die genaue Adresse ist auf der Event-Seite verlinkt." },
+    ],
+  },
+  ru: {
+    navEvents: "События",
+    navContact: "Контакты",
+    heroText: "Открой для себя эксклюзивные события с настоящей русской атмосферой и незабываемые ночи с музыкой, настроением и особенными моментами.",
+    buyTickets: "Купить билеты",
+    discoverEvents: "Смотреть события",
+    from: "от",
+    openEvent: "Открыть событие",
+    nextEvent: "Ближайшее событие",
+    viewTickets: "Смотреть билеты",
+    noEventsTitle: "Новые события скоро!",
+    noEventsText: "Сейчас нет запланированных событий. Подпишись на Instagram, чтобы узнать о новых событиях первым.",
+    followInstagram: "Подписаться в Instagram",
+    notification: "Уведомление",
+    aboutEyebrow: "WOLNAA",
+    aboutTitle: "События с эмоцией, энергией и настоящими моментами.",
+    aboutText1: "Wolnaa — это эксклюзивные ночи, настоящие русские вайбы и атмосфера, которая объединяет людей.",
+    aboutText2: "Мы соединяем музыку, хорошее настроение и особенные локации, чтобы вечер стал настоящим событием.",
+    upcoming: "Скоро",
+    upcomingTitle: "Ближайшие события",
+    moments: "Моменты",
+    momentsTitle: "Ночи, которые остаются в памяти.",
+    momentsText: "Впечатления, музыка и атмосфера сообщества Wolnaa.",
+    community: "Сообщество",
+    followTitle: "Следи за WOLNAA",
+    followText: "Эксклюзивные видео, анонсы и закулисье в TikTok и Instagram.",
+    tiktokFollow: "Подписаться в TikTok",
+    faqTitle: "Частые вопросы",
+    contact: "Контакты",
+    contactTitle: "Напиши нам",
+    contactText: "Вопросы о билетах, lounge или сотрудничестве? Мы быстро ответим!",
+    today: "Сегодня!",
+    tomorrow: "Завтра!",
+    daysLeft: "Осталось {days} дн.",
+    faq: [
+      { q: "С какого возраста можно прийти?", a: "Наши события только для гостей от 18 лет. На входе проверяется действительный документ." },
+      { q: "Как я получу билет?", a: "После успешной оплаты билет с QR-кодом сразу приходит на e-mail." },
+      { q: "Есть ли lounge?", a: "На выбранных событиях доступны эксклюзивные VIP lounge. Доступность указана на странице события." },
+      { q: "Где можно припарковаться?", a: "Парковки находятся рядом с локацией. Точный адрес указан на странице события." },
+    ],
+  },
+} as const;
+
+type Lang = keyof typeof I18N;
+
+
 type EventItem = {
   id: string;
   title: string; city: string; date: string; time: string;
@@ -23,20 +111,21 @@ function createEventLink(event: EventItem): string {
   return `/event/${(event as any).slug || event.title.toLowerCase().replace(/\s+/g, "-").replace(/[^\w-]+/g, "")}`;
 }
 
-function calcCountdown(d: string) {
+function calcCountdown(d: string, lang: Lang = 'de') {
   if (!d) return null;
   const diff = new Date(d + "T00:00:00").getTime() - new Date().getTime();
   const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
   if (days < 0) return null;
-  if (days === 0) return "Heute!";
-  if (days === 1) return "Morgen!";
-  return `Noch ${days} Tage`;
+  const t = I18N[lang];
+  if (days === 0) return t.today;
+  if (days === 1) return t.tomorrow;
+  return t.daysLeft.replace('{days}', String(days));
 }
 
-function formatDate(d: string) {
+function formatDate(d: string, lang: Lang = 'de') {
   if (!d) return "";
   try {
-    return new Date(d + "T00:00:00").toLocaleDateString("de-DE", {
+    return new Date(d + "T00:00:00").toLocaleDateString(lang === "ru" ? "ru-RU" : "de-DE", {
       weekday: "short", day: "numeric", month: "long", year: "numeric"
     });
   } catch { return d; }
@@ -47,7 +136,8 @@ function getStartingPrice(event: EventItem): string {
   return parseFloat(event.price || "0").toFixed(2);
 }
 
-function EventCard({ event }: { event: EventItem }) {
+function EventCard({ event, lang }: { event: EventItem; lang: Lang }) {
+  const t = I18N[lang];
   const [tapped, setTapped] = useState(false);
   function handleTouch() {
     setTapped(true);
@@ -64,39 +154,40 @@ function EventCard({ event }: { event: EventItem }) {
       </div>
       <div className="p-7">
         <div className="flex items-center justify-between">
-          <p className="text-[#d6b36a] text-sm font-medium tracking-wide">{formatDate(event.date)}{event.time && ` · ${event.time}`}</p>
-          {calcCountdown(event.date) && <span className="bg-[#d6b36a] text-black text-xs font-bold px-2 py-0.5 rounded-full whitespace-nowrap">{calcCountdown(event.date)}</span>}
+          <p className="text-[#d6b36a] text-sm font-medium tracking-wide">{formatDate(event.date, lang)}{event.time && ` · ${event.time}`}</p>
+          {calcCountdown(event.date, lang) && <span className="bg-[#d6b36a] text-black text-xs font-bold px-2 py-0.5 rounded-full whitespace-nowrap">{calcCountdown(event.date, lang)}</span>}
         </div>
         <h3 className="text-2xl font-bold mt-3 leading-tight">{event.title}</h3>
         <p className="text-zinc-400 mt-2 text-sm">{event.city}{event.location && ` · ${event.location}`}</p>
         <div className="mt-5 flex items-center justify-between">
-          <p className="text-[#d6b36a] font-bold text-lg">ab {getStartingPrice(event)} €</p>
+          <p className="text-[#d6b36a] font-bold text-lg">{t.from} {getStartingPrice(event)} €</p>
           {event.lounges && event.lounge_list?.length > 0 && (
             <span className="text-xs text-zinc-400 border border-zinc-700 rounded-full px-3 py-1">Lounge</span>
           )}
         </div>
-        <div className="mt-6 w-full rounded-2xl bg-white py-4 text-center text-black text-sm font-bold tracking-wide group-hover:bg-[#d6b36a] group-active:bg-[#d6b36a] transition-colors duration-200">Event öffnen</div>
+        <div className="mt-6 w-full rounded-2xl bg-white py-4 text-center text-black text-sm font-bold tracking-wide group-hover:bg-[#d6b36a] group-active:bg-[#d6b36a] transition-colors duration-200">{t.openEvent}</div>
       </div>
     </a>
   );
 }
 
-function EmptyState() {
+function EmptyState({ lang }: { lang: Lang }) {
+  const t = I18N[lang];
   return (
     <div className="col-span-3 py-20 flex flex-col items-center justify-center text-center gap-4">
       <div className="w-20 h-20 rounded-full border border-[#d6b36a]/20 bg-[#d6b36a]/5 flex items-center justify-center mb-2">
         <span className="text-4xl">🎉</span>
       </div>
-      <h3 className="text-2xl font-bold text-white">Neue Events kommen bald!</h3>
-      <p className="text-zinc-400 text-sm max-w-sm leading-relaxed">Aktuell sind keine Events geplant. Folge uns auf Instagram um als Erstes von neuen Events zu erfahren!</p>
+      <h3 className="text-2xl font-bold text-white">{t.noEventsTitle}</h3>
+      <p className="text-zinc-400 text-sm max-w-sm leading-relaxed">{t.noEventsText}</p>
       <div className="flex gap-3 mt-2">
         <a href="https://www.instagram.com/wolnaa_event" target="_blank" rel="noopener noreferrer"
           className="rounded-2xl bg-[#d6b36a] px-6 py-3 text-sm font-bold text-black hover:bg-[#ead08d] active:bg-[#ead08d] active:scale-95 transition-all">
-          📸 Instagram folgen
+          📸 {t.followInstagram}
         </a>
         <a href="mailto:kontakt@wolnaa.de"
           className="rounded-2xl border border-white/15 px-6 py-3 text-sm font-bold text-white hover:border-[#d6b36a] hover:text-[#d6b36a] active:border-[#d6b36a] active:text-[#d6b36a] active:scale-95 transition-all">
-          ✉️ Benachrichtigung
+          ✉️ {t.notification}
         </a>
       </div>
     </div>
@@ -104,7 +195,8 @@ function EmptyState() {
 }
 
 
-function FeaturedEvent({ event }: { event: EventItem }) {
+function FeaturedEvent({ event, lang }: { event: EventItem; lang: Lang }) {
+  const t = I18N[lang];
   return (
     <a href={createEventLink(event)} className="group mb-12 grid overflow-hidden rounded-3xl border border-white/10 bg-zinc-950/70 md:grid-cols-[1.15fr_0.85fr]">
       <div className="relative min-h-[320px] overflow-hidden bg-zinc-950 md:min-h-[420px]">
@@ -118,7 +210,7 @@ function FeaturedEvent({ event }: { event: EventItem }) {
 
       <div className="flex flex-col justify-center p-7 md:p-10">
         <p className="mb-4 text-xs font-bold uppercase tracking-[0.28em] text-[#d6b36a]">
-          Nächstes Event
+          {t.nextEvent}
         </p>
 
         <h3 className="text-3xl font-semibold leading-tight md:text-5xl">
@@ -126,7 +218,7 @@ function FeaturedEvent({ event }: { event: EventItem }) {
         </h3>
 
         <p className="mt-5 text-sm leading-relaxed text-zinc-400 md:text-base">
-          {formatDate(event.date)}{event.time && ` · ${event.time}`}
+          {formatDate(event.date, lang)}{event.time && ` · ${event.time}`}
           {event.city && ` · ${event.city}`}
           {event.location && ` · ${event.location}`}
         </p>
@@ -139,10 +231,10 @@ function FeaturedEvent({ event }: { event: EventItem }) {
 
         <div className="mt-8 flex flex-wrap items-center gap-4">
           <span className="text-lg font-bold text-[#d6b36a]">
-            ab {getStartingPrice(event)} €
+            {t.from} {getStartingPrice(event)} €
           </span>
           <span className="inline-flex h-12 items-center justify-center rounded-full bg-[#d6b36a] px-6 text-sm font-bold text-black transition-colors group-hover:bg-[#ead08d]">
-            Tickets ansehen
+            {t.viewTickets}
           </span>
         </div>
       </div>
@@ -241,6 +333,8 @@ export default function Home() {
   const [mounted, setMounted] = useState(false);
   const [showLegal, setShowLegal] = useState<LegalType>(null);
   const [legalContent, setLegalContent] = useState<Record<string, string>>({});
+  const [lang, setLang] = useState<Lang>("de");
+  const t = I18N[lang];
 
   useEffect(() => {
     setMounted(true);
@@ -291,26 +385,20 @@ export default function Home() {
           </a>
 
           <nav className="hidden items-center gap-8 text-sm font-bold uppercase tracking-[0.22em] text-white/75 md:flex">
-            <a href="#events" className="transition-colors hover:text-[#d6b36a]">Events</a>
-            <a href="#kontakt" className="transition-colors hover:text-[#d6b36a]">Kontakt</a>
+            <a href="#events" className="transition-colors hover:text-[#d6b36a]">{t.navEvents}</a>
+            <a href="#kontakt" className="transition-colors hover:text-[#d6b36a]">{t.navContact}</a>
           </nav>
 
-          <div className="flex items-center gap-4">
-            <a href="https://www.tiktok.com/@wolnaa_event?_r=1&_t=ZG-96mDjgLge8H" target="_blank" rel="noopener noreferrer" aria-label="WOLNAA TikTok" className="text-[#d6b36a] transition-all duration-200 hover:text-[#ead08d]">
-              <svg viewBox="0 0 24 24" className="h-5 w-5 fill-current md:h-6 md:w-6" aria-hidden="true">
-                <path d="M16.6 5.82c1.05.78 2.32 1.24 3.66 1.27v3.15a7.8 7.8 0 0 1-3.7-.93v5.45c0 3.55-2.88 6.43-6.43 6.43A6.43 6.43 0 0 1 3.7 14.76c0-3.55 2.88-6.43 6.43-6.43.39 0 .77.04 1.14.1v3.28a3.15 3.15 0 1 0 2.23 3.01V2.8h3.1c.17 1.22.88 2.31 2 3.02z"/>
-              </svg>
-            </a>
-
-            <a href="https://www.instagram.com/wolnaa_event?igsh=MWExbHJlcms3ZXp4MQ==" target="_blank" rel="noopener noreferrer" aria-label="WOLNAA Instagram" className="text-[#d6b36a] transition-all duration-200 hover:text-[#ead08d]">
-              <svg viewBox="0 0 24 24" className="h-5 w-5 fill-current md:h-6 md:w-6" aria-hidden="true">
-                <path d="M7.75 2h8.5A5.76 5.76 0 0 1 22 7.75v8.5A5.76 5.76 0 0 1 16.25 22h-8.5A5.76 5.76 0 0 1 2 16.25v-8.5A5.76 5.76 0 0 1 7.75 2zm0 2A3.75 3.75 0 0 0 4 7.75v8.5A3.75 3.75 0 0 0 7.75 20h8.5A3.75 3.75 0 0 0 20 16.25v-8.5A3.75 3.75 0 0 0 16.25 4h-8.5zM12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10zm0 2a3 3 0 1 0 0 6 3 3 0 0 0 0-6zm5.25-2.25a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5z"/>
-              </svg>
-            </a>
-
-            <a href="#events" className="rounded-full bg-[#d6b36a] px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] text-black transition-all hover:bg-[#ead08d] active:scale-95 md:px-5">
-              Tickets
-            </a>
+          <div className="flex items-center rounded-full border border-white/15 bg-black/25 p-1 text-xs font-bold uppercase tracking-[0.16em]">
+            {(["de", "ru"] as Lang[]).map((item) => (
+              <button
+                key={item}
+                onClick={() => setLang(item)}
+                className={`rounded-full px-3 py-2 transition-all ${lang === item ? "bg-[#d6b36a] text-black" : "text-white/70 hover:text-[#d6b36a]"}`}
+              >
+                {item.toUpperCase()}
+              </button>
+            ))}
           </div>
         </div>
       </header>
@@ -320,11 +408,11 @@ export default function Home() {
         <div style={{position:"absolute",inset:0,zIndex:0,background:"linear-gradient(to bottom, rgba(0,0,0,0.45), rgba(0,0,0,0.55), rgba(0,0,0,0.92))"}} />
         <div className="relative z-10 max-w-7xl mx-auto text-center pt-40 md:pt-56">
           <p className="text-zinc-400 text-base tracking-wide md:hidden">
-            Erlebe exklusive Events mit authentischen russischen Vibes und genieße unvergessliche Nächte voller Musik, guter Stimmung und einzigartiger Momente.
+            {t.heroText}
           </p>
           <div className="flex flex-wrap justify-center gap-4 mt-8 md:hidden">
-            <a href="#events" className="inline-flex h-14 w-56 items-center justify-center rounded-2xl bg-[#d6b36a] text-black font-bold text-base hover:bg-[#ead08d] active:scale-95 transition-all">Tickets kaufen</a>
-            <a href="#events" className="inline-flex h-14 w-56 items-center justify-center rounded-2xl border border-white/30 text-white font-bold text-base hover:border-[#d6b36a] hover:text-[#d6b36a] active:scale-95 transition-all">Events entdecken</a>
+            <a href="#events" className="inline-flex h-14 w-56 items-center justify-center rounded-2xl bg-[#d6b36a] text-black font-bold text-base hover:bg-[#ead08d] active:scale-95 transition-all">{t.buyTickets}</a>
+            <a href="#events" className="inline-flex h-14 w-56 items-center justify-center rounded-2xl border border-white/30 text-white font-bold text-base hover:border-[#d6b36a] hover:text-[#d6b36a] active:scale-95 transition-all">{t.discoverEvents}</a>
           </div>
 
         </div>
@@ -333,32 +421,32 @@ export default function Home() {
       <section className="mx-auto grid max-w-7xl gap-10 px-6 py-20 md:grid-cols-[0.9fr_1.1fr] md:items-end">
         <div>
           <p className="mb-4 text-xs font-bold uppercase tracking-[0.28em] text-[#d6b36a]">
-            WOLNAA
+            {t.aboutEyebrow}
           </p>
           <h2 className="text-4xl font-semibold leading-tight md:text-6xl">
-            Events mit Gefühl, Energie und echten Momenten.
+            {t.aboutTitle}
           </h2>
         </div>
 
         <div className="space-y-6 text-base leading-8 text-zinc-400 md:text-lg">
           <p>
-            Wolnaa steht für exklusive Nächte, authentische russische Vibes und eine Atmosphäre, die Menschen verbindet.
+            {t.aboutText1}
           </p>
           <p>
-            Unsere Events bringen Musik, gute Stimmung und besondere Locations zusammen, damit aus einem Abend ein Erlebnis wird.
+            {t.aboutText2}
           </p>
         </div>
       </section>
 
       <section id="events" className="mx-auto max-w-7xl px-6 py-16">
-        <p className="mb-3 text-sm uppercase tracking-[0.26em] text-[#d6b36a]">Upcoming</p>
-        <h2 className="mb-10 text-4xl font-semibold md:text-5xl">Kommende Veranstaltungen</h2>
+        <p className="mb-3 text-sm uppercase tracking-[0.26em] text-[#d6b36a]">{t.upcoming}</p>
+        <h2 className="mb-10 text-4xl font-semibold md:text-5xl">{t.upcomingTitle}</h2>
 
-        {featuredEvent && <FeaturedEvent event={featuredEvent} />}
+        {featuredEvent && <FeaturedEvent event={featuredEvent} lang={lang} />}
 
         <div className="grid gap-8 md:grid-cols-3">
-          {mounted && events.length === 0 && <EmptyState />}
-          {mounted && remainingEvents.map(event => <EventCard key={event.id} event={event} />)}
+          {mounted && events.length === 0 && <EmptyState lang={lang} />}
+          {mounted && remainingEvents.map(event => <EventCard key={event.id} event={event} lang={lang} />)}
         </div>
       </section>
 
@@ -367,14 +455,14 @@ export default function Home() {
         <div className="mb-10 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
             <p className="mb-4 text-xs font-bold uppercase tracking-[0.28em] text-[#d6b36a]">
-              Moments
+              {t.moments}
             </p>
             <h2 className="text-4xl font-semibold leading-tight md:text-5xl">
-              Nächte, die bleiben.
+              {t.momentsTitle}
             </h2>
           </div>
           <p className="max-w-xl text-sm leading-7 text-zinc-400 md:text-base">
-            Eindrücke, Musik und Atmosphäre aus der Wolnaa Community.
+            {t.momentsText}
           </p>
         </div>
 
@@ -399,15 +487,15 @@ export default function Home() {
       <section className="max-w-5xl mx-auto px-6 pb-20 text-center">
         <div className="px-6 py-10">
           <p className="text-[#d6b36a] uppercase tracking-[0.26em] text-xs mb-3">
-            Community
+            {t.community}
           </p>
 
           <h2 className="text-3xl md:text-5xl font-semibold mb-4">
-            Folge WOLNAA
+            {t.followTitle}
           </h2>
 
           <p className="text-zinc-400 max-w-2xl mx-auto mb-7">
-            Exklusive Eventvideos, Ankündigungen und Behind the Scenes auf TikTok und Instagram.
+            {t.followText}
           </p>
 
           <div className="flex flex-wrap items-center justify-center gap-4">
@@ -417,7 +505,7 @@ export default function Home() {
               rel="noopener noreferrer"
               className="rounded-2xl bg-[#d6b36a] px-6 py-4 text-sm font-bold text-black hover:bg-[#ead08d] active:bg-[#ead08d] active:scale-95 transition-all"
             >
-              TikTok folgen
+              {t.tiktokFollow}
             </a>
 
             <a
@@ -426,7 +514,7 @@ export default function Home() {
               rel="noopener noreferrer"
               className="rounded-2xl border border-white/15 px-6 py-4 text-sm font-bold text-white hover:border-[#d6b36a] hover:text-[#d6b36a] active:border-[#d6b36a] active:text-[#d6b36a] active:scale-95 transition-all"
             >
-              Instagram folgen
+              {t.followInstagram}
             </a>
           </div>
         </div>
@@ -436,15 +524,9 @@ export default function Home() {
       <section className="mx-auto max-w-5xl px-6 py-20">
         <div>
           <p className="mb-4 text-center text-xs font-bold uppercase tracking-[0.28em] text-[#d6b36a]">FAQ</p>
-          <h2 className="mb-12 text-center text-4xl font-semibold md:text-5xl">Häufige Fragen</h2>
+          <h2 className="mb-12 text-center text-4xl font-semibold md:text-5xl">{t.faqTitle}</h2>
           <div className="mx-auto max-w-3xl divide-y divide-white/10 border-y border-white/10">
-            {[
-              { q: "Wie alt muss ich sein?", a: "Unsere Events sind ausschließlich für Personen ab 18 Jahren. Ein gültiger Ausweis wird beim Einlass kontrolliert." },
-              { q: "Wie erhalte ich mein Ticket?", a: "Nach erfolgreicher Zahlung erhältst du dein Ticket mit QR-Code sofort per E-Mail." },
-
-              { q: "Gibt es Lounges?", a: "Bei ausgewählten Events bieten wir exklusive VIP Lounges an. Die Verfügbarkeit siehst du direkt auf der Event-Seite." },
-              { q: "Wo kann ich parken?", a: "Parkmöglichkeiten findest du in der Nähe des Veranstaltungsortes. Die genaue Adresse ist auf der Event-Seite verlinkt." },
-            ].map((item, i) => (
+            {t.faq.map((item, i) => (
               <details key={i} className="group">
                 <summary className="flex cursor-pointer list-none items-center justify-between gap-6 py-6 text-left text-base font-semibold text-white transition-colors hover:text-[#d6b36a] md:text-lg">
                   {item.q}
@@ -460,10 +542,10 @@ export default function Home() {
       {/* Kontakt */}
       <section id="kontakt" className="max-w-5xl mx-auto px-4 pb-10">
         <div className="px-6 py-10 text-center">
-          <p className="text-[#d6b36a] uppercase tracking-[0.26em] text-xs mb-3">Kontakt</p>
-          <h2 className="text-3xl md:text-4xl font-semibold mb-4">Schreib uns</h2>
+          <p className="text-[#d6b36a] uppercase tracking-[0.26em] text-xs mb-3">{t.contact}</p>
+          <h2 className="text-3xl md:text-4xl font-semibold mb-4">{t.contactTitle}</h2>
           <p className="text-zinc-400 max-w-xl mx-auto mb-8 text-sm leading-relaxed">
-            Fragen zu Tickets, Lounges oder Kooperationen? Wir antworten schnell!
+            {t.contactText}
           </p>
           <div className="flex flex-wrap items-center justify-center gap-4">
             <a href="https://www.instagram.com/wolnaa_event" target="_blank" rel="noopener noreferrer"
