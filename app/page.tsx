@@ -654,17 +654,14 @@ export default function Home() {
         <video className="absolute inset-0 z-0 h-full w-full object-cover" src="/hero-wolnaa.mp4" autoPlay muted loop playsInline preload="auto" />
         <div style={{position:"absolute",inset:0,zIndex:0,background:"linear-gradient(to bottom, rgba(0,0,0,0.45), rgba(0,0,0,0.55), rgba(0,0,0,0.92))"}} />
         <div className="relative z-10 max-w-7xl mx-auto text-center pt-40 md:pt-56">
-          <div className="hidden md:block">
-            <p className="float-text mb-5 text-sm font-bold uppercase tracking-[0.34em] text-[#d6b36a] lg:text-base">
+          <div>
+            <p className="float-text mb-4 text-[11px] font-bold uppercase tracking-[0.26em] text-[#d6b36a] md:mb-5 md:text-sm md:tracking-[0.34em] lg:text-base">
               Events <span className="text-white/40">|</span> Clubbing <span className="text-white/40">|</span> Festivals
             </p>
-            <h1 className="float-text text-5xl font-semibold uppercase leading-[1.05] tracking-[-0.025em] text-white drop-shadow-[0_4px_24px_rgba(0,0,0,0.75)] lg:text-7xl">
+            <h1 className="float-text text-4xl font-semibold uppercase leading-[1.05] tracking-[-0.025em] text-white drop-shadow-[0_4px_24px_rgba(0,0,0,0.75)] sm:text-5xl lg:text-7xl">
               Die Nacht, die du verdienst
             </h1>
           </div>
-          <p className="text-zinc-400 text-base tracking-wide md:hidden">
-            {t.heroText}
-          </p>
           <div className="flex flex-wrap justify-center gap-4 mt-8 md:hidden">
             <a href="#events" className="inline-flex h-14 w-56 items-center justify-center rounded-md bg-[#d6b36a] text-black font-bold text-base hover:bg-[#ead08d] active:scale-95 transition-all">{t.buyTickets}</a>
             <a href="#events" className="inline-flex h-14 w-56 items-center justify-center rounded-md border border-white/30 text-white font-bold text-base hover:border-[#d6b36a] hover:text-[#d6b36a] active:scale-95 transition-all">{t.discoverEvents}</a>
