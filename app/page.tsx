@@ -340,6 +340,23 @@ export default function Home() {
     loadLegal();
   }, []);
 
+  useEffect(() => {
+    const sections = document.querySelectorAll<HTMLElement>(".reveal-section");
+    const observer = new IntersectionObserver(
+      entries => {
+        entries.forEach(entry => {
+          if (!entry.isIntersecting) return;
+          entry.target.classList.add("is-visible");
+          observer.unobserve(entry.target);
+        });
+      },
+      { threshold: 0.12, rootMargin: "0px 0px -8% 0px" }
+    );
+
+    sections.forEach(section => observer.observe(section));
+    return () => observer.disconnect();
+  }, []);
+
   async function loadEvents() {
     const { data, error } = await sb
       .from("events")
@@ -377,17 +394,6 @@ export default function Home() {
   return (
     <main className="wolnaa-page min-h-screen bg-black text-white overflow-hidden">
       <style jsx global>{`
-        @keyframes wolnaaReveal {
-          from {
-            opacity: 0;
-            transform: translateY(28px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
         @keyframes wolnaaSoftFloat {
           0%, 100% {
             transform: translateY(0);
@@ -398,7 +404,17 @@ export default function Home() {
         }
 
         .wolnaa-page .reveal-section {
-          animation: wolnaaReveal 0.9s ease both;
+          opacity: 0;
+          transform: translateY(34px);
+          transition:
+            opacity 850ms cubic-bezier(.2,.65,.25,1),
+            transform 850ms cubic-bezier(.2,.65,.25,1);
+          will-change: opacity, transform;
+        }
+
+        .wolnaa-page .reveal-section.is-visible {
+          opacity: 1;
+          transform: translateY(0);
         }
 
         .wolnaa-page .float-text {
@@ -487,6 +503,11 @@ export default function Home() {
         }
 
         @media (prefers-reduced-motion: reduce) {
+          .wolnaa-page .reveal-section {
+            opacity: 1;
+            transform: none;
+          }
+
           .wolnaa-page *,
           .wolnaa-page *::before,
           .wolnaa-page *::after {
