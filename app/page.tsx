@@ -375,7 +375,103 @@ export default function Home() {
   const remainingEvents = featuredEvent ? events.slice(1) : events;
 
   return (
-    <main className="min-h-screen bg-black text-white overflow-hidden">
+    <main className="wolnaa-page min-h-screen bg-black text-white overflow-hidden">
+      <style jsx global>{`
+        @keyframes wolnaaReveal {
+          from {
+            opacity: 0;
+            transform: translateY(28px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        @keyframes wolnaaSoftFloat {
+          0%, 100% {
+            transform: translateY(0);
+          }
+          50% {
+            transform: translateY(-8px);
+          }
+        }
+
+        .wolnaa-page .reveal-section {
+          animation: wolnaaReveal 0.9s ease both;
+        }
+
+        .wolnaa-page .motion-card {
+          will-change: transform, box-shadow, border-color;
+          transition:
+            transform 420ms cubic-bezier(.2,.8,.2,1),
+            box-shadow 420ms cubic-bezier(.2,.8,.2,1),
+            border-color 420ms ease,
+            background-color 420ms ease;
+        }
+
+        .wolnaa-page .motion-card:hover {
+          transform: translateY(-8px);
+          box-shadow: 0 28px 90px rgba(214, 179, 106, 0.18);
+        }
+
+        .wolnaa-page .wolnaa-hover-glow {
+          position: relative;
+        }
+
+        .wolnaa-page .wolnaa-hover-glow::before {
+          content: "";
+          position: absolute;
+          inset: 0;
+          z-index: 2;
+          pointer-events: none;
+          border: 1px solid rgba(214, 179, 106, 0);
+          box-shadow: inset 0 0 0 1px rgba(214, 179, 106, 0);
+          opacity: 0;
+          transition: opacity 420ms ease, border-color 420ms ease, box-shadow 420ms ease;
+        }
+
+        .wolnaa-page .wolnaa-hover-glow:hover::before {
+          opacity: 1;
+          border-color: rgba(214, 179, 106, 0.82);
+          box-shadow:
+            inset 0 0 0 1px rgba(214, 179, 106, 0.26),
+            0 0 34px rgba(214, 179, 106, 0.22);
+        }
+
+        .wolnaa-page a,
+        .wolnaa-page button {
+          transition:
+            transform 220ms ease,
+            color 220ms ease,
+            background-color 220ms ease,
+            border-color 220ms ease,
+            box-shadow 220ms ease;
+        }
+
+        .wolnaa-page a:hover,
+        .wolnaa-page button:hover {
+          transform: translateY(-1px);
+        }
+
+        .wolnaa-page header {
+          transition: background-color 260ms ease, border-color 260ms ease;
+        }
+
+        .wolnaa-page video {
+          animation: wolnaaSoftFloat 12s ease-in-out infinite;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .wolnaa-page *,
+          .wolnaa-page *::before,
+          .wolnaa-page *::after {
+            animation: none !important;
+            transition: none !important;
+          }
+        }
+      `}</style>
+
       <header className="fixed left-0 right-0 top-0 z-50 border-b border-white/10 bg-black/65 backdrop-blur-xl">
         <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-5 md:px-8">
           <a href="/" aria-label="WOLNAA Startseite" className="flex items-center">
@@ -401,7 +497,7 @@ export default function Home() {
         </div>
       </header>
 
-      <section className="relative flex min-h-[92vh] items-center justify-center overflow-hidden bg-black px-6 pb-16 pt-32 md:min-h-screen">
+      <section className="reveal-section relative flex min-h-[92vh] items-center justify-center overflow-hidden bg-black px-6 pb-16 pt-32 md:min-h-screen">
         <video className="absolute inset-0 z-0 h-full w-full object-cover" src="/hero-wolnaa.mp4" autoPlay muted loop playsInline preload="metadata" poster="/hero-bg.png" />
         <div style={{position:"absolute",inset:0,zIndex:0,background:"linear-gradient(to bottom, rgba(0,0,0,0.45), rgba(0,0,0,0.55), rgba(0,0,0,0.92))"}} />
         <div className="relative z-10 max-w-7xl mx-auto text-center pt-40 md:pt-56">
@@ -416,7 +512,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="mx-auto grid max-w-7xl gap-10 px-6 py-20 md:grid-cols-[0.9fr_1.1fr] md:items-end">
+      <section className="reveal-section mx-auto grid max-w-7xl gap-10 px-6 py-20 md:grid-cols-[0.9fr_1.1fr] md:items-end">
         <div>
           <p className="mb-4 text-xs font-bold uppercase tracking-[0.28em] text-[#d6b36a]">
             {t.aboutEyebrow}
@@ -436,7 +532,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="events" className="mx-auto max-w-7xl px-6 py-16">
+      <section id="events" className="reveal-section mx-auto max-w-7xl px-6 py-16">
         <p className="mb-3 text-sm uppercase tracking-[0.26em] text-[#d6b36a]">{t.upcoming}</p>
         <h2 className="mb-10 text-4xl font-semibold md:text-5xl">{t.upcomingTitle}</h2>
 
@@ -449,7 +545,7 @@ export default function Home() {
       </section>
 
 
-      <section className="mx-auto max-w-7xl px-6 py-20">
+      <section className="reveal-section mx-auto max-w-7xl px-6 py-20">
         <div className="mb-10 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
             <p className="mb-4 text-xs font-bold uppercase tracking-[0.28em] text-[#d6b36a]">
@@ -482,7 +578,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="max-w-5xl mx-auto px-6 pb-20 text-center">
+      <section className="reveal-section max-w-5xl mx-auto px-6 pb-20 text-center">
         <div className="px-6 py-10">
           <p className="text-[#d6b36a] uppercase tracking-[0.26em] text-xs mb-3">
             {t.community}
@@ -519,7 +615,7 @@ export default function Home() {
       </section>
 
       {/* FAQ */}
-      <section className="mx-auto max-w-5xl px-6 py-20">
+      <section className="reveal-section mx-auto max-w-5xl px-6 py-20">
         <div>
           <p className="mb-4 text-center text-xs font-bold uppercase tracking-[0.28em] text-[#d6b36a]">FAQ</p>
           <h2 className="mb-12 text-center text-4xl font-semibold md:text-5xl">{t.faqTitle}</h2>
@@ -538,7 +634,7 @@ export default function Home() {
       </section>
 
       {/* Kontakt */}
-      <section id="kontakt" className="max-w-5xl mx-auto px-4 pb-10">
+      <section id="kontakt" className="reveal-section max-w-5xl mx-auto px-4 pb-10">
         <div className="px-6 py-10 text-center">
           <p className="text-[#d6b36a] uppercase tracking-[0.26em] text-xs mb-3">{t.contact}</p>
           <h2 className="text-3xl md:text-4xl font-semibold mb-4">{t.contactTitle}</h2>
