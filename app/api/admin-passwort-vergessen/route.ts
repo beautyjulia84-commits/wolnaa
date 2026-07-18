@@ -1,14 +1,14 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
-
-const adminEmail = () => (process.env.ADMIN_EMAIL || "kontakt@wolnaa.de").trim().toLowerCase();
+import { adminAuthClient, currentAdminEmail, findAdminUser } from "@/lib/admin-account";
 
 export async function POST(req: Request) {
   const { email } = await req.json();
   const normalizedEmail = String(email || "").trim().toLowerCase();
 
   // Immer dieselbe Antwort, damit die Admin-Adresse nicht bestätigt oder verraten wird.
-  if (!normalizedEmail || normalizedEmail !== adminEmail()) {
+  const expectedEmail = await currentAdminEmail();
+  if (!normalizedEmail || normalizedEmail !== expectedEmail) {
     return NextResponse.json({ success: true });
   }
 
@@ -17,18 +17,21 @@ export async function POST(req: Request) {
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   );
-  const adminClient = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
+  const adminClient = adminAuthClient();
+  const existingUser = await findAdminUser();
 
-  const { data } = await adminClient.auth.admin.listUsers({ page: 1, perPage: 1000 });
-  const exists = data.users.some(user => user.email?.toLowerCase() === normalizedEmail);
-
-  if (exists) {
+  if (existingUser) {
+    await adminClient.auth.admin.updateUserById(existingUser.id, {
+      app_metadata: { ...existingUser.app_metadata, role: "admin", password_managed: true },
+    });
     await authClient.auth.resetPasswordForEmail(normalizedEmail, { redirectTo });
   } else {
-    await adminClient.auth.admin.inviteUserByEmail(normalizedEmail, { redirectTo });
+    const { data } = await adminClient.auth.admin.inviteUserByEmail(normalizedEmail, { redirectTo });
+    if (data.user) {
+      await adminClient.auth.admin.updateUserById(data.user.id, {
+        app_metadata: { role: "admin", password_managed: true },
+      });
+    }
   }
 
   return NextResponse.json({ success: true });

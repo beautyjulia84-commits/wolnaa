@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
-
-const adminEmail = () => (process.env.ADMIN_EMAIL || "kontakt@wolnaa.de").trim().toLowerCase();
+import { currentAdminEmail, findAdminUser } from "@/lib/admin-account";
 
 export async function POST(req: NextRequest) {
   const { email, password } = await req.json();
@@ -10,15 +9,20 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "E-Mail und Passwort fehlen." }, { status: 400 });
   }
 
-  let valid = normalizedEmail === adminEmail() && password === process.env.ADMIN_PASSWORD;
+  const expectedEmail = await currentAdminEmail();
+  const storedAdmin = await findAdminUser();
+  const legacyPasswordAllowed = !storedAdmin?.app_metadata?.password_managed;
+  let valid = normalizedEmail === expectedEmail && legacyPasswordAllowed && password === process.env.ADMIN_PASSWORD;
 
-  if (!valid && normalizedEmail === adminEmail()) {
+  if (!valid && normalizedEmail === expectedEmail) {
     const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     );
     const { data, error } = await supabase.auth.signInWithPassword({ email: normalizedEmail, password });
-    valid = !error && data.user?.email?.toLowerCase() === adminEmail();
+    valid = !error
+      && data.user?.email?.toLowerCase() === expectedEmail
+      && (data.user.app_metadata?.role === "admin" || data.user.id === storedAdmin?.id);
   }
 
   if (valid && process.env.ADMIN_PASSWORD) {

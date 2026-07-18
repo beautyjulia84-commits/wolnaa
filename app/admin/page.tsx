@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import jsQR from "jsqr";
 
-type Tab = "events" | "tickets" | "rechtliches" | "scanner" | "veranstalter";
+type Tab = "events" | "tickets" | "rechtliches" | "scanner" | "veranstalter" | "einstellungen";
 type LegalKey = "impressum" | "datenschutz" | "agb" | "teilnahme" | "widerruf";
 type TicketType = { name: string; price: string; quantity: string };
 type Lounge = { name: string; persons: string; price: string };
@@ -225,6 +225,12 @@ export default function AdminPage() {
   const [legalSaved, setLegalSaved] = useState(false);
   const [saveLoading, setSaveLoading] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
+  const [accountEmail, setAccountEmail] = useState("");
+  const [accountPassword, setAccountPassword] = useState("");
+  const [accountPasswordRepeat, setAccountPasswordRepeat] = useState("");
+  const [accountLoading, setAccountLoading] = useState(false);
+  const [accountMessage, setAccountMessage] = useState("");
+  const [accountError, setAccountError] = useState("");
 
   useEffect(() => {
     // Middleware schützt die Route - wenn wir hier sind, sind wir eingeloggt
@@ -233,8 +239,44 @@ export default function AdminPage() {
   }, []);
 
   useEffect(() => {
-    if (authed) { loadEvents(); loadLegal(); }
+    if (authed) { loadEvents(); loadLegal(); loadAccount(); }
   }, [authed]);
+
+  async function loadAccount() {
+    const res = await fetch("/api/admin/account", {
+      headers: adminPw ? { "x-admin-token": adminPw } : undefined,
+    });
+    const data = await res.json().catch(() => ({}));
+    if (res.ok) setAccountEmail(data.email || "");
+  }
+
+  async function saveAccount() {
+    setAccountMessage("");
+    setAccountError("");
+    if (accountPassword && accountPassword !== accountPasswordRepeat) {
+      setAccountError("Die Passwörter stimmen nicht überein.");
+      return;
+    }
+    setAccountLoading(true);
+    const res = await fetch("/api/admin/account", {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        ...(adminPw ? { "x-admin-token": adminPw } : {}),
+      },
+      body: JSON.stringify({ email: accountEmail, password: accountPassword }),
+    });
+    const data = await res.json().catch(() => ({}));
+    setAccountLoading(false);
+    if (!res.ok) {
+      setAccountError(data.error || "Einstellungen konnten nicht gespeichert werden.");
+      return;
+    }
+    setAccountEmail(data.email || accountEmail);
+    setAccountPassword("");
+    setAccountPasswordRepeat("");
+    setAccountMessage("E-Mail-Adresse und Zugang wurden gespeichert.");
+  }
 
   async function loadEvents() {
     setEvLoading(true);
@@ -415,6 +457,7 @@ export default function AdminPage() {
     { key: "rechtliches", label: "Rechtliches" },
     { key: "scanner", label: "Scanner" },
     { key: "veranstalter", label: "Veranstalter" },
+    { key: "einstellungen", label: "Einstellungen" },
   ];
 
   if (!authed) {
@@ -601,6 +644,41 @@ export default function AdminPage() {
         {tab === "veranstalter" && (
           <div className="p-5">
             <VeranstalterEinladen adminPw={adminPw} />
+          </div>
+        )}
+
+        {tab === "einstellungen" && (
+          <div className="mx-auto max-w-xl">
+            <div className="mb-5">
+              <h1 className="text-lg font-bold">Einstellungen</h1>
+              <p className="mt-0.5 text-xs text-zinc-600">Admin-E-Mail und Passwort verwalten</p>
+            </div>
+            <div className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm sm:p-6">
+              {accountMessage && <div className="mb-5 rounded-xl border border-green-200 bg-green-50 p-3 text-sm text-green-700">✓ {accountMessage}</div>}
+              {accountError && <div className="mb-5 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">{accountError}</div>}
+              <div className="mb-5">
+                <label className={lbl}>Admin-E-Mail-Adresse</label>
+                <input type="email" value={accountEmail} onChange={e => setAccountEmail(e.target.value)} autoComplete="email" className={inp} />
+                <p className="mt-1.5 text-xs text-zinc-500">Diese Adresse wird künftig für die Admin-Anmeldung und Passwort-Links verwendet.</p>
+              </div>
+              <div className="border-t border-zinc-200 pt-5">
+                <h2 className="mb-4 text-sm font-bold">Passwort ändern</h2>
+                <div className="space-y-4">
+                  <div>
+                    <label className={lbl}>Neues Passwort</label>
+                    <input type="password" value={accountPassword} onChange={e => setAccountPassword(e.target.value)} placeholder="Mindestens 10 Zeichen" autoComplete="new-password" className={inp} />
+                  </div>
+                  <div>
+                    <label className={lbl}>Passwort wiederholen</label>
+                    <input type="password" value={accountPasswordRepeat} onChange={e => setAccountPasswordRepeat(e.target.value)} autoComplete="new-password" className={inp} />
+                  </div>
+                </div>
+                <p className="mt-2 text-xs text-zinc-500">Leer lassen, wenn nur die E-Mail-Adresse geändert werden soll.</p>
+              </div>
+              <button onClick={saveAccount} disabled={accountLoading || !accountEmail.trim()} className="mt-6 w-full rounded-xl bg-[#d6b36a] py-3.5 text-sm font-bold text-zinc-950 transition-colors hover:bg-[#c5a15b] disabled:cursor-not-allowed disabled:opacity-50">
+                {accountLoading ? "Speichert…" : "Änderungen speichern"}
+              </button>
+            </div>
           </div>
         )}
       </main>
