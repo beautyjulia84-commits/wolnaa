@@ -144,15 +144,15 @@ function EventCard({ event, lang }: { event: EventItem; lang: Lang }) {
     setTimeout(() => setTapped(false), 600);
   }
   return (
-    <a href={createEventLink(event)} onTouchStart={handleTouch} className={`wolnaa-hover-glow motion-card group block rounded-md overflow-hidden border transition-all duration-300 shadow-2xl hover:-translate-y-2 ${tapped ? "border-[#d6b36a] shadow-[0_0_30px_rgba(214,179,106,0.28)] scale-95" : "border-white/10 hover:border-[#d6b36a] hover:shadow-[0_0_30px_rgba(214,179,106,0.28)]"} bg-gradient-to-b from-zinc-950 to-black`}>
+    <a href={createEventLink(event)} onTouchStart={handleTouch} className={`motion-card group block overflow-hidden rounded-md border bg-zinc-950/70 transition-all duration-500 hover:-translate-y-1 ${tapped ? "border-[#d6b36a]/60 scale-[0.99]" : "border-white/10 hover:border-white/20 hover:bg-zinc-950"}`}>
       <div className="relative h-56 flex items-center justify-center bg-[radial-gradient(circle_at_top,#2b1b00_0%,#111_38%,#000_100%)] overflow-hidden">
         {event.image_url ? (
-          <img src={event.image_url} alt={event.title} className="w-full h-56 object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" decoding="async" />
+          <img src={event.image_url} alt={event.title} className="w-full h-56 object-cover transition-transform duration-700 group-hover:scale-[1.02]" loading="lazy" decoding="async" />
         ) : (
           <Image src="/wolnaa-logo.png" alt="WOLNAA" width={230} height={90} className="h-auto w-[190px] object-contain opacity-90" />
         )}
       </div>
-      <div className="p-7">
+      <div className="p-6">
         <div className="flex items-center justify-between">
           <p className="float-text text-[#d6b36a] text-sm font-medium tracking-wide">{formatDate(event.date, lang)}{event.time && ` · ${event.time}`}</p>
           {calcCountdown(event.date, lang) && <span className="bg-[#d6b36a] text-black text-xs font-bold px-2 py-0.5 rounded-md whitespace-nowrap">{calcCountdown(event.date, lang)}</span>}
@@ -168,7 +168,7 @@ function EventCard({ event, lang }: { event: EventItem; lang: Lang }) {
             <span className="text-xs text-zinc-400 border border-zinc-700 rounded-md px-3 py-1">Lounge</span>
           )}
         </div>
-        <div className="mt-6 w-full rounded-md bg-white py-4 text-center text-black text-sm font-bold tracking-wide group-hover:bg-[#d6b36a] group-active:bg-[#d6b36a] transition-colors duration-200">{t.openEvent}</div>
+        <div className="mt-6 border-t border-white/10 pt-4 text-sm font-semibold tracking-wide text-white/75 transition-colors duration-300 group-hover:text-[#d6b36a]">{t.openEvent} →</div>
       </div>
     </a>
   );
@@ -499,7 +499,7 @@ export default function Home() {
       <header className="fixed left-0 right-0 top-0 z-50 border-b border-white/10 bg-black/65 backdrop-blur-xl">
         <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-5 md:px-8">
           <a href="/" aria-label="WOLNAA Startseite" className="flex items-center">
-            <Image src="/wolnaa-logo-gold-header.png" alt="WOLNAA" width={260} height={96} priority className="h-8 w-auto object-contain md:h-9" />
+            <Image src="/wolnaa-logo-gold-header.png" alt="WOLNAA" width={220} height={81} priority className="h-6 w-auto object-contain md:h-7" />
           </a>
 
           <nav className="hidden items-center gap-8 text-sm font-bold uppercase tracking-[0.22em] text-white/75 md:flex">

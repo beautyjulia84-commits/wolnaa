@@ -172,26 +172,26 @@ export default function EventPage() {
 
   return (
     <div className="min-h-screen bg-black text-white">
-      <div className="relative h-[46vh] min-h-[340px] overflow-hidden md:h-[56vh] md:min-h-[430px]">
+      <div className="relative h-[40vh] min-h-[300px] overflow-hidden md:h-[48vh] md:min-h-[360px]">
         {n.imageUrl ? <img src={n.imageUrl} alt={event.title} className="w-full h-full object-cover" /> : <div className="w-full h-full bg-gradient-to-br from-zinc-900 to-black" />}
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/45 to-black/15" />
       </div>
 
-      <div className="max-w-3xl mx-auto px-5 -mt-20 relative z-10 pb-44 md:-mt-28">
+      <div className="max-w-3xl mx-auto px-5 -mt-14 relative z-10 pb-40 md:-mt-20">
         <Link href="/" className="mb-8 inline-flex items-center text-xs font-bold uppercase tracking-[0.18em] text-white/70 transition-colors hover:text-[#d6b36a]">
           ← Zurück
         </Link>
 
-        <div className="mb-10">
-          <p className="mb-4 text-xs font-bold uppercase tracking-[0.28em] text-[#d6b36a]">WOLNAA EVENT</p>
-          <h1 className="text-3xl font-semibold leading-tight mb-6 md:text-5xl">{event.title}</h1>
-          <div className="flex flex-col gap-3">
-            {event.date && <div className="flex flex-col gap-1"><div className="flex items-center gap-3"><span className="w-9 h-9 rounded-md bg-black/35 border border-white/10 flex items-center justify-center shrink-0">📅</span><span className="text-zinc-200 text-sm">{formatDate(event.date)}{event.time ? ` · ${event.time} Uhr` : ""}</span></div>{calcCountdown(event.date) && <span className="ml-12 bg-[#d6b36a] text-black text-xs font-bold px-2 py-0.5 rounded-md w-fit">{calcCountdown(event.date)}</span>}</div>}
-            {event.city && <div className="flex items-center gap-3"><span className="w-9 h-9 rounded-md bg-black/35 border border-white/10 flex items-center justify-center shrink-0">📍</span><span className="text-zinc-200 text-sm">{event.city}{event.location ? ` · ${event.location}` : ""}</span></div>}
-            {event.address && <div className="flex items-center gap-3"><span className="w-9 h-9 rounded-md bg-black/35 border border-white/10 flex items-center justify-center shrink-0">🗺️</span><a href={`https://maps.google.com/?q=${encodeURIComponent(event.address)}`} target="_blank" rel="noopener noreferrer" className="text-[#d6b36a] text-sm hover:underline">{event.address}</a></div>}
+        <div className="mb-8">
+          <p className="mb-3 text-xs font-bold uppercase tracking-[0.28em] text-[#d6b36a]">WOLNAA EVENT</p>
+          <h1 className="text-3xl font-semibold leading-tight mb-5 md:text-5xl">{event.title}</h1>
+          <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-zinc-300">
+            {event.date && <p>{formatDate(event.date)}{event.time ? ` · ${event.time} Uhr` : ""}{calcCountdown(event.date) && <span className="ml-3 text-xs font-semibold text-[#d6b36a]">{calcCountdown(event.date)}</span>}</p>}
+            {event.city && <p>{event.city}{event.location ? ` · ${event.location}` : ""}</p>}
+            {event.address && <a href={`https://maps.google.com/?q=${encodeURIComponent(event.address)}`} target="_blank" rel="noopener noreferrer" className="text-zinc-400 transition-colors hover:text-[#d6b36a]">Route anzeigen →</a>}
           </div>
         </div>
-        {event.description && <div className="bg-black/35 border border-white/10 rounded-md p-6 mb-8 backdrop-blur-md"><p className="text-zinc-200 text-sm leading-7 whitespace-pre-wrap">{event.description}</p></div>}
+        {event.description && <div className="max-w-2xl border-t border-white/10 pt-6"><p className="text-zinc-400 text-sm leading-7 whitespace-pre-wrap">{event.description}</p></div>}
       </div>
 
       {step === "info" && (
