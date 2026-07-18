@@ -46,6 +46,35 @@ const I18N = {
     today: "Heute!",
     tomorrow: "Morgen!",
     daysLeft: "Noch {days} Tage",
+    heroEyebrow: "Events | Clubbing | Festivals",
+    heroTitle: "Die Nacht, die du verdienst",
+    soldOut: "Ausverkauft",
+    vatIncluded: "inkl. 19% MwSt.",
+    momentsScroll: "Seitlich wischen oder scrollen →",
+    close: "Schließen",
+    noLegalContent: "Kein Inhalt hinterlegt.",
+    legalImprint: "Impressum",
+    legalPrivacy: "Datenschutz",
+    legalPrivacyTitle: "Datenschutzerklärung",
+    legalTerms: "AGB",
+    legalTermsTitle: "Allgemeine Geschäftsbedingungen",
+    legalParticipation: "Teilnahmebedingungen",
+    legalWithdrawal: "Widerrufsrecht",
+    cookieTitle: "Cookie-Hinweis",
+    cookieText: "Wir verwenden Cookies für den Betrieb der Website. Mit Klick auf „Alle akzeptieren“ stimmst du der Nutzung aller Cookies zu.",
+    acceptAll: "Alle akzeptieren",
+    necessaryOnly: "Nur notwendige",
+    contactCloseAria: "Kontaktformular schließen",
+    contactModalText: "Wir melden uns so schnell wie möglich bei dir.",
+    messageSent: "Nachricht gesendet",
+    messageSentText: "Vielen Dank! Wir melden uns bald bei dir.",
+    name: "Name",
+    email: "E-Mail",
+    message: "Nachricht",
+    contactError: "Die Nachricht konnte nicht gesendet werden. Bitte versuche es erneut.",
+    sending: "Wird gesendet …",
+    sendMessage: "Nachricht senden",
+    momentsAlts: ["Wolnaa Partynacht auf der Tanzfläche", "Gast bei einem Wolnaa Event", "Wolnaa Eventmoment an der Bar", "Volle Tanzfläche bei Wolnaa"],
     faq: [
       { q: "Wie alt muss ich sein?", a: "Unsere Events sind ausschließlich für Personen ab 18 Jahren. Ein gültiger Ausweis wird beim Einlass kontrolliert." },
       { q: "Wie erhalte ich mein Ticket?", a: "Nach erfolgreicher Zahlung erhältst du dein Ticket mit QR-Code sofort per E-Mail." },
@@ -87,6 +116,35 @@ const I18N = {
     today: "Сегодня!",
     tomorrow: "Завтра!",
     daysLeft: "Осталось {days} дн.",
+    heroEyebrow: "События | Клубные ночи | Фестивали",
+    heroTitle: "Ночь, которую ты заслуживаешь",
+    soldOut: "Продано",
+    vatIncluded: "вкл. 19% НДС",
+    momentsScroll: "Листай или прокручивай в сторону →",
+    close: "Закрыть",
+    noLegalContent: "Содержимое пока не добавлено.",
+    legalImprint: "Выходные данные",
+    legalPrivacy: "Защита данных",
+    legalPrivacyTitle: "Политика конфиденциальности",
+    legalTerms: "Условия",
+    legalTermsTitle: "Общие условия",
+    legalParticipation: "Условия участия",
+    legalWithdrawal: "Право на отказ",
+    cookieTitle: "Использование файлов cookie",
+    cookieText: "Мы используем файлы cookie для работы сайта. Нажимая «Принять все», ты соглашаешься на использование всех файлов cookie.",
+    acceptAll: "Принять все",
+    necessaryOnly: "Только необходимые",
+    contactCloseAria: "Закрыть контактную форму",
+    contactModalText: "Мы ответим тебе как можно скорее.",
+    messageSent: "Сообщение отправлено",
+    messageSentText: "Спасибо! Мы скоро свяжемся с тобой.",
+    name: "Имя",
+    email: "E-mail",
+    message: "Сообщение",
+    contactError: "Не удалось отправить сообщение. Пожалуйста, попробуй ещё раз.",
+    sending: "Отправляется …",
+    sendMessage: "Отправить сообщение",
+    momentsAlts: ["Вечеринка Wolnaa на танцполе", "Гость события Wolnaa", "Момент события Wolnaa у бара", "Полный танцпол Wolnaa"],
     faq: [
       { q: "С какого возраста можно прийти?", a: "Наши события только для гостей от 18 лет. На входе проверяется действительный документ." },
       { q: "Как я получу билет?", a: "После успешной оплаты билет с QR-кодом сразу приходит на e-mail." },
@@ -164,8 +222,8 @@ function EventCard({ event, lang }: { event: EventItem; lang: Lang }) {
         <p className="float-text text-zinc-400 mt-2 text-sm">{event.city}{event.location && ` · ${event.location}`}</p>
         <div className="mt-5 flex items-center justify-between">
           <div>
-            <p className="float-text text-[#d6b36a] font-bold text-lg">{event.sold_out ? "Ausverkauft" : `${t.from} ${getStartingPrice(event)} €`}</p>
-            <p className="mt-1 text-[11px] text-zinc-500">inkl. 19% MwSt.</p>
+            <p className="float-text text-[#d6b36a] font-bold text-lg">{event.sold_out ? t.soldOut : `${t.from} ${getStartingPrice(event)} €`}</p>
+            <p className="mt-1 text-[11px] text-zinc-500">{t.vatIncluded}</p>
           </div>
           {event.lounges && event.lounge_list?.length > 0 && (
             <span className="text-xs text-zinc-400 border border-zinc-700 rounded-md px-3 py-1">Lounge</span>
@@ -231,8 +289,8 @@ function FeaturedEvent({ event, lang }: { event: EventItem; lang: Lang }) {
 
         <div className="mt-8 flex flex-wrap items-center gap-4">
           <span>
-            <span className="block text-lg font-bold text-[#d6b36a]">{event.sold_out ? "Ausverkauft" : `${t.from} ${getStartingPrice(event)} €`}</span>
-            <span className="mt-1 block text-[11px] text-zinc-500">inkl. 19% MwSt.</span>
+            <span className="block text-lg font-bold text-[#d6b36a]">{event.sold_out ? t.soldOut : `${t.from} ${getStartingPrice(event)} €`}</span>
+            <span className="mt-1 block text-[11px] text-zinc-500">{t.vatIncluded}</span>
           </span>
           <span className="inline-flex h-12 items-center justify-center rounded-md bg-[#d6b36a] px-6 text-sm font-bold text-black transition-colors group-hover:bg-[#ead08d]">
             {t.viewTickets}
@@ -243,10 +301,11 @@ function FeaturedEvent({ event, lang }: { event: EventItem; lang: Lang }) {
   );
 }
 
-function LegalModal({ type, content, onClose }: { type: LegalType; content: string; onClose: () => void }) {
+function LegalModal({ type, content, onClose, lang }: { type: LegalType; content: string; onClose: () => void; lang: Lang }) {
+  const t = I18N[lang];
   const titles: Record<string, string> = {
-    impressum: "Impressum", datenschutz: "Datenschutzerklärung",
-    agb: "Allgemeine Geschäftsbedingungen", teilnahme: "Teilnahmebedingungen", widerruf: "Widerrufsrecht",
+    impressum: t.legalImprint, datenschutz: t.legalPrivacyTitle,
+    agb: t.legalTermsTitle, teilnahme: t.legalParticipation, widerruf: t.legalWithdrawal,
   };
   useEffect(() => {
     const handler = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
@@ -259,7 +318,7 @@ function LegalModal({ type, content, onClose }: { type: LegalType; content: stri
     <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4" onClick={onClose} role="dialog" aria-modal="true">
       <div className="bg-zinc-950 border border-zinc-700 rounded-md p-8 max-w-3xl w-full max-h-[80vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
         <div className="flex flex-col items-center mb-6 gap-3">
-          <button onClick={onClose} className="absolute top-4 left-1/2 -translate-x-1/2 bg-[#d6b36a] text-black font-bold text-sm border border-[#ead08d] rounded-md px-4 py-2 shadow-lg z-50">Schließen ✕</button>
+          <button onClick={onClose} className="absolute top-4 left-1/2 -translate-x-1/2 bg-[#d6b36a] text-black font-bold text-sm border border-[#ead08d] rounded-md px-4 py-2 shadow-lg z-50">{t.close} ✕</button>
           <h2 className="text-2xl font-bold text-center">{titles[type]}</h2>
         </div>
         {content ? <div className="text-zinc-300 leading-7 text-base">{content.split("\n").map((line, i) => {
@@ -270,14 +329,15 @@ function LegalModal({ type, content, onClose }: { type: LegalType; content: stri
     if (part.match(/[\w.-]+@[\w.-]+\.[a-z]{2,}/)) return <a key={j} href={`mailto:${part}`} className="text-[#d6b36a] underline">{part}</a>;
     return part;
   })}</p>;
-})}</div> : <p className="text-zinc-500 italic">Kein Inhalt hinterlegt.</p>}
+})}</div> : <p className="text-zinc-500 italic">{t.noLegalContent}</p>}
       </div>
     </div>
   );
 }
 
 
-function CookieBanner() {
+function CookieBanner({ lang }: { lang: Lang }) {
+  const t = I18N[lang];
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -307,29 +367,30 @@ function CookieBanner() {
       display: 'flex', flexDirection: 'column', gap: 14,
     }}>
       <div>
-        <p style={{ color: '#fff', fontWeight: 700, fontSize: 15, marginBottom: 6 }}>🍪 Cookie-Hinweis</p>
+        <p style={{ color: '#fff', fontWeight: 700, fontSize: 15, marginBottom: 6 }}>🍪 {t.cookieTitle}</p>
         <p style={{ color: '#a1a1aa', fontSize: 13, lineHeight: 1.6 }}>
-          Wir verwenden Cookies für den Betrieb der Website. Mit Klick auf "Alle akzeptieren" stimmst du der Nutzung aller Cookies zu.{' '}
-          <button onClick={() => {}} style={{ color: '#facc15', background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, padding: 0 }}>Datenschutz</button>
+          {t.cookieText}{' '}
+          <button onClick={() => {}} style={{ color: '#d6b36a', background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, padding: 0 }}>{t.legalPrivacy}</button>
         </p>
       </div>
       <div style={{ display: 'flex', gap: 10 }}>
         <button onClick={accept} style={{
-          flex: 1, background: '#facc15', color: '#000',
+          flex: 1, background: '#d6b36a', color: '#000',
           border: 'none', borderRadius: 12, padding: '10px 16px',
           fontWeight: 700, fontSize: 14, cursor: 'pointer',
-        }}>Alle akzeptieren</button>
+        }}>{t.acceptAll}</button>
         <button onClick={decline} style={{
           flex: 1, background: 'transparent', color: '#a1a1aa',
           border: '1px solid #333', borderRadius: 12, padding: '10px 16px',
           fontWeight: 600, fontSize: 14, cursor: 'pointer',
-        }}>Nur notwendige</button>
+        }}>{t.necessaryOnly}</button>
       </div>
     </div>
   );
 }
 
-function ContactModal({ onClose }: { onClose: () => void }) {
+function ContactModal({ onClose, lang }: { onClose: () => void; lang: Lang }) {
+  const t = I18N[lang];
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
@@ -364,34 +425,34 @@ function ContactModal({ onClose }: { onClose: () => void }) {
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm" onClick={onClose} role="dialog" aria-modal="true" aria-labelledby="contact-title">
       <div className="relative w-full max-w-lg rounded-md border border-white/10 bg-zinc-950 p-6 shadow-2xl md:p-8" onClick={event => event.stopPropagation()}>
-        <button type="button" onClick={onClose} aria-label="Kontaktformular schließen" className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full border border-white/10 text-zinc-400 hover:border-[#d6b36a] hover:text-[#d6b36a]">✕</button>
-        <p className="mb-3 text-xs font-bold uppercase tracking-[0.26em] text-[#d6b36a]">Kontakt</p>
-        <h2 id="contact-title" className="mb-2 text-3xl font-semibold">Schreib uns</h2>
-        <p className="mb-6 text-sm leading-6 text-zinc-400">Wir melden uns so schnell wie möglich bei dir.</p>
+        <button type="button" onClick={onClose} aria-label={t.contactCloseAria} className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full border border-white/10 text-zinc-400 hover:border-[#d6b36a] hover:text-[#d6b36a]">✕</button>
+        <p className="mb-3 text-xs font-bold uppercase tracking-[0.26em] text-[#d6b36a]">{t.contact}</p>
+        <h2 id="contact-title" className="mb-2 text-3xl font-semibold">{t.contactTitle}</h2>
+        <p className="mb-6 text-sm leading-6 text-zinc-400">{t.contactModalText}</p>
 
         {status === "success" ? (
           <div className="border-t border-white/10 py-8 text-center">
-            <p className="text-xl font-semibold text-white">Nachricht gesendet</p>
-            <p className="mt-2 text-sm text-zinc-400">Vielen Dank! Wir melden uns bald bei dir.</p>
-            <button type="button" onClick={onClose} className="mt-6 inline-flex h-12 w-48 items-center justify-center rounded-md bg-[#d6b36a] text-sm font-bold text-black hover:bg-[#ead08d]">Schließen</button>
+            <p className="text-xl font-semibold text-white">{t.messageSent}</p>
+            <p className="mt-2 text-sm text-zinc-400">{t.messageSentText}</p>
+            <button type="button" onClick={onClose} className="mt-6 inline-flex h-12 w-48 items-center justify-center rounded-md bg-[#d6b36a] text-sm font-bold text-black hover:bg-[#ead08d]">{t.close}</button>
           </div>
         ) : (
           <form onSubmit={submit} className="space-y-4">
             <div>
-              <label htmlFor="contact-name" className="mb-2 block text-xs font-bold uppercase tracking-[0.16em] text-zinc-400">Name</label>
+              <label htmlFor="contact-name" className="mb-2 block text-xs font-bold uppercase tracking-[0.16em] text-zinc-400">{t.name}</label>
               <input id="contact-name" required maxLength={100} value={name} onChange={event => setName(event.target.value)} className="w-full rounded-md border border-white/10 bg-black px-4 py-3 text-sm text-white outline-none transition-colors focus:border-[#d6b36a]" />
             </div>
             <div>
-              <label htmlFor="contact-email" className="mb-2 block text-xs font-bold uppercase tracking-[0.16em] text-zinc-400">E-Mail</label>
+              <label htmlFor="contact-email" className="mb-2 block text-xs font-bold uppercase tracking-[0.16em] text-zinc-400">{t.email}</label>
               <input id="contact-email" type="email" required maxLength={200} value={email} onChange={event => setEmail(event.target.value)} className="w-full rounded-md border border-white/10 bg-black px-4 py-3 text-sm text-white outline-none transition-colors focus:border-[#d6b36a]" />
             </div>
             <div>
-              <label htmlFor="contact-message" className="mb-2 block text-xs font-bold uppercase tracking-[0.16em] text-zinc-400">Nachricht</label>
+              <label htmlFor="contact-message" className="mb-2 block text-xs font-bold uppercase tracking-[0.16em] text-zinc-400">{t.message}</label>
               <textarea id="contact-message" required minLength={10} maxLength={3000} rows={5} value={message} onChange={event => setMessage(event.target.value)} className="w-full resize-none rounded-md border border-white/10 bg-black px-4 py-3 text-sm text-white outline-none transition-colors focus:border-[#d6b36a]" />
             </div>
-            {status === "error" && <p className="text-sm text-red-400">Die Nachricht konnte nicht gesendet werden. Bitte versuche es erneut.</p>}
+            {status === "error" && <p className="text-sm text-red-400">{t.contactError}</p>}
             <button type="submit" disabled={status === "sending"} className="inline-flex h-14 w-full items-center justify-center rounded-md bg-[#d6b36a] text-sm font-bold text-black hover:bg-[#ead08d] disabled:cursor-wait disabled:opacity-60">
-              {status === "sending" ? "Wird gesendet …" : "Nachricht senden"}
+              {status === "sending" ? t.sending : t.sendMessage}
             </button>
           </form>
         )}
@@ -474,8 +535,8 @@ export default function Home() {
   const closeLegal = useCallback(() => setShowLegal(null), []);
 
   const legalLinks: [LegalType, string][] = [
-    ["impressum", "Impressum"], ["datenschutz", "Datenschutz"],
-    ["agb", "AGB"], ["teilnahme", "Teilnahmebedingungen"], ["widerruf", "Widerrufsrecht"],
+    ["impressum", t.legalImprint], ["datenschutz", t.legalPrivacy],
+    ["agb", t.legalTerms], ["teilnahme", t.legalParticipation], ["widerruf", t.legalWithdrawal],
   ];
 
   const featuredEvent = mounted && events.length > 0 ? events[0] : null;
@@ -656,10 +717,10 @@ export default function Home() {
         <div className="relative z-10 max-w-7xl mx-auto text-center pt-40 md:pt-56">
           <div>
             <p className="float-text mb-4 text-[11px] font-bold uppercase tracking-[0.26em] text-[#d6b36a] md:mb-5 md:text-sm md:tracking-[0.34em] lg:text-base">
-              Events <span className="text-white/40">|</span> Clubbing <span className="text-white/40">|</span> Festivals
+              {t.heroEyebrow}
             </p>
             <h1 className="float-text text-4xl font-semibold uppercase leading-[1.05] tracking-[-0.025em] text-white drop-shadow-[0_4px_24px_rgba(0,0,0,0.75)] sm:text-5xl lg:text-7xl">
-              Die Nacht, die du verdienst
+              {t.heroTitle}
             </h1>
           </div>
           <div className="flex flex-wrap justify-center gap-4 mt-8 md:hidden">
@@ -720,10 +781,10 @@ export default function Home() {
 
         <div className="moments-track -mx-6 flex snap-x snap-mandatory gap-4 overflow-x-auto px-6 pb-5 [scroll-padding-inline:1.5rem]">
           {[
-            { src: "/moments/wolnaa-night-01.jpg", alt: "Wolnaa Partynacht auf der Tanzfläche" },
-            { src: "/moments/wolnaa-night-02.jpg", alt: "Gast bei einem Wolnaa Event" },
-            { src: "/moments/wolnaa-night-03.jpg", alt: "Wolnaa Eventmoment an der Bar" },
-            { src: "/moments/wolnaa-night-04.jpg", alt: "Volle Tanzfläche bei Wolnaa" },
+            { src: "/moments/wolnaa-night-01.jpg", alt: t.momentsAlts[0] },
+            { src: "/moments/wolnaa-night-02.jpg", alt: t.momentsAlts[1] },
+            { src: "/moments/wolnaa-night-03.jpg", alt: t.momentsAlts[2] },
+            { src: "/moments/wolnaa-night-04.jpg", alt: t.momentsAlts[3] },
           ].map(photo => (
             <div key={photo.src} className="motion-card group relative aspect-[3/4] w-[82vw] max-w-[440px] shrink-0 snap-center overflow-hidden rounded-md bg-zinc-950 md:w-[38vw] lg:w-[30vw]">
               <Image
@@ -737,7 +798,7 @@ export default function Home() {
             </div>
           ))}
         </div>
-        <p className="mt-3 text-xs uppercase tracking-[0.18em] text-zinc-600">Seitlich wischen oder scrollen →</p>
+        <p className="mt-3 text-xs uppercase tracking-[0.18em] text-zinc-600">{t.momentsScroll}</p>
       </section>
 
       <section className="reveal-section max-w-5xl mx-auto px-6 pb-20 text-center">
@@ -806,7 +867,7 @@ export default function Home() {
           <div className="flex flex-wrap items-center justify-center gap-4">
             <button type="button" onClick={() => setShowContact(true)}
               className="inline-flex h-14 w-56 items-center justify-center rounded-md border border-white/15 text-sm font-bold text-white hover:border-[#d6b36a] hover:text-[#d6b36a] active:border-[#d6b36a] active:text-[#d6b36a] active:scale-95 transition-all">
-              Kontakt
+              {t.contact}
             </button>
           </div>
         </div>
@@ -822,9 +883,9 @@ export default function Home() {
 
       </footer>
 
-      <CookieBanner />
-      {showContact && <ContactModal onClose={() => setShowContact(false)} />}
-      {showLegal && <LegalModal type={showLegal} content={legalContent[showLegal!] ?? ""} onClose={closeLegal} />}
+      <CookieBanner lang={lang} />
+      {showContact && <ContactModal lang={lang} onClose={() => setShowContact(false)} />}
+      {showLegal && <LegalModal lang={lang} type={showLegal} content={legalContent[showLegal!] ?? ""} onClose={closeLegal} />}
     </main>
   );
 }
