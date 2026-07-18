@@ -54,7 +54,7 @@ function EventCard({ event }: { event: EventItem }) {
     setTimeout(() => setTapped(false), 600);
   }
   return (
-    <a href={createEventLink(event)} onTouchStart={handleTouch} className={`group block rounded-[32px] overflow-hidden border transition-all duration-300 shadow-2xl hover:-translate-y-2 ${tapped ? "border-yellow-400 shadow-[0_0_30px_rgba(250,204,21,0.3)] scale-95" : "border-white/10 hover:border-yellow-400 hover:shadow-[0_0_30px_rgba(250,204,21,0.3)]"} bg-gradient-to-b from-zinc-950 to-black`}>
+    <a href={createEventLink(event)} onTouchStart={handleTouch} className={`group block rounded-3xl overflow-hidden border transition-all duration-300 shadow-2xl hover:-translate-y-2 ${tapped ? "border-[#d6b36a] shadow-[0_0_30px_rgba(214,179,106,0.28)] scale-95" : "border-white/10 hover:border-[#d6b36a] hover:shadow-[0_0_30px_rgba(214,179,106,0.28)]"} bg-gradient-to-b from-zinc-950 to-black`}>
       <div className="relative h-56 flex items-center justify-center bg-[radial-gradient(circle_at_top,#2b1b00_0%,#111_38%,#000_100%)] overflow-hidden">
         {event.image_url ? (
           <img src={event.image_url} alt={event.title} className="w-full h-56 object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" decoding="async" />
@@ -64,18 +64,18 @@ function EventCard({ event }: { event: EventItem }) {
       </div>
       <div className="p-7">
         <div className="flex items-center justify-between">
-          <p className="text-yellow-400 text-sm font-medium tracking-wide">{formatDate(event.date)}{event.time && ` · ${event.time}`}</p>
-          {calcCountdown(event.date) && <span className="bg-yellow-400 text-black text-xs font-bold px-2 py-0.5 rounded-full whitespace-nowrap">{calcCountdown(event.date)}</span>}
+          <p className="text-[#d6b36a] text-sm font-medium tracking-wide">{formatDate(event.date)}{event.time && ` · ${event.time}`}</p>
+          {calcCountdown(event.date) && <span className="bg-[#d6b36a] text-black text-xs font-bold px-2 py-0.5 rounded-full whitespace-nowrap">{calcCountdown(event.date)}</span>}
         </div>
         <h3 className="text-2xl font-bold mt-3 leading-tight">{event.title}</h3>
         <p className="text-zinc-400 mt-2 text-sm">{event.city}{event.location && ` · ${event.location}`}</p>
         <div className="mt-5 flex items-center justify-between">
-          <p className="text-yellow-400 font-bold text-lg">ab {getStartingPrice(event)} €</p>
+          <p className="text-[#d6b36a] font-bold text-lg">ab {getStartingPrice(event)} €</p>
           {event.lounges && event.lounge_list?.length > 0 && (
             <span className="text-xs text-zinc-400 border border-zinc-700 rounded-full px-3 py-1">Lounge</span>
           )}
         </div>
-        <div className="mt-6 w-full rounded-2xl bg-white py-4 text-center text-black text-sm font-bold tracking-wide group-hover:bg-yellow-400 group-active:bg-yellow-400 transition-colors duration-200">Event öffnen</div>
+        <div className="mt-6 w-full rounded-2xl bg-white py-4 text-center text-black text-sm font-bold tracking-wide group-hover:bg-[#d6b36a] group-active:bg-[#d6b36a] transition-colors duration-200">Event öffnen</div>
       </div>
     </a>
   );
@@ -84,18 +84,18 @@ function EventCard({ event }: { event: EventItem }) {
 function EmptyState() {
   return (
     <div className="col-span-3 py-20 flex flex-col items-center justify-center text-center gap-4">
-      <div className="w-20 h-20 rounded-full border border-yellow-400/20 bg-yellow-400/5 flex items-center justify-center mb-2">
+      <div className="w-20 h-20 rounded-full border border-[#d6b36a]/20 bg-[#d6b36a]/5 flex items-center justify-center mb-2">
         <span className="text-4xl">🎉</span>
       </div>
-      <h3 className="text-2xl font-black text-white">Neue Events kommen bald!</h3>
+      <h3 className="text-2xl font-bold text-white">Neue Events kommen bald!</h3>
       <p className="text-zinc-400 text-sm max-w-sm leading-relaxed">Aktuell sind keine Events geplant. Folge uns auf Instagram um als Erstes von neuen Events zu erfahren!</p>
       <div className="flex gap-3 mt-2">
         <a href="https://www.instagram.com/wolnaa_event" target="_blank" rel="noopener noreferrer"
-          className="rounded-2xl bg-yellow-400 px-6 py-3 text-sm font-black text-black hover:bg-yellow-300 active:bg-yellow-300 active:scale-95 transition-all">
+          className="rounded-2xl bg-[#d6b36a] px-6 py-3 text-sm font-bold text-black hover:bg-[#ead08d] active:bg-[#ead08d] active:scale-95 transition-all">
           📸 Instagram folgen
         </a>
         <a href="mailto:kontakt@wolnaa.de"
-          className="rounded-2xl border border-white/15 px-6 py-3 text-sm font-black text-white hover:border-yellow-400 hover:text-yellow-400 active:border-yellow-400 active:text-yellow-400 active:scale-95 transition-all">
+          className="rounded-2xl border border-white/15 px-6 py-3 text-sm font-bold text-white hover:border-[#d6b36a] hover:text-[#d6b36a] active:border-[#d6b36a] active:text-[#d6b36a] active:scale-95 transition-all">
           ✉️ Benachrichtigung
         </a>
       </div>
@@ -119,15 +119,15 @@ function LegalModal({ type, content, onClose }: { type: LegalType; content: stri
     <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4" onClick={onClose} role="dialog" aria-modal="true">
       <div className="bg-zinc-950 border border-zinc-700 rounded-3xl p-8 max-w-3xl w-full max-h-[80vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
         <div className="flex flex-col items-center mb-6 gap-3">
-          <button onClick={onClose} className="absolute top-4 left-1/2 -translate-x-1/2 bg-yellow-400 text-black font-bold text-sm border border-yellow-300 rounded-full px-4 py-2 shadow-lg z-50">Schließen ✕</button>
-          <h2 className="text-2xl font-black text-center">{titles[type]}</h2>
+          <button onClick={onClose} className="absolute top-4 left-1/2 -translate-x-1/2 bg-[#d6b36a] text-black font-bold text-sm border border-[#ead08d] rounded-full px-4 py-2 shadow-lg z-50">Schließen ✕</button>
+          <h2 className="text-2xl font-bold text-center">{titles[type]}</h2>
         </div>
         {content ? <div className="text-zinc-300 leading-7 text-base">{content.split("\n").map((line, i) => {
   const urlRegex = /(https?:\/\/[^\s]+|[\w.-]+@[\w.-]+\.[a-z]{2,})/gi;
   const parts = line.split(urlRegex);
   return <p key={i} className="mb-2">{parts.map((part, j) => {
-    if (part.match(/^https?:\/\//)) return <a key={j} href={part} target="_blank" rel="noopener noreferrer" className="text-yellow-400 underline">{part}</a>;
-    if (part.match(/[\w.-]+@[\w.-]+\.[a-z]{2,}/)) return <a key={j} href={`mailto:${part}`} className="text-yellow-400 underline">{part}</a>;
+    if (part.match(/^https?:\/\//)) return <a key={j} href={part} target="_blank" rel="noopener noreferrer" className="text-[#d6b36a] underline">{part}</a>;
+    if (part.match(/[\w.-]+@[\w.-]+\.[a-z]{2,}/)) return <a key={j} href={`mailto:${part}`} className="text-[#d6b36a] underline">{part}</a>;
     return part;
   })}</p>;
 })}</div> : <p className="text-zinc-500 italic">Kein Inhalt hinterlegt.</p>}
@@ -241,24 +241,24 @@ export default function Home() {
           </a>
 
           <nav className="hidden items-center gap-8 text-sm font-bold uppercase tracking-[0.22em] text-white/75 md:flex">
-            <a href="#events" className="transition-colors hover:text-yellow-400">Events</a>
-            <a href="#kontakt" className="transition-colors hover:text-yellow-400">Kontakt</a>
+            <a href="#events" className="transition-colors hover:text-[#d6b36a]">Events</a>
+            <a href="#kontakt" className="transition-colors hover:text-[#d6b36a]">Kontakt</a>
           </nav>
 
           <div className="flex items-center gap-4">
-            <a href="https://www.tiktok.com/@wolnaa_event?_r=1&_t=ZG-96mDjgLge8H" target="_blank" rel="noopener noreferrer" aria-label="WOLNAA TikTok" className="text-yellow-400 transition-all duration-200 hover:text-yellow-300">
+            <a href="https://www.tiktok.com/@wolnaa_event?_r=1&_t=ZG-96mDjgLge8H" target="_blank" rel="noopener noreferrer" aria-label="WOLNAA TikTok" className="text-[#d6b36a] transition-all duration-200 hover:text-[#ead08d]">
               <svg viewBox="0 0 24 24" className="h-5 w-5 fill-current md:h-6 md:w-6" aria-hidden="true">
                 <path d="M16.6 5.82c1.05.78 2.32 1.24 3.66 1.27v3.15a7.8 7.8 0 0 1-3.7-.93v5.45c0 3.55-2.88 6.43-6.43 6.43A6.43 6.43 0 0 1 3.7 14.76c0-3.55 2.88-6.43 6.43-6.43.39 0 .77.04 1.14.1v3.28a3.15 3.15 0 1 0 2.23 3.01V2.8h3.1c.17 1.22.88 2.31 2 3.02z"/>
               </svg>
             </a>
 
-            <a href="https://www.instagram.com/wolnaa_event?igsh=MWExbHJlcms3ZXp4MQ==" target="_blank" rel="noopener noreferrer" aria-label="WOLNAA Instagram" className="text-yellow-400 transition-all duration-200 hover:text-yellow-300">
+            <a href="https://www.instagram.com/wolnaa_event?igsh=MWExbHJlcms3ZXp4MQ==" target="_blank" rel="noopener noreferrer" aria-label="WOLNAA Instagram" className="text-[#d6b36a] transition-all duration-200 hover:text-[#ead08d]">
               <svg viewBox="0 0 24 24" className="h-5 w-5 fill-current md:h-6 md:w-6" aria-hidden="true">
                 <path d="M7.75 2h8.5A5.76 5.76 0 0 1 22 7.75v8.5A5.76 5.76 0 0 1 16.25 22h-8.5A5.76 5.76 0 0 1 2 16.25v-8.5A5.76 5.76 0 0 1 7.75 2zm0 2A3.75 3.75 0 0 0 4 7.75v8.5A3.75 3.75 0 0 0 7.75 20h8.5A3.75 3.75 0 0 0 20 16.25v-8.5A3.75 3.75 0 0 0 16.25 4h-8.5zM12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10zm0 2a3 3 0 1 0 0 6 3 3 0 0 0 0-6zm5.25-2.25a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5z"/>
               </svg>
             </a>
 
-            <a href="#events" className="rounded-full bg-yellow-400 px-4 py-2 text-xs font-black uppercase tracking-[0.18em] text-black transition-all hover:bg-yellow-300 active:scale-95 md:px-5">
+            <a href="#events" className="rounded-full bg-[#d6b36a] px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] text-black transition-all hover:bg-[#ead08d] active:scale-95 md:px-5">
               Tickets
             </a>
           </div>
@@ -273,16 +273,16 @@ export default function Home() {
             Erlebe exklusive Events mit authentischen russischen Vibes und genieße unvergessliche Nächte voller Musik, guter Stimmung und einzigartiger Momente.
           </p>
           <div className="flex flex-wrap justify-center gap-4 mt-8 md:hidden">
-            <a href="#events" className="inline-flex h-14 w-56 items-center justify-center rounded-2xl bg-yellow-400 text-black font-black text-base hover:bg-yellow-300 active:scale-95 transition-all">Tickets kaufen</a>
-            <a href="#events" className="inline-flex h-14 w-56 items-center justify-center rounded-2xl border border-white/30 text-white font-bold text-base hover:border-yellow-400 hover:text-yellow-400 active:scale-95 transition-all">Events entdecken</a>
+            <a href="#events" className="inline-flex h-14 w-56 items-center justify-center rounded-2xl bg-[#d6b36a] text-black font-bold text-base hover:bg-[#ead08d] active:scale-95 transition-all">Tickets kaufen</a>
+            <a href="#events" className="inline-flex h-14 w-56 items-center justify-center rounded-2xl border border-white/30 text-white font-bold text-base hover:border-[#d6b36a] hover:text-[#d6b36a] active:scale-95 transition-all">Events entdecken</a>
           </div>
 
         </div>
       </section>
 
       <section id="events" className="max-w-7xl mx-auto px-6 py-10">
-        <p className="text-yellow-400 uppercase tracking-[4px] text-sm mb-3">Upcoming</p>
-        <h2 className="text-4xl md:text-6xl font-black mb-12">Kommende Veranstaltungen</h2>
+        <p className="text-[#d6b36a] uppercase tracking-[0.26em] text-sm mb-3">Upcoming</p>
+        <h2 className="text-4xl md:text-5xl font-semibold mb-12">Kommende Veranstaltungen</h2>
         <div className="grid md:grid-cols-3 gap-8">
           {mounted && events.length === 0 && <EmptyState />}
           {mounted && events.map(event => <EventCard key={event.id} event={event} />)}
@@ -292,11 +292,11 @@ export default function Home() {
 
       <section className="max-w-5xl mx-auto px-6 pb-20 text-center">
         <div className="px-6 py-10">
-          <p className="text-yellow-400 uppercase tracking-[4px] text-xs mb-3">
+          <p className="text-[#d6b36a] uppercase tracking-[0.26em] text-xs mb-3">
             Community
           </p>
 
-          <h2 className="text-3xl md:text-5xl font-black mb-4">
+          <h2 className="text-3xl md:text-5xl font-semibold mb-4">
             Folge WOLNAA
           </h2>
 
@@ -309,7 +309,7 @@ export default function Home() {
               href="https://www.tiktok.com/@wolnaa_event?_r=1&_t=ZG-96mDjgLge8H"
               target="_blank"
               rel="noopener noreferrer"
-              className="rounded-2xl bg-yellow-400 px-6 py-4 text-sm font-black text-black hover:bg-yellow-300 active:bg-yellow-300 active:scale-95 transition-all"
+              className="rounded-2xl bg-[#d6b36a] px-6 py-4 text-sm font-bold text-black hover:bg-[#ead08d] active:bg-[#ead08d] active:scale-95 transition-all"
             >
               TikTok folgen
             </a>
@@ -318,7 +318,7 @@ export default function Home() {
               href="https://www.instagram.com/wolnaa_event?igsh=MWExbHJlcms3ZXp4MQ=="
               target="_blank"
               rel="noopener noreferrer"
-              className="rounded-2xl border border-white/15 px-6 py-4 text-sm font-black text-white hover:border-yellow-400 hover:text-yellow-400 active:border-yellow-400 active:text-yellow-400 active:scale-95 transition-all"
+              className="rounded-2xl border border-white/15 px-6 py-4 text-sm font-bold text-white hover:border-[#d6b36a] hover:text-[#d6b36a] active:border-[#d6b36a] active:text-[#d6b36a] active:scale-95 transition-all"
             >
               Instagram folgen
             </a>
@@ -329,8 +329,8 @@ export default function Home() {
       {/* FAQ */}
       <section className="max-w-5xl mx-auto px-4 pb-10">
         <div className="px-6 py-10">
-          <p className="text-yellow-400 uppercase tracking-[4px] text-xs mb-3 text-center">FAQ</p>
-          <h2 className="text-3xl md:text-4xl font-black mb-8 text-center">Häufige Fragen</h2>
+          <p className="text-[#d6b36a] uppercase tracking-[0.26em] text-xs mb-3 text-center">FAQ</p>
+          <h2 className="text-3xl md:text-4xl font-semibold mb-8 text-center">Häufige Fragen</h2>
           <div className="space-y-4 max-w-2xl mx-auto">
             {[
               { q: "Wie alt muss ich sein?", a: "Unsere Events sind ausschließlich für Personen ab 18 Jahren. Ein gültiger Ausweis wird beim Einlass kontrolliert." },
@@ -340,7 +340,7 @@ export default function Home() {
               { q: "Wo kann ich parken?", a: "Parkmöglichkeiten findest du in der Nähe des Veranstaltungsortes. Die genaue Adresse ist auf der Event-Seite verlinkt." },
             ].map((item, i) => (
               <details key={i} className="group border border-white/10 rounded-2xl overflow-hidden">
-                <summary className="flex items-center justify-between px-5 py-4 cursor-pointer font-semibold text-sm hover:text-yellow-400 transition-colors list-none">
+                <summary className="flex items-center justify-between px-5 py-4 cursor-pointer font-semibold text-sm hover:text-[#d6b36a] transition-colors list-none">
                   {item.q}
                   <span className="text-zinc-500 group-open:rotate-180 transition-transform">▼</span>
                 </summary>
@@ -354,18 +354,18 @@ export default function Home() {
       {/* Kontakt */}
       <section id="kontakt" className="max-w-5xl mx-auto px-4 pb-10">
         <div className="px-6 py-10 text-center">
-          <p className="text-yellow-400 uppercase tracking-[4px] text-xs mb-3">Kontakt</p>
-          <h2 className="text-3xl md:text-4xl font-black mb-4">Schreib uns</h2>
+          <p className="text-[#d6b36a] uppercase tracking-[0.26em] text-xs mb-3">Kontakt</p>
+          <h2 className="text-3xl md:text-4xl font-semibold mb-4">Schreib uns</h2>
           <p className="text-zinc-400 max-w-xl mx-auto mb-8 text-sm leading-relaxed">
             Fragen zu Tickets, Lounges oder Kooperationen? Wir antworten schnell!
           </p>
           <div className="flex flex-wrap items-center justify-center gap-4">
             <a href="https://www.instagram.com/wolnaa_event" target="_blank" rel="noopener noreferrer"
-              className="rounded-2xl bg-yellow-400 px-6 py-4 text-sm font-black text-black hover:bg-yellow-300 active:bg-yellow-300 active:scale-95 transition-all flex items-center gap-2">
+              className="rounded-2xl bg-[#d6b36a] px-6 py-4 text-sm font-bold text-black hover:bg-[#ead08d] active:bg-[#ead08d] active:scale-95 transition-all flex items-center gap-2">
               Instagram DM
             </a>
             <a href="mailto:kontakt@wolnaa.de"
-              className="rounded-2xl border border-white/15 px-6 py-4 text-sm font-black text-white hover:border-yellow-400 hover:text-yellow-400 active:border-yellow-400 active:text-yellow-400 active:scale-95 transition-all flex items-center gap-2">
+              className="rounded-2xl border border-white/15 px-6 py-4 text-sm font-bold text-white hover:border-[#d6b36a] hover:text-[#d6b36a] active:border-[#d6b36a] active:text-[#d6b36a] active:scale-95 transition-all flex items-center gap-2">
               ✉️ kontakt@wolnaa.de
             </a>
           </div>
@@ -375,7 +375,7 @@ export default function Home() {
       <footer className="border-t border-white/10 pt-8 pb-6 text-center">
         <div className="flex flex-wrap items-center justify-center gap-4 text-sm text-zinc-400 mb-4">
           {legalLinks.map(([key, label]) => (
-            <button key={key!} onClick={() => setShowLegal(key)} className="hover:text-yellow-400 active:text-yellow-400 transition-colors underline-offset-4 hover:underline active:underline">{label}</button>
+            <button key={key!} onClick={() => setShowLegal(key)} className="hover:text-[#d6b36a] active:text-[#d6b36a] transition-colors underline-offset-4 hover:underline active:underline">{label}</button>
           ))}
         </div>
         <p className="text-zinc-500 text-sm mb-3">© {new Date().getFullYear()} WOLNAA</p>
