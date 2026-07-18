@@ -144,7 +144,7 @@ function EventCard({ event, lang }: { event: EventItem; lang: Lang }) {
     setTimeout(() => setTapped(false), 600);
   }
   return (
-    <a href={createEventLink(event)} onTouchStart={handleTouch} className={`group block rounded-md overflow-hidden border transition-all duration-300 shadow-2xl hover:-translate-y-2 ${tapped ? "border-[#d6b36a] shadow-[0_0_30px_rgba(214,179,106,0.28)] scale-95" : "border-white/10 hover:border-[#d6b36a] hover:shadow-[0_0_30px_rgba(214,179,106,0.28)]"} bg-gradient-to-b from-zinc-950 to-black`}>
+    <a href={createEventLink(event)} onTouchStart={handleTouch} className={`wolnaa-hover-glow motion-card group block rounded-md overflow-hidden border transition-all duration-300 shadow-2xl hover:-translate-y-2 ${tapped ? "border-[#d6b36a] shadow-[0_0_30px_rgba(214,179,106,0.28)] scale-95" : "border-white/10 hover:border-[#d6b36a] hover:shadow-[0_0_30px_rgba(214,179,106,0.28)]"} bg-gradient-to-b from-zinc-950 to-black`}>
       <div className="relative h-56 flex items-center justify-center bg-[radial-gradient(circle_at_top,#2b1b00_0%,#111_38%,#000_100%)] overflow-hidden">
         {event.image_url ? (
           <img src={event.image_url} alt={event.title} className="w-full h-56 object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" decoding="async" />
@@ -201,7 +201,7 @@ function EmptyState({ lang }: { lang: Lang }) {
 function FeaturedEvent({ event, lang }: { event: EventItem; lang: Lang }) {
   const t = I18N[lang];
   return (
-    <a href={createEventLink(event)} className="group mb-12 grid overflow-hidden rounded-md border border-white/10 bg-zinc-950/70 md:grid-cols-[1.15fr_0.85fr]">
+    <a href={createEventLink(event)} className="wolnaa-hover-glow motion-card group mb-12 grid overflow-hidden rounded-md border border-white/10 bg-zinc-950/70 md:grid-cols-[1.15fr_0.85fr]">
       <div className="relative min-h-[320px] overflow-hidden bg-zinc-950 md:min-h-[420px]">
         {event.image_url ? (
           <img src={event.image_url} alt={event.title} className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy" decoding="async" />
@@ -411,8 +411,11 @@ export default function Home() {
         }
 
         .wolnaa-page .motion-card:hover {
-          transform: translateY(-8px);
-          box-shadow: 0 28px 90px rgba(214, 179, 106, 0.18);
+          transform: translateY(-10px) scale(1.015);
+          border-color: rgba(214, 179, 106, 0.85);
+          box-shadow:
+            0 24px 80px rgba(0, 0, 0, 0.55),
+            0 0 42px rgba(214, 179, 106, 0.26);
         }
 
         .wolnaa-page .wolnaa-hover-glow {
@@ -433,10 +436,11 @@ export default function Home() {
 
         .wolnaa-page .wolnaa-hover-glow:hover::before {
           opacity: 1;
-          border-color: rgba(214, 179, 106, 0.82);
+          border-color: rgba(214, 179, 106, 0.95);
           box-shadow:
-            inset 0 0 0 1px rgba(214, 179, 106, 0.26),
-            0 0 34px rgba(214, 179, 106, 0.22);
+            inset 0 0 0 1px rgba(214, 179, 106, 0.38),
+            inset 0 0 38px rgba(214, 179, 106, 0.08),
+            0 0 46px rgba(214, 179, 106, 0.3);
         }
 
         .wolnaa-page a,
@@ -451,7 +455,17 @@ export default function Home() {
 
         .wolnaa-page a:hover,
         .wolnaa-page button:hover {
-          transform: translateY(-1px);
+          transform: translateY(-2px);
+        }
+
+        .wolnaa-page a:active,
+        .wolnaa-page button:active {
+          transform: translateY(0) scale(0.98);
+        }
+
+        .wolnaa-page .group:hover img,
+        .wolnaa-page .group:hover video {
+          filter: saturate(1.08) contrast(1.05);
         }
 
         .wolnaa-page header {
@@ -562,7 +576,7 @@ export default function Home() {
 
         <div className="grid gap-4 md:grid-cols-4">
           {[0, 1, 2, 3].map((item) => (
-            <div key={item} className={`relative overflow-hidden rounded-md bg-zinc-950 ${item === 0 ? "md:col-span-2 md:row-span-2 min-h-[420px]" : "min-h-[260px]"}`}>
+            <div key={item} className={`motion-card wolnaa-hover-glow relative overflow-hidden rounded-md bg-zinc-950 ${item === 0 ? "md:col-span-2 md:row-span-2 min-h-[420px]" : "min-h-[260px]"}`}>
               <video
                 className="absolute inset-0 h-full w-full object-cover"
                 src="/hero-wolnaa.mp4"
