@@ -1,10 +1,29 @@
 import { NextRequest, NextResponse } from "next/server";
+import { createClient } from "@supabase/supabase-js";
+
+const adminEmail = () => (process.env.ADMIN_EMAIL || "kontakt@wolnaa.de").trim().toLowerCase();
 
 export async function POST(req: NextRequest) {
-  const { password } = await req.json();
-  if (password === process.env.ADMIN_PASSWORD) {
+  const { email, password } = await req.json();
+  const normalizedEmail = String(email || "").trim().toLowerCase();
+  if (!normalizedEmail || !password) {
+    return NextResponse.json({ error: "E-Mail und Passwort fehlen." }, { status: 400 });
+  }
+
+  let valid = normalizedEmail === adminEmail() && password === process.env.ADMIN_PASSWORD;
+
+  if (!valid && normalizedEmail === adminEmail()) {
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
+    const { data, error } = await supabase.auth.signInWithPassword({ email: normalizedEmail, password });
+    valid = !error && data.user?.email?.toLowerCase() === adminEmail();
+  }
+
+  if (valid && process.env.ADMIN_PASSWORD) {
     const res = NextResponse.json({ ok: true });
-    res.cookies.set("wolnaa-admin-token", password, {
+    res.cookies.set("wolnaa-admin-token", process.env.ADMIN_PASSWORD, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
@@ -13,7 +32,7 @@ export async function POST(req: NextRequest) {
     });
     return res;
   }
-  return NextResponse.json({ error: "Falsches Passwort." }, { status: 401 });
+  return NextResponse.json({ error: "E-Mail oder Passwort ist falsch." }, { status: 401 });
 }
 
 export async function DELETE() {

@@ -209,7 +209,7 @@ function VeranstalterEinladen({ adminPw }: { adminPw: string }) {
 
 export default function AdminPage() {
   const [authed, setAuthed] = useState(false);
-  const [pw, setPw] = useState(""); const [pwErr, setPwErr] = useState(""); const [adminPw, setAdminPw] = useState("");
+  const [adminPw, setAdminPw] = useState("");
   const [tab, setTab] = useState<Tab>("events");
   const [menuOpen, setMenuOpen] = useState(false);
   const [showForm, setShowForm] = useState(false);
@@ -322,13 +322,6 @@ export default function AdminPage() {
     setTicketLoading(false);
   }
 
-  async function login() {
-    setPwErr("");
-    const res = await fetch("/api/admin-login", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ password: pw }) });
-    if (res.ok) { setAdminPw(pw); setAuthed(true); }
-    else setPwErr("Falsches Passwort.");
-  }
-
   async function logout() {
     await fetch("/api/admin-login", { method: "DELETE" });
     setAuthed(false);
@@ -427,22 +420,7 @@ export default function AdminPage() {
   if (!authed) {
     return (
       <main className="min-h-screen bg-zinc-50 flex items-center justify-center p-6 text-zinc-950">
-        <div className="w-full max-w-sm">
-          <div className="text-center mb-8">
-            <img src="/wolnaa-logo.png" alt="Wolnaa" className="h-16 w-auto mx-auto mb-4" />
-            <h1 className="text-2xl font-bold text-zinc-950">Admin</h1>
-            <p className="text-zinc-600 text-sm mt-1">Bitte anmelden</p>
-          </div>
-          <div className="bg-white border border-zinc-200 rounded-2xl p-6 space-y-4 shadow-sm">
-            <div>
-              <label className={lbl}>Passwort</label>
-              <input type="password" value={pw} onChange={e => { setPw(e.target.value); setPwErr(""); }} onKeyDown={e => e.key === "Enter" && login()} placeholder="••••••••" className={inp} autoFocus />
-              {pwErr && <p className="text-red-400 text-xs mt-1.5">{pwErr}</p>}
-            </div>
-            <button onClick={login} className="w-full rounded-xl bg-yellow-400 text-black font-bold py-3 hover:bg-yellow-300 transition-colors">Anmelden</button>
-          </div>
-          <p className="text-center mt-5"><Link href="/" className="text-zinc-600 text-sm hover:text-zinc-700">← Zurück zur Website</Link></p>
-        </div>
+        <p className="text-sm text-zinc-500">Adminbereich wird geladen…</p>
       </main>
     );
   }
