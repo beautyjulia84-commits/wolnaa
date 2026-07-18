@@ -114,7 +114,7 @@ export default function VeranstalterScanner() {
 
           {!result && !camError && (
             <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none' }}>
-              <div style={{ width: '180px', height: '180px', border: '3px solid #facc15', borderRadius: '18px', boxShadow: '0 0 0 999px rgba(0,0,0,.35)' }} />
+              <div style={{ width: '180px', height: '180px', border: '3px solid #d6b36a', borderRadius: '18px', boxShadow: '0 0 0 999px rgba(0,0,0,.35)' }} />
             </div>
           )}
 
@@ -142,7 +142,7 @@ export default function VeranstalterScanner() {
             <div style={{ position: 'absolute', inset: 0, background: '#111827', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', padding: '24px', textAlign: 'center' }}>
               <div>
                 <p>{camError}</p>
-                <button onClick={startCamera} style={{ marginTop: '12px', background: '#facc15', color: '#000', border: 'none', borderRadius: '8px', padding: '10px 16px', fontWeight: 700 }}>Erneut versuchen</button>
+                <button onClick={startCamera} style={{ marginTop: '12px', background: '#d6b36a', color: '#000', border: 'none', borderRadius: '8px', padding: '10px 16px', fontWeight: 700 }}>Erneut versuchen</button>
               </div>
             </div>
           )}

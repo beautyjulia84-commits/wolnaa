@@ -180,7 +180,7 @@ export default function TeilnehmerPage() {
                         fontSize: '12px',
                         fontWeight: 600,
                         background: t.status === 'checked_in' ? '#dcfce7' : t.status === 'cancelled' ? '#fee2e2' : '#fef3c7',
-                        color: t.status === 'checked_in' ? '#15803d' : t.status === 'cancelled' ? '#dc2626' : '#92400e',
+                        color: t.status === 'checked_in' ? '#15803d' : t.status === 'cancelled' ? '#dc2626' : '#765725',
                       }}>
                         {t.status === 'checked_in' ? 'Eingecheckt' : t.status === 'cancelled' ? 'Storniert' : 'Bezahlt'}
                       </span>

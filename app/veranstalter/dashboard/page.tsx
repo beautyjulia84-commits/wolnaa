@@ -57,12 +57,12 @@ export default function VeranstalterDashboard() {
       </div>
 
       {!stats.stripeOk && (
-        <div style={{ background:'#fffbeb', border:'1px solid #fcd34d', borderRadius:'12px', padding:'16px 20px', marginBottom:'24px', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+        <div style={{ background:'#faf7ef', border:'1px solid #d6b36a', borderRadius:'12px', padding:'16px 20px', marginBottom:'24px', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
           <div>
-            <p style={{ margin:'0 0 2px', fontWeight:'600', color:'#92400e', fontSize:'14px' }}>Stripe-Konto nicht verbunden</p>
-            <p style={{ margin:0, color:'#b45309', fontSize:'13px' }}>Verbinde dein Stripe-Konto um Tickets zu verkaufen.</p>
+            <p style={{ margin:'0 0 2px', fontWeight:'600', color:'#765725', fontSize:'14px' }}>Stripe-Konto nicht verbunden</p>
+            <p style={{ margin:0, color:'#8a6932', fontSize:'13px' }}>Verbinde dein Stripe-Konto um Tickets zu verkaufen.</p>
           </div>
-          <Link href="/veranstalter/einstellungen" style={{ background:'#f59e0b', color:'#fff', padding:'8px 16px', borderRadius:'8px', textDecoration:'none', fontSize:'13px', fontWeight:'600', whiteSpace:'nowrap' }}>Jetzt verbinden</Link>
+          <Link href="/veranstalter/einstellungen" style={{ background:'#d6b36a', color:'#18181b', padding:'8px 16px', borderRadius:'8px', textDecoration:'none', fontSize:'13px', fontWeight:'600', whiteSpace:'nowrap' }}>Jetzt verbinden</Link>
         </div>
       )}
 

@@ -116,7 +116,7 @@ export default function ScannerPage() {
     <main className="min-h-screen bg-black text-white flex flex-col">
       {/* Header */}
       <div className="flex items-center justify-between px-5 py-4 border-b border-white/10">
-        <Link href="/admin" className="text-yellow-400 font-bold text-sm">← Dashboard</Link>
+        <Link href="/admin" className="text-[#d6b36a] font-bold text-sm">← Dashboard</Link>
         <h1 className="font-black text-lg">Check-In Scanner</h1>
         <div className={`w-2.5 h-2.5 rounded-full ${scanning ? "bg-green-400 animate-pulse" : "bg-zinc-600"}`} />
       </div>
@@ -137,11 +137,11 @@ export default function ScannerPage() {
                 "bottom-0 left-0 border-b-4 border-l-4 rounded-bl-2xl",
                 "bottom-0 right-0 border-b-4 border-r-4 rounded-br-2xl",
               ].map((cls, i) => (
-                <div key={i} className={`absolute w-10 h-10 border-yellow-400 ${cls}`} />
+                <div key={i} className={`absolute w-10 h-10 border-[#d6b36a] ${cls}`} />
               ))}
               {/* Scan line */}
               {scanning && (
-                <div className="absolute left-4 right-4 h-0.5 bg-yellow-400/70 top-1/2 animate-bounce" />
+                <div className="absolute left-4 right-4 h-0.5 bg-[#d6b36a]/70 top-1/2 animate-bounce" />
               )}
             </div>
             <p className="absolute bottom-24 text-zinc-400 text-sm">QR-Code in den Rahmen halten</p>
@@ -196,7 +196,7 @@ export default function ScannerPage() {
               <p className="text-5xl mb-4">📷</p>
               <p className="text-red-400 font-bold mb-2">Kein Kamerazugriff</p>
               <p className="text-zinc-400 text-sm">{error}</p>
-              <button onClick={startCamera} className="mt-6 rounded-2xl bg-yellow-400 text-black font-bold px-6 py-3">
+              <button onClick={startCamera} className="mt-6 rounded-2xl bg-[#d6b36a] text-black font-bold px-6 py-3">
                 Erneut versuchen
               </button>
             </div>

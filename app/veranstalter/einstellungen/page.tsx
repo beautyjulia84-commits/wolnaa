@@ -109,9 +109,9 @@ export default function Einstellungen() {
             </div>
           ) : (
             <div>
-              <div style={{ background:'#fffbeb', border:'1px solid #fcd34d', borderRadius:'10px', padding:'16px', marginBottom:'20px' }}>
-                <p style={{ color:'#92400e', margin:'0 0 4px', fontWeight:'600', fontSize:'14px' }}>⚠️ Kein Stripe-Konto verbunden</p>
-                <p style={{ color:'#b45309', margin:0, fontSize:'13px' }}>Du kannst erst Events verkaufen wenn du ein Stripe-Konto verknüpft hast.</p>
+              <div style={{ background:'#faf7ef', border:'1px solid #d6b36a', borderRadius:'10px', padding:'16px', marginBottom:'20px' }}>
+                <p style={{ color:'#765725', margin:'0 0 4px', fontWeight:'600', fontSize:'14px' }}>⚠️ Kein Stripe-Konto verbunden</p>
+                <p style={{ color:'#8a6932', margin:0, fontSize:'13px' }}>Du kannst erst Events verkaufen wenn du ein Stripe-Konto verknüpft hast.</p>
               </div>
               <button onClick={handleStripeConnect} disabled={connecting}
                 style={{ padding:'12px 24px', background:connecting?'#9ca3af':'#635bff', color:'#fff', border:'none', borderRadius:'8px', fontSize:'15px', fontWeight:'600', cursor:connecting?'not-allowed':'pointer' }}>

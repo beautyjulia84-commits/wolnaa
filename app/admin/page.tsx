@@ -80,7 +80,7 @@ async function uploadImage(file: File, adminPw: string): Promise<string> {
   return data.url;
 }
 
-const inp = "w-full rounded-xl border border-zinc-300 bg-white focus:border-yellow-400 px-4 py-3 text-black placeholder:text-zinc-600 outline-none transition-all text-sm";
+const inp = "w-full rounded-xl border border-zinc-300 bg-white focus:border-[#d6b36a] px-4 py-3 text-black placeholder:text-zinc-600 outline-none transition-all text-sm";
 const lbl = "block text-xs font-semibold text-zinc-700 mb-1.5 uppercase tracking-wide";
 const saleEndDate = (value: string) => value.slice(0, 10);
 const saleEndTime = (value: string) => value.includes("T") ? value.slice(11, 16) : "";
@@ -89,7 +89,7 @@ function Toggle({ value, onChange, label }: { value: boolean; onChange: (v: bool
   return (
     <div className="flex items-center justify-between py-1">
       <span className="text-sm text-zinc-300">{label}</span>
-      <button onClick={() => onChange(!value)} className={`w-12 h-6 rounded-full transition-colors flex items-center px-0.5 shrink-0 ${value ? "bg-yellow-400" : "bg-zinc-700"}`}>
+      <button onClick={() => onChange(!value)} className={`w-12 h-6 rounded-full transition-colors flex items-center px-0.5 shrink-0 ${value ? "bg-[#d6b36a]" : "bg-zinc-700"}`}>
         <div className={`w-5 h-5 rounded-full bg-white shadow transition-transform duration-200 ${value ? "translate-x-6" : "translate-x-0"}`} />
       </button>
     </div>
@@ -139,9 +139,9 @@ function ScannerView({ adminPw }: { adminPw: string }) {
           <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
             <div className="relative w-44 h-44">
               {["top-0 left-0 border-t-[3px] border-l-[3px] rounded-tl-xl","top-0 right-0 border-t-[3px] border-r-[3px] rounded-tr-xl","bottom-0 left-0 border-b-[3px] border-l-[3px] rounded-bl-xl","bottom-0 right-0 border-b-[3px] border-r-[3px] rounded-br-xl"].map((cls, i) => (
-                <div key={i} className={`absolute w-8 h-8 border-yellow-400 ${cls}`} />
+                <div key={i} className={`absolute w-8 h-8 border-[#d6b36a] ${cls}`} />
               ))}
-              {scanning && <div className="absolute left-2 right-2 h-px bg-yellow-400/80 top-1/2 animate-bounce" />}
+              {scanning && <div className="absolute left-2 right-2 h-px bg-[#d6b36a]/80 top-1/2 animate-bounce" />}
             </div>
             <p className="mt-4 text-white/60 text-sm">QR-Code in den Rahmen halten</p>
           </div>
@@ -157,7 +157,7 @@ function ScannerView({ adminPw }: { adminPw: string }) {
         )}
         {camError && (
           <div className="absolute inset-0 flex items-center justify-center bg-zinc-900/95 p-6 text-center">
-            <div><p className="text-zinc-700 text-sm mb-4">{camError}</p><button onClick={startCamera} className="rounded-xl bg-yellow-400 text-black font-bold px-5 py-2.5 text-sm">Erneut versuchen</button></div>
+            <div><p className="text-zinc-700 text-sm mb-4">{camError}</p><button onClick={startCamera} className="rounded-xl bg-[#d6b36a] text-black font-bold px-5 py-2.5 text-sm">Erneut versuchen</button></div>
           </div>
         )}
       </div>
@@ -194,13 +194,13 @@ function VeranstalterEinladen({ adminPw }: { adminPw: string }) {
       {error && <div className="bg-red-50 border border-red-200 rounded-xl p-3 mb-4 text-red-700 text-sm">{error}</div>}
       <div className="mb-4">
         <label className="block text-xs text-zinc-600 mb-1">Firmenname</label>
-        <input value={firmenname} onChange={e => setFirmenname(e.target.value)} placeholder="z.B. Event GmbH" className="w-full p-3 bg-white border border-zinc-300 rounded-xl text-zinc-950 text-sm outline-none focus:border-yellow-400" />
+        <input value={firmenname} onChange={e => setFirmenname(e.target.value)} placeholder="z.B. Event GmbH" className="w-full p-3 bg-white border border-zinc-300 rounded-xl text-zinc-950 text-sm outline-none focus:border-[#d6b36a]" />
       </div>
       <div className="mb-5">
         <label className="block text-xs text-zinc-600 mb-1">E-Mail Adresse</label>
-        <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="veranstalter@email.de" className="w-full p-3 bg-white border border-zinc-300 rounded-xl text-zinc-950 text-sm outline-none focus:border-yellow-400" />
+        <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="veranstalter@email.de" className="w-full p-3 bg-white border border-zinc-300 rounded-xl text-zinc-950 text-sm outline-none focus:border-[#d6b36a]" />
       </div>
-      <button onClick={handleSubmit} disabled={loading} className="w-full py-3 bg-yellow-400 text-black font-bold rounded-xl text-sm disabled:opacity-50">
+      <button onClick={handleSubmit} disabled={loading} className="w-full py-3 bg-[#d6b36a] text-black font-bold rounded-xl text-sm disabled:opacity-50">
         {loading ? "Sende..." : "✉️ Einladung senden"}
       </button>
     </div>
@@ -482,7 +482,7 @@ export default function AdminPage() {
               aria-label="Admin-Menü öffnen"
               aria-expanded={menuOpen}
               onClick={() => setMenuOpen(open => !open)}
-              className="flex h-10 w-10 flex-col items-center justify-center gap-1.5 rounded-xl border border-zinc-200 bg-white text-zinc-950 shadow-sm transition-colors hover:border-yellow-400"
+              className="flex h-10 w-10 flex-col items-center justify-center gap-1.5 rounded-xl border border-zinc-200 bg-white text-zinc-950 shadow-sm transition-colors hover:border-[#d6b36a]"
             >
               <span className="h-0.5 w-5 rounded-full bg-current" />
               <span className="h-0.5 w-5 rounded-full bg-current" />
@@ -491,7 +491,7 @@ export default function AdminPage() {
             {menuOpen && (
               <div className="absolute right-0 top-12 w-56 overflow-hidden rounded-2xl border border-zinc-200 bg-white p-2 shadow-xl">
                 {tabs.map(t => (
-                  <button key={t.key} onClick={() => { setTab(t.key); setMenuOpen(false); }} className={`w-full rounded-xl px-4 py-3 text-left text-sm font-semibold transition-colors ${tab === t.key ? "bg-yellow-400 text-black" : "text-zinc-700 hover:bg-zinc-100 hover:text-black"}`}>{t.label}</button>
+                  <button key={t.key} onClick={() => { setTab(t.key); setMenuOpen(false); }} className={`w-full rounded-xl px-4 py-3 text-left text-sm font-semibold transition-colors ${tab === t.key ? "bg-[#d6b36a] text-black" : "text-zinc-700 hover:bg-zinc-100 hover:text-black"}`}>{t.label}</button>
                 ))}
                 <div className="my-2 border-t border-zinc-200" />
                 <Link href="/" onClick={() => setMenuOpen(false)} className="block rounded-xl px-4 py-3 text-sm font-medium text-zinc-600 hover:bg-zinc-100 hover:text-black">Zur Website</Link>
@@ -509,14 +509,14 @@ export default function AdminPage() {
           <div>
             <div className="flex items-center justify-between mb-5">
               <div><h1 className="text-lg font-bold">Events</h1><p className="text-zinc-600 text-xs mt-0.5">{events.length} gesamt</p></div>
-              <button onClick={openNew} className="rounded-xl bg-yellow-400 text-black font-bold px-4 py-2 text-sm hover:bg-yellow-300 transition-colors">+ Neues Event</button>
+              <button onClick={openNew} className="rounded-xl bg-[#d6b36a] text-black font-bold px-4 py-2 text-sm hover:bg-[#c5a15b] transition-colors">+ Neues Event</button>
             </div>
             {evLoading ? (
-              <div className="flex justify-center py-12"><div className="w-6 h-6 border-2 border-yellow-400 border-t-transparent rounded-full animate-spin" /></div>
+              <div className="flex justify-center py-12"><div className="w-6 h-6 border-2 border-[#d6b36a] border-t-transparent rounded-full animate-spin" /></div>
             ) : events.length === 0 ? (
               <div className="text-center py-16 rounded-2xl border-2 border-dashed border-zinc-300 bg-white">
                 <p className="text-zinc-600 text-sm mb-3">Noch keine Events vorhanden.</p>
-                <button onClick={openNew} className="rounded-xl bg-yellow-400 text-black font-bold px-4 py-2 text-sm">Event erstellen</button>
+                <button onClick={openNew} className="rounded-xl bg-[#d6b36a] text-black font-bold px-4 py-2 text-sm">Event erstellen</button>
               </div>
             ) : (
               <div className="space-y-2">
@@ -527,12 +527,12 @@ export default function AdminPage() {
                       <div className="flex-1 min-w-0">
                         <p className="font-semibold text-sm truncate">{e.title}</p>
                         <p className="text-zinc-600 text-xs">{e.city}{e.location ? ` · ${e.location}` : ""}</p>
-                        <p className="text-yellow-400 text-xs">{e.date}{e.time ? ` · ${e.time}` : ""}</p>
+                        <p className="text-[#9b7435] text-xs">{e.date}{e.time ? ` · ${e.time}` : ""}</p>
                       </div>
                     </div>
                     <div className="flex gap-2 mt-3 pt-3 border-t border-zinc-200">
-                      <button onClick={() => openEdit(e)} className="flex-1 rounded-xl border border-zinc-300 text-zinc-700 text-xs py-2 hover:border-yellow-400 hover:text-black transition-colors font-medium">Bearbeiten</button>
-                      <button onClick={() => showEventTickets(e.id)} className="flex-1 rounded-xl border border-zinc-300 text-zinc-700 text-xs py-2 hover:border-yellow-400 hover:text-black transition-colors font-medium">Tickets</button>
+                      <button onClick={() => openEdit(e)} className="flex-1 rounded-xl border border-zinc-300 text-zinc-700 text-xs py-2 hover:border-[#d6b36a] hover:text-black transition-colors font-medium">Bearbeiten</button>
+                      <button onClick={() => showEventTickets(e.id)} className="flex-1 rounded-xl border border-zinc-300 text-zinc-700 text-xs py-2 hover:border-[#d6b36a] hover:text-black transition-colors font-medium">Tickets</button>
                       <button onClick={() => delEv(e.id!)} className="flex-1 rounded-xl border border-zinc-200 text-zinc-500 text-xs py-2 hover:border-red-300 hover:text-red-600 transition-colors font-medium">Löschen</button>
                     </div>
                   </div>
@@ -552,7 +552,7 @@ export default function AdminPage() {
             <div className="grid grid-cols-3 gap-3 mb-5">
               {[{ l: "Tickets", v: filtered.length }, { l: "Eingecheckt", v: selectedCheckedIn }, { l: "Umsatz", v: `€${selectedRevenue.toFixed(2)}` }].map(s => (
                 <div key={s.l} className="bg-white border border-zinc-200 rounded-2xl p-4 text-center shadow-sm">
-                  <p className="text-xl font-bold text-yellow-400">{s.v}</p>
+                  <p className="text-xl font-bold text-[#9b7435]">{s.v}</p>
                   <p className="text-zinc-600 text-xs mt-0.5">{s.l}</p>
                 </div>
               ))}
@@ -567,24 +567,24 @@ export default function AdminPage() {
                   Wähle unten eine Veranstaltung aus.
                 </div>
               )}
-              {selectedTicketEvent && <button onClick={() => setSelectedTicketEventId("")} className="rounded-xl border border-zinc-300 bg-white px-4 text-zinc-700 hover:border-yellow-400 hover:text-black text-sm transition-colors">Wechseln</button>}
-              <button onClick={() => loadTickets(selectedTicketEvent)} className="rounded-xl border border-zinc-300 bg-white px-4 text-zinc-700 hover:border-yellow-400 hover:text-black text-sm transition-colors">↻</button>
+              {selectedTicketEvent && <button onClick={() => setSelectedTicketEventId("")} className="rounded-xl border border-zinc-300 bg-white px-4 text-zinc-700 hover:border-[#d6b36a] hover:text-black text-sm transition-colors">Wechseln</button>}
+              <button onClick={() => loadTickets(selectedTicketEvent)} className="rounded-xl border border-zinc-300 bg-white px-4 text-zinc-700 hover:border-[#d6b36a] hover:text-black text-sm transition-colors">↻</button>
             </div>
             {ticketLoading ? (
-              <div className="flex justify-center py-12"><div className="w-6 h-6 border-2 border-yellow-400 border-t-transparent rounded-full animate-spin" /></div>
+              <div className="flex justify-center py-12"><div className="w-6 h-6 border-2 border-[#d6b36a] border-t-transparent rounded-full animate-spin" /></div>
             ) : !selectedTicketEvent ? (
               <div className="space-y-2">
                 {eventTicketStats.length === 0 ? (
                   <div className="text-center py-12 rounded-2xl border border-zinc-200 bg-white text-zinc-500 text-sm">Keine Veranstaltungen vorhanden.</div>
                 ) : eventTicketStats.map(({ event, total, checkedIn, revenue }) => (
-                  <button key={event.id || event.title} onClick={() => { setSelectedTicketEventId(event.id || ""); loadTickets(event); }} className="w-full bg-white border border-zinc-200 rounded-2xl p-4 shadow-sm hover:border-yellow-400 transition-colors text-left">
+                  <button key={event.id || event.title} onClick={() => { setSelectedTicketEventId(event.id || ""); loadTickets(event); }} className="w-full bg-white border border-zinc-200 rounded-2xl p-4 shadow-sm hover:border-[#d6b36a] transition-colors text-left">
                     <div className="flex items-center justify-between gap-4">
                       <div className="min-w-0">
                         <p className="font-semibold text-sm truncate text-zinc-950">{event.title}</p>
                         <p className="text-zinc-600 text-xs mt-1">{event.date}{event.location ? ` · ${event.location}` : ""}</p>
                       </div>
                       <div className="flex items-center gap-5 shrink-0 text-right">
-                        <div><p className="text-yellow-400 font-bold text-sm">{total}</p><p className="text-zinc-600 text-xs">Tickets</p></div>
+                        <div><p className="text-[#9b7435] font-bold text-sm">{total}</p><p className="text-zinc-600 text-xs">Tickets</p></div>
                         <div><p className="text-green-400 font-bold text-sm">{checkedIn}</p><p className="text-zinc-600 text-xs">Check-in</p></div>
                         <div><p className="text-zinc-950 font-bold text-sm">€{revenue.toFixed(2)}</p><p className="text-zinc-600 text-xs">Umsatz</p></div>
                       </div>
@@ -604,7 +604,7 @@ export default function AdminPage() {
                             <td className="px-4 py-3"><p className="font-semibold text-sm">{t.customer_name}</p><p className="text-zinc-600 text-xs">{t.customer_email}</p></td>
                             <td className="px-4 py-3 text-zinc-700 text-xs whitespace-nowrap">{t.event_title}</td>
                             <td className="px-4 py-3 font-bold text-sm whitespace-nowrap">€{t.amount.toFixed(2)}</td>
-                            <td className="px-4 py-3 whitespace-nowrap"><span className={`rounded-full px-2.5 py-1 text-xs font-medium ${t.status === "checked_in" ? "bg-green-400/10 text-green-400" : t.status === "cancelled" ? "bg-red-400/10 text-red-400" : "bg-yellow-400/10 text-yellow-400"}`}>{t.status === "checked_in" ? "✓ Eingecheckt" : t.status === "cancelled" ? "✕ Storniert" : "Bezahlt"}</span></td>
+                            <td className="px-4 py-3 whitespace-nowrap"><span className={`rounded-full px-2.5 py-1 text-xs font-medium ${t.status === "checked_in" ? "bg-green-400/10 text-green-400" : t.status === "cancelled" ? "bg-red-400/10 text-red-400" : "bg-[#d6b36a]/15 text-[#765725]"}`}>{t.status === "checked_in" ? "✓ Eingecheckt" : t.status === "cancelled" ? "✕ Storniert" : "Bezahlt"}</span></td>
                             <td className="px-4 py-3 whitespace-nowrap">{t.status !== "cancelled" && <button onClick={() => cancelTicket(t.ticket_id, t.customer_name)} className="rounded-lg border border-red-500/30 text-red-400 text-xs px-3 py-1.5 hover:bg-red-500/10 transition-colors font-medium">Stornieren</button>}</td>
                             <td className="px-4 py-3 text-zinc-600 text-xs whitespace-nowrap">{t.checked_in_at ? new Date(t.checked_in_at).toLocaleString("de-DE") : "—"}</td>
                           </tr>
@@ -622,11 +622,11 @@ export default function AdminPage() {
           <div>
             <div className="flex items-center justify-between mb-5">
               <div><h1 className="text-lg font-bold">Rechtliches</h1><p className="text-zinc-600 text-xs mt-0.5">Texte verwalten</p></div>
-              <button onClick={saveLegal} className={`rounded-xl font-bold px-4 py-2 text-sm transition-colors ${legalSaved ? "bg-green-500 text-white" : "bg-yellow-400 text-black hover:bg-yellow-300"}`}>{legalSaved ? "✓ Gespeichert" : "Speichern"}</button>
+              <button onClick={saveLegal} className={`rounded-xl font-bold px-4 py-2 text-sm transition-colors ${legalSaved ? "bg-green-500 text-white" : "bg-[#d6b36a] text-black hover:bg-[#c5a15b]"}`}>{legalSaved ? "✓ Gespeichert" : "Speichern"}</button>
             </div>
             <div className="flex gap-1 mb-4 bg-white border border-zinc-200 rounded-xl p-1 overflow-x-auto shadow-sm">
               {(Object.keys(LEGAL_LABELS) as LegalKey[]).map(k => (
-                <button key={k} onClick={() => setLegalTab(k)} className={`shrink-0 text-xs font-medium px-3 py-2 rounded-lg transition-colors ${legalTab === k ? "bg-yellow-400 text-black" : "text-zinc-600 hover:bg-zinc-100 hover:text-black"}`}>{LEGAL_LABELS[k]}</button>
+                <button key={k} onClick={() => setLegalTab(k)} className={`shrink-0 text-xs font-medium px-3 py-2 rounded-lg transition-colors ${legalTab === k ? "bg-[#d6b36a] text-black" : "text-zinc-600 hover:bg-zinc-100 hover:text-black"}`}>{LEGAL_LABELS[k]}</button>
               ))}
             </div>
             <textarea value={legal[legalTab]} onChange={e => setLegal(p => ({ ...p, [legalTab]: e.target.value }))} placeholder={`${LEGAL_LABELS[legalTab]} hier eingeben...`} rows={20} className={inp + " resize-none"} />
@@ -743,12 +743,12 @@ export default function AdminPage() {
                   <div>
                     <label className={lbl}>Adresse (Google Maps)</label>
                     <input value={ev.address} onChange={e => f("address", e.target.value)} placeholder="Musterstr. 1, 10115 Berlin" className={inp} />
-                    {ev.address && <a href={`https://maps.google.com/?q=${encodeURIComponent(ev.address)}`} target="_blank" rel="noopener noreferrer" className="text-yellow-400 text-xs mt-1.5 inline-block hover:underline">In Google Maps prüfen →</a>}
+                    {ev.address && <a href={`https://maps.google.com/?q=${encodeURIComponent(ev.address)}`} target="_blank" rel="noopener noreferrer" className="text-[#9b7435] text-xs mt-1.5 inline-block hover:underline">In Google Maps prüfen →</a>}
                   </div>
                   <div>
                     <label className={lbl}>Bild hochladen</label>
                     <div className="space-y-2">
-                      <label className="flex items-center justify-center gap-2 w-full rounded-xl border-2 border-dashed border-zinc-300 hover:border-yellow-400 py-4 cursor-pointer transition-colors bg-white">
+                      <label className="flex items-center justify-center gap-2 w-full rounded-xl border-2 border-dashed border-zinc-300 hover:border-[#d6b36a] py-4 cursor-pointer transition-colors bg-white">
                         <svg className="w-5 h-5 text-zinc-900" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
                         <span className="text-zinc-900 text-sm font-semibold">{uploadingImage ? "Wird hochgeladen..." : "Bild auswählen"}</span>
                         <input type="file" accept="image/*" className="hidden" onChange={async (e) => {
@@ -777,7 +777,7 @@ export default function AdminPage() {
               <div className="bg-white rounded-2xl border border-zinc-200 overflow-hidden">
                 <div className="px-4 py-3 border-b border-zinc-200 bg-zinc-50 flex items-center justify-between">
                   <div><p className="text-base font-bold text-zinc-900 mb-0">Ticketphasen</p><p className="mt-1 text-xs text-zinc-500">Automatischer Wechsel in dieser Reihenfolge</p></div>
-                  <button onClick={() => f("tickets", [...ev.tickets, { name: "", price: "", quantity: "" }])} className="text-yellow-400 text-xs font-bold hover:text-yellow-300">+ Phase</button>
+                  <button onClick={() => f("tickets", [...ev.tickets, { name: "", price: "", quantity: "" }])} className="text-[#9b7435] text-xs font-bold hover:text-[#765725]">+ Phase</button>
                 </div>
                 <div className="p-4 space-y-3">
                   {ev.tickets.map((t, i) => (
@@ -809,7 +809,7 @@ export default function AdminPage() {
                           </div>
                         </div>
                       ))}
-                      <button onClick={() => f("loungeList", [...ev.loungeList, { name: "", persons: "", price: "" }])} className="text-yellow-400 text-xs font-bold hover:text-yellow-300 transition-colors">+ Lounge hinzufügen</button>
+                      <button onClick={() => f("loungeList", [...ev.loungeList, { name: "", persons: "", price: "" }])} className="text-[#9b7435] text-xs font-bold hover:text-[#765725] transition-colors">+ Lounge hinzufügen</button>
                     </div>
                   )}
                 </div>
@@ -818,7 +818,7 @@ export default function AdminPage() {
               <div className="bg-white rounded-2xl border border-zinc-200 overflow-hidden">
                 <div className="px-4 py-3 border-b border-zinc-200 bg-zinc-50 flex items-center justify-between">
                   <p className="text-base font-bold text-zinc-900 mb-0">Rabattcodes</p>
-                  <button onClick={() => f("discountCodes", [...ev.discountCodes, { code: "", percent: "" }])} className="text-yellow-400 text-xs font-bold hover:text-yellow-300">+ Hinzufügen</button>
+                  <button onClick={() => f("discountCodes", [...ev.discountCodes, { code: "", percent: "" }])} className="text-[#9b7435] text-xs font-bold hover:text-[#765725]">+ Hinzufügen</button>
                 </div>
                 <div className="p-4 space-y-3">
                   {ev.discountCodes.length === 0 && <p className="text-zinc-600 text-xs">Keine Rabattcodes konfiguriert.</p>}
@@ -837,7 +837,7 @@ export default function AdminPage() {
 
             <div className="sticky bottom-0 bg-white border-t border-zinc-200 px-5 py-4 flex gap-3">
               <button onClick={() => setShowForm(false)} className="flex-1 rounded-xl border border-zinc-300 py-3.5 text-sm font-semibold text-zinc-600 hover:text-black transition-colors">Abbrechen</button>
-              <button onClick={saveEv} disabled={!ev.title || saveLoading} className="flex-1 rounded-xl bg-yellow-400 text-black font-bold py-3.5 text-sm hover:bg-yellow-300 transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+              <button onClick={saveEv} disabled={!ev.title || saveLoading} className="flex-1 rounded-xl bg-[#d6b36a] text-black font-bold py-3.5 text-sm hover:bg-[#c5a15b] transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2">
                 {saveLoading ? <><div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />Speichern...</> : (evIdx ? "Änderungen speichern" : "Event erstellen")}
               </button>
             </div>

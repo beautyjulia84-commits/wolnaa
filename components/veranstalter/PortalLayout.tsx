@@ -92,7 +92,7 @@ function VeranstalterLayoutInner({ children }: { children: React.ReactNode }) {
             {menuOpen && (
               <div style={{position:'absolute',right:0,top:'48px',width:'224px',background:'#fff',border:'1px solid #e5e7eb',borderRadius:'16px',padding:'8px',boxShadow:'0 18px 40px rgba(0,0,0,.14)',overflow:'hidden'}}>
                 {links.map(l => (
-                  <Link key={l.href} href={l.href} onClick={() => setMenuOpen(false)} style={{display:'block',color:pathname===l.href?'#000':'#3f3f46',textDecoration:'none',padding:'12px 16px',borderRadius:'12px',fontSize:'14px',fontWeight:600,background:pathname===l.href?'#facc15':'transparent'}}>
+                  <Link key={l.href} href={l.href} onClick={() => setMenuOpen(false)} style={{display:'block',color:pathname===l.href?'#000':'#3f3f46',textDecoration:'none',padding:'12px 16px',borderRadius:'12px',fontSize:'14px',fontWeight:600,background:pathname===l.href?'#d6b36a':'transparent'}}>
                     {l.label}
                   </Link>
                 ))}
