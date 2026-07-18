@@ -12,6 +12,7 @@ const sb = createClient(
 type TicketType = { name: string; price: string; quantity: string };
 type Lounge = { name: string; persons: string; price: string; type?: string };
 type DiscountCode = { code: string; percent: string };
+type Availability = { activeIndex: number; remaining: number | null; soldOut: boolean };
 type EventItem = {
   id: string; title: string; city: string; date: string; time: string;
   location: string; address: string;
@@ -90,6 +91,7 @@ export default function EventPage() {
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
   const [checkoutError, setCheckoutError] = useState("");
+  const [availability, setAvailability] = useState<Availability | null>(null);
 
   useEffect(() => { loadEvent(); }, [id]);
 
@@ -100,7 +102,12 @@ export default function EventPage() {
         .select("*, veranstalter:veranstalter_id(firmenname,kontakt_email)")
         .eq("slug", id)
         .single();
-      if (data) setEvent(data);
+      if (data) {
+        setEvent(data);
+        const response = await fetch(`/api/events/${data.id}/availability`, { cache: "no-store" });
+        const available = await response.json();
+        if (response.ok) setAvailability(available);
+      }
       else setNotFound(true);
     } catch { setNotFound(true); }
   }
@@ -120,6 +127,8 @@ export default function EventPage() {
   );
 
   const n = normalize(event);
+  const activeTicketIndex = availability?.activeIndex ?? -1;
+  const activeTicket = activeTicketIndex >= 0 ? n.tickets[activeTicketIndex] : null;
   const totalTickets = Object.values(ticketQtys).reduce((a, b) => a + b, 0);
   const hasSelection = totalTickets > 0;
 
@@ -164,7 +173,13 @@ export default function EventPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Fehler aufgetreten.");
       if (data.url) window.location.href = data.url; else throw new Error("Fehler aufgetreten.");
-    } catch (err: any) { setCheckoutError(err?.message || "Fehler aufgetreten. Bitte erneut versuchen."); }
+    } catch (err: any) {
+      setCheckoutError(err?.message || "Fehler aufgetreten. Bitte erneut versuchen.");
+      setTicketQtys({});
+      const response = await fetch(`/api/events/${event.id}/availability`, { cache: "no-store" });
+      const available = await response.json().catch(() => null);
+      if (response.ok && available) setAvailability(available);
+    }
     finally { setLoading(false); }
   }
 
@@ -199,9 +214,9 @@ export default function EventPage() {
           <div className="max-w-2xl mx-auto flex items-center justify-between">
             <div>
               <p className="text-xs text-zinc-500 uppercase tracking-widest">Ab</p>
-              <p className="text-2xl font-bold text-[#d6b36a]">{n.tickets.length > 0 ? formatMoney(toMoney(n.tickets[0].price)) : "Kostenlos"}</p><p className="mt-1 text-xs text-zinc-500">inkl. 19% MwSt.</p>
+              <p className="text-2xl font-bold text-[#d6b36a]">{!availability ? "Wird geladen…" : activeTicket ? formatMoney(toMoney(activeTicket.price)) : "Ausverkauft"}</p>{activeTicket && <p className="mt-1 text-xs text-zinc-500">inkl. 19% MwSt.</p>}
             </div>
-            <button onClick={() => setStep("tickets")} className="bg-[#d6b36a] text-black font-bold px-8 py-4 rounded-md text-base hover:bg-[#ead08d] transition-colors uppercase tracking-[0.12em]">Tickets kaufen →</button>
+            <button onClick={() => setStep("tickets")} disabled={!availability || (!activeTicket && !n.hasLounges)} className="bg-[#d6b36a] text-black font-bold px-8 py-4 rounded-md text-base hover:bg-[#ead08d] transition-colors uppercase tracking-[0.12em] disabled:cursor-not-allowed disabled:bg-zinc-800 disabled:text-zinc-500">{!availability ? "Bitte warten" : activeTicket || n.hasLounges ? "Tickets kaufen →" : "Ausverkauft"}</button>
           </div>
         </div>
       )}
@@ -214,16 +229,17 @@ export default function EventPage() {
               <button onClick={() => setStep("info")} className="w-9 h-9 rounded-md border border-zinc-700 flex items-center justify-center text-zinc-400 hover:text-white">✕</button>
             </div>
             <div className="px-6 py-5 space-y-3">
-              {n.tickets.map((ticket, i) => (
-                <div key={i} className="flex items-center justify-between bg-black/35 border border-white/10 rounded-md px-5 py-4">
-                  <div><p className="font-bold text-base">{ticket.name || "Ticket"}</p><p className="text-[#d6b36a] font-bold mt-0.5">{formatMoney(toMoney(ticket.price))}</p><p className="mt-1 text-[11px] text-zinc-500">inkl. 19% MwSt.</p></div>
+              {activeTicket && (
+                <div className="flex items-center justify-between bg-black/35 border border-white/10 rounded-md px-5 py-4">
+                  <div><p className="font-bold text-base">{activeTicket.name || "Ticket"}</p><p className="text-[#d6b36a] font-bold mt-0.5">{formatMoney(toMoney(activeTicket.price))}</p><p className="mt-1 text-[11px] text-zinc-500">inkl. 19% MwSt.{availability?.remaining !== null && availability?.remaining !== undefined ? ` · Noch ${availability.remaining} verfügbar` : ""}</p></div>
                   <div className="flex items-center gap-2">
-                    <button onClick={() => setTicketQtys(p => ({ ...p, [i]: Math.max(0, (p[i] ?? 0) - 1) }))} className="w-9 h-9 rounded-md border border-zinc-700 flex items-center justify-center font-bold hover:border-[#d6b36a] hover:text-[#d6b36a] transition-colors text-lg">−</button>
-                    <span className="w-6 text-center font-bold">{ticketQtys[i] ?? 0}</span>
-                    <button onClick={() => setTicketQtys(p => ({ ...p, [i]: (p[i] ?? 0) + 1 }))} className="w-9 h-9 rounded-md bg-[#d6b36a] text-black flex items-center justify-center font-bold hover:bg-[#ead08d] transition-colors text-lg">+</button>
+                    <button onClick={() => setTicketQtys(p => ({ ...p, [activeTicketIndex]: Math.max(0, (p[activeTicketIndex] ?? 0) - 1) }))} className="w-9 h-9 rounded-md border border-zinc-700 flex items-center justify-center font-bold hover:border-[#d6b36a] hover:text-[#d6b36a] transition-colors text-lg">−</button>
+                    <span className="w-6 text-center font-bold">{ticketQtys[activeTicketIndex] ?? 0}</span>
+                    <button onClick={() => setTicketQtys(p => ({ ...p, [activeTicketIndex]: Math.min(availability?.remaining ?? Number.POSITIVE_INFINITY, (p[activeTicketIndex] ?? 0) + 1) }))} className="w-9 h-9 rounded-md bg-[#d6b36a] text-black flex items-center justify-center font-bold hover:bg-[#ead08d] transition-colors text-lg">+</button>
                   </div>
                 </div>
-              ))}
+              )}
+              {!activeTicket && !n.hasLounges && <p className="py-8 text-center text-zinc-400">Dieses Event ist ausverkauft.</p>}
               {n.hasLounges && n.loungeList.length > 0 && (
                 <>
                   <p className="text-xs font-bold text-zinc-500 uppercase tracking-widest pt-2">Lounge</p>

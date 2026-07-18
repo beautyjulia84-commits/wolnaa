@@ -105,6 +105,8 @@ type EventItem = {
   location: string; address: string; image_url: string; price: string;
   description: string; tickets: any[];
   lounges: boolean; lounge_list: any[]; discount_codes: any[];
+  active_ticket_price?: string | number | null;
+  sold_out?: boolean;
 };
 
 function createEventLink(event: EventItem): string {
@@ -132,6 +134,7 @@ function formatDate(d: string, lang: Lang = 'de') {
 }
 
 function getStartingPrice(event: EventItem): string {
+  if (event.active_ticket_price !== undefined && event.active_ticket_price !== null) return parseFloat(String(event.active_ticket_price) || "0").toFixed(2);
   if (event.tickets && event.tickets.length > 0) return parseFloat(event.tickets[0].price || "0").toFixed(2);
   return parseFloat(event.price || "0").toFixed(2);
 }
@@ -161,7 +164,7 @@ function EventCard({ event, lang }: { event: EventItem; lang: Lang }) {
         <p className="float-text text-zinc-400 mt-2 text-sm">{event.city}{event.location && ` · ${event.location}`}</p>
         <div className="mt-5 flex items-center justify-between">
           <div>
-            <p className="float-text text-[#d6b36a] font-bold text-lg">{t.from} {getStartingPrice(event)} €</p>
+            <p className="float-text text-[#d6b36a] font-bold text-lg">{event.sold_out ? "Ausverkauft" : `${t.from} ${getStartingPrice(event)} €`}</p>
             <p className="mt-1 text-[11px] text-zinc-500">inkl. 19% MwSt.</p>
           </div>
           {event.lounges && event.lounge_list?.length > 0 && (
@@ -228,7 +231,7 @@ function FeaturedEvent({ event, lang }: { event: EventItem; lang: Lang }) {
 
         <div className="mt-8 flex flex-wrap items-center gap-4">
           <span>
-            <span className="block text-lg font-bold text-[#d6b36a]">{t.from} {getStartingPrice(event)} €</span>
+            <span className="block text-lg font-bold text-[#d6b36a]">{event.sold_out ? "Ausverkauft" : `${t.from} ${getStartingPrice(event)} €`}</span>
             <span className="mt-1 block text-[11px] text-zinc-500">inkl. 19% MwSt.</span>
           </span>
           <span className="inline-flex h-12 items-center justify-center rounded-md bg-[#d6b36a] px-6 text-sm font-bold text-black transition-colors group-hover:bg-[#ead08d]">
@@ -441,7 +444,22 @@ export default function Home() {
       return;
     }
 
-    setEvents((data ?? []).map((row: any) => row.data ?? row));
+    const rows = (data ?? []).map((row: any) => row.data ?? row);
+    const enriched = await Promise.all(rows.map(async (event: EventItem) => {
+      try {
+        const response = await fetch(`/api/events/${event.id}/availability`, { cache: "no-store" });
+        const availability = await response.json();
+        if (!response.ok) return event;
+        return {
+          ...event,
+          active_ticket_price: availability.activeTicket?.price ?? null,
+          sold_out: availability.soldOut,
+        };
+      } catch {
+        return event;
+      }
+    }));
+    setEvents(enriched);
   }
 
   async function loadLegal() {

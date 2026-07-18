@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { createClient } from "@supabase/supabase-js";
+import { getTicketPhase, normalizeTicketName } from "@/lib/ticket-phases";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
@@ -57,6 +58,32 @@ export async function POST(req: Request) {
     const configuredLounges = Array.isArray(event.lounge_list) ? event.lounge_list : [];
     const configuredDiscounts = Array.isArray(event.discount_codes) ? event.discount_codes : [];
 
+    const { data: soldRows, error: soldError } = await supabase
+      .from("tickets")
+      .select("ticket_name,status")
+      .eq("event_id", eventId);
+
+    if (soldError) {
+      return NextResponse.json({ error: "Ticketbestand konnte nicht geprüft werden." }, { status: 500 });
+    }
+
+    const phase = getTicketPhase(configuredTickets, soldRows || []);
+    const configuredTicketRequests = requestedTickets.filter((item: any) =>
+      configuredTickets.some((ticket: any) => normalizeTicketName(ticket.name) === normalizeTicketName(item.name))
+    );
+    const requestedTicketQty = configuredTicketRequests.reduce((sum: number, item: any) => sum + item.qty, 0);
+    if (requestedTicketQty > 0 && !phase.activeTicket) {
+      return NextResponse.json({ error: "Dieses Event ist ausverkauft." }, { status: 400 });
+    }
+    for (const item of configuredTicketRequests) {
+      if (normalizeTicketName(item.name) !== normalizeTicketName(phase.activeTicket?.name)) {
+        return NextResponse.json({ error: "Die Ticketphase hat sich geändert. Bitte lade die Seite neu." }, { status: 409 });
+      }
+    }
+    if (phase.remaining !== null && requestedTicketQty > phase.remaining) {
+      return NextResponse.json({ error: "In dieser Ticketphase sind nicht mehr genügend Tickets verfügbar." }, { status: 409 });
+    }
+
     let subtotal = 0;
     const checkoutLineItems = (lineItems || [])
       .map((item: any) => {
@@ -95,39 +122,6 @@ export async function POST(req: Request) {
 
     if (!Number.isFinite(totalAmount) || totalAmount <= 0) {
       return NextResponse.json({ error: "Der Gesamtbetrag ist ungültig. Bitte lade die Seite neu." }, { status: 400 });
-    }
-
-    const limitedRequests = requestedTickets.filter((item: any) => {
-      const configured = configuredTickets.find((ticket: any) => normalizeName(ticket.name) === normalizeName(item.name));
-      return configured?.quantity !== undefined && configured?.quantity !== null && String(configured.quantity).trim() !== "";
-    });
-
-    if (limitedRequests.length > 0) {
-      const { data: soldRows, error: soldError } = await supabase
-        .from("tickets")
-        .select("ticket_name,status")
-        .eq("event_id", eventId);
-
-      if (soldError) {
-        return NextResponse.json({ error: "Ticketbestand konnte nicht geprüft werden." }, { status: 500 });
-      }
-
-      const soldByName = new Map<string, number>();
-      for (const row of soldRows || []) {
-        if (row.status === "cancelled") continue;
-        const key = normalizeName(row.ticket_name || "");
-        soldByName.set(key, (soldByName.get(key) || 0) + 1);
-      }
-
-      for (const item of limitedRequests) {
-        const configured = configuredTickets.find((ticket: any) => normalizeName(ticket.name) === normalizeName(item.name));
-        const limit = Number(configured?.quantity || 0);
-        const sold = soldByName.get(normalizeName(item.name)) || 0;
-
-        if (limit > 0 && sold + item.qty > limit) {
-          return NextResponse.json({ error: `${item.name} ist ausverkauft oder nicht mehr in ausreichender Menge verfügbar.` }, { status: 400 });
-        }
-      }
     }
 
     let stripeAccountId: string | null = event.stripe_account_id || null;

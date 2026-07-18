@@ -694,17 +694,17 @@ export default function AdminPage() {
 
               <div className="bg-white rounded-2xl border border-zinc-200 overflow-hidden">
                 <div className="px-4 py-3 border-b border-zinc-200 bg-zinc-50 flex items-center justify-between">
-                  <p className="text-base font-bold text-zinc-900 mb-0">Ticket-Typen</p>
-                  <button onClick={() => f("tickets", [...ev.tickets, { name: "", price: "", quantity: "" }])} className="text-yellow-400 text-xs font-bold hover:text-yellow-300">+ Hinzufügen</button>
+                  <div><p className="text-base font-bold text-zinc-900 mb-0">Ticketphasen</p><p className="mt-1 text-xs text-zinc-500">Automatischer Wechsel in dieser Reihenfolge</p></div>
+                  <button onClick={() => f("tickets", [...ev.tickets, { name: "", price: "", quantity: "" }])} className="text-yellow-400 text-xs font-bold hover:text-yellow-300">+ Phase</button>
                 </div>
                 <div className="p-4 space-y-3">
                   {ev.tickets.map((t, i) => (
                     <div key={i} className="space-y-2">
-                      <div className="flex justify-between"><p className="text-xs text-zinc-600">Ticket {i + 1}</p><button onClick={() => f("tickets", ev.tickets.filter((_, j) => j !== i))} className="text-zinc-600 hover:text-red-600 text-xs transition-colors">Entfernen</button></div>
+                      <div className="flex justify-between"><p className="text-xs text-zinc-600">Phase {i + 1}</p><button onClick={() => f("tickets", ev.tickets.filter((_, j) => j !== i))} className="text-zinc-600 hover:text-red-600 text-xs transition-colors">Entfernen</button></div>
                       <div className="grid grid-cols-3 gap-2">
                         <input placeholder="Name" value={t.name} onChange={e => setTix(i, "name", e.target.value)} className={inp} />
                         <input placeholder="Preis €" value={t.price} onChange={e => setTix(i, "price", e.target.value)} inputMode="decimal" className={inp} />
-                        <input placeholder="Anzahl" value={t.quantity} onChange={e => setTix(i, "quantity", e.target.value)} inputMode="numeric" className={inp} />
+                        <input placeholder={i === ev.tickets.length - 1 ? "Leer = unbegrenzt" : "Kontingent"} value={t.quantity} onChange={e => setTix(i, "quantity", e.target.value.replace(/\D/g, ""))} inputMode="numeric" className={inp} />
                       </div>
                     </div>
                   ))}

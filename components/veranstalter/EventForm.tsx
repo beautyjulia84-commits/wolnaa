@@ -256,20 +256,20 @@ export default function VeranstalterEventForm({ eventId }: { eventId?: string })
 
         <section style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: '12px', padding: '20px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-            <h2 style={{ margin: 0, fontSize: '16px', color: '#111' }}>Ticketarten</h2>
-            <button onClick={() => setField('tickets', [...form.tickets, { name: '', price: '', quantity: '' }])} style={{ border: 'none', background: '#111827', color: '#fff', borderRadius: '8px', padding: '8px 12px', cursor: 'pointer' }}>+ Ticket</button>
+            <div><h2 style={{ margin: 0, fontSize: '16px', color: '#111' }}>Ticketphasen</h2><p style={{ margin:'4px 0 0', color:'#6b7280', fontSize:'12px' }}>Reihenfolge = Verkaufsreihenfolge. Nach dem Kontingent startet automatisch die nächste Phase.</p></div>
+            <button onClick={() => setField('tickets', [...form.tickets, { name: '', price: '', quantity: '' }])} style={{ border: 'none', background: '#111827', color: '#fff', borderRadius: '8px', padding: '8px 12px', cursor: 'pointer' }}>+ Phase</button>
           </div>
           <div style={{ display: 'grid', gap: '12px' }}>
             {form.tickets.map((ticket, index) => (
               <div key={index} style={{ border: '1px solid #e5e7eb', borderRadius: '10px', padding: '12px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
-                  <strong style={{ fontSize: '13px', color: '#374151' }}>Ticket {index + 1}</strong>
+                  <strong style={{ fontSize: '13px', color: '#374151' }}>Phase {index + 1}</strong>
                   <button onClick={() => setField('tickets', form.tickets.filter((_, i) => i !== index))} style={{ border: 'none', background: 'transparent', color: '#dc2626', cursor: 'pointer' }}>Entfernen</button>
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px' }}>
                   <input style={inputStyle} placeholder="Name" value={ticket.name} onChange={e => setTicket(index, 'name', e.target.value)} />
                   <input style={inputStyle} placeholder="Preis EUR" inputMode="decimal" value={ticket.price} onChange={e => setTicket(index, 'price', e.target.value)} />
-                  <input style={inputStyle} placeholder="Menge" inputMode="numeric" value={ticket.quantity} onChange={e => setTicket(index, 'quantity', e.target.value.replace(/\D/g, ''))} />
+                  <input style={inputStyle} placeholder={index === form.tickets.length - 1 ? "Menge (leer = unbegrenzt)" : "Kontingent"} inputMode="numeric" value={ticket.quantity} onChange={e => setTicket(index, 'quantity', e.target.value.replace(/\D/g, ''))} />
                 </div>
               </div>
             ))}
