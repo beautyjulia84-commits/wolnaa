@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, type FormEvent } from "react";
 import { createClient } from "@supabase/supabase-js";
 
 const sb = createClient(
@@ -326,12 +326,84 @@ function CookieBanner() {
   );
 }
 
+function ContactModal({ onClose }: { onClose: () => void }) {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [message, setMessage] = useState("");
+  const [status, setStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
+
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => event.key === "Escape" && onClose();
+    document.addEventListener("keydown", onKeyDown);
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", onKeyDown);
+      document.body.style.overflow = "";
+    };
+  }, [onClose]);
+
+  async function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setStatus("sending");
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, message }),
+      });
+      if (!response.ok) throw new Error("Kontaktanfrage fehlgeschlagen");
+      setStatus("success");
+    } catch {
+      setStatus("error");
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm" onClick={onClose} role="dialog" aria-modal="true" aria-labelledby="contact-title">
+      <div className="relative w-full max-w-lg rounded-md border border-white/10 bg-zinc-950 p-6 shadow-2xl md:p-8" onClick={event => event.stopPropagation()}>
+        <button type="button" onClick={onClose} aria-label="Kontaktformular schließen" className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full border border-white/10 text-zinc-400 hover:border-[#d6b36a] hover:text-[#d6b36a]">✕</button>
+        <p className="mb-3 text-xs font-bold uppercase tracking-[0.26em] text-[#d6b36a]">Kontakt</p>
+        <h2 id="contact-title" className="mb-2 text-3xl font-semibold">Schreib uns</h2>
+        <p className="mb-6 text-sm leading-6 text-zinc-400">Wir melden uns so schnell wie möglich bei dir.</p>
+
+        {status === "success" ? (
+          <div className="border-t border-white/10 py-8 text-center">
+            <p className="text-xl font-semibold text-white">Nachricht gesendet</p>
+            <p className="mt-2 text-sm text-zinc-400">Vielen Dank! Wir melden uns bald bei dir.</p>
+            <button type="button" onClick={onClose} className="mt-6 inline-flex h-12 w-48 items-center justify-center rounded-md bg-[#d6b36a] text-sm font-bold text-black hover:bg-[#ead08d]">Schließen</button>
+          </div>
+        ) : (
+          <form onSubmit={submit} className="space-y-4">
+            <div>
+              <label htmlFor="contact-name" className="mb-2 block text-xs font-bold uppercase tracking-[0.16em] text-zinc-400">Name</label>
+              <input id="contact-name" required maxLength={100} value={name} onChange={event => setName(event.target.value)} className="w-full rounded-md border border-white/10 bg-black px-4 py-3 text-sm text-white outline-none transition-colors focus:border-[#d6b36a]" />
+            </div>
+            <div>
+              <label htmlFor="contact-email" className="mb-2 block text-xs font-bold uppercase tracking-[0.16em] text-zinc-400">E-Mail</label>
+              <input id="contact-email" type="email" required maxLength={200} value={email} onChange={event => setEmail(event.target.value)} className="w-full rounded-md border border-white/10 bg-black px-4 py-3 text-sm text-white outline-none transition-colors focus:border-[#d6b36a]" />
+            </div>
+            <div>
+              <label htmlFor="contact-message" className="mb-2 block text-xs font-bold uppercase tracking-[0.16em] text-zinc-400">Nachricht</label>
+              <textarea id="contact-message" required minLength={10} maxLength={3000} rows={5} value={message} onChange={event => setMessage(event.target.value)} className="w-full resize-none rounded-md border border-white/10 bg-black px-4 py-3 text-sm text-white outline-none transition-colors focus:border-[#d6b36a]" />
+            </div>
+            {status === "error" && <p className="text-sm text-red-400">Die Nachricht konnte nicht gesendet werden. Bitte versuche es erneut.</p>}
+            <button type="submit" disabled={status === "sending"} className="inline-flex h-14 w-full items-center justify-center rounded-md bg-[#d6b36a] text-sm font-bold text-black hover:bg-[#ead08d] disabled:cursor-wait disabled:opacity-60">
+              {status === "sending" ? "Wird gesendet …" : "Nachricht senden"}
+            </button>
+          </form>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function Home() {
   const [events, setEvents] = useState<EventItem[]>([]);
   const [mounted, setMounted] = useState(false);
   const [showLegal, setShowLegal] = useState<LegalType>(null);
   const [legalContent, setLegalContent] = useState<Record<string, string>>({});
   const [lang, setLang] = useState<Lang>("de");
+  const [showContact, setShowContact] = useState(false);
   const t = I18N[lang];
 
   useEffect(() => {
@@ -518,7 +590,7 @@ export default function Home() {
       `}</style>
 
       <header className="fixed left-0 right-0 top-0 z-50 border-b border-white/10 bg-black/65 backdrop-blur-xl">
-        <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-5 md:px-8">
+        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-5 md:px-8">
           <a href="/" aria-label="WOLNAA Startseite" className="flex items-center">
             <Image src="/wolnaa-logo-gold-header.png" alt="WOLNAA" width={220} height={81} priority className="h-6 w-auto object-contain md:h-7" />
           </a>
@@ -642,7 +714,7 @@ export default function Home() {
               href="https://www.tiktok.com/@wolnaa_event?_r=1&_t=ZG-96mDjgLge8H"
               target="_blank"
               rel="noopener noreferrer"
-              className="rounded-md bg-[#d6b36a] px-6 py-4 text-sm font-bold text-black hover:bg-[#ead08d] active:bg-[#ead08d] active:scale-95 transition-all"
+              className="inline-flex h-14 w-56 items-center justify-center rounded-md bg-[#d6b36a] text-sm font-bold text-black hover:bg-[#ead08d] active:bg-[#ead08d] active:scale-95 transition-all"
             >
               {t.tiktokFollow}
             </a>
@@ -651,7 +723,7 @@ export default function Home() {
               href="https://www.instagram.com/wolnaa_event?igsh=MWExbHJlcms3ZXp4MQ=="
               target="_blank"
               rel="noopener noreferrer"
-              className="rounded-md border border-white/15 px-6 py-4 text-sm font-bold text-white hover:border-[#d6b36a] hover:text-[#d6b36a] active:border-[#d6b36a] active:text-[#d6b36a] active:scale-95 transition-all"
+              className="inline-flex h-14 w-56 items-center justify-center rounded-md border border-white/15 text-sm font-bold text-white hover:border-[#d6b36a] hover:text-[#d6b36a] active:border-[#d6b36a] active:text-[#d6b36a] active:scale-95 transition-all"
             >
               {t.followInstagram}
             </a>
@@ -687,14 +759,10 @@ export default function Home() {
             {t.contactText}
           </p>
           <div className="flex flex-wrap items-center justify-center gap-4">
-            <a href="https://www.instagram.com/wolnaa_event" target="_blank" rel="noopener noreferrer"
-              className="rounded-md bg-[#d6b36a] px-6 py-4 text-sm font-bold text-black hover:bg-[#ead08d] active:bg-[#ead08d] active:scale-95 transition-all flex items-center gap-2">
-              Instagram DM
-            </a>
-            <a href="mailto:kontakt@wolnaa.de"
-              className="rounded-md border border-white/15 px-6 py-4 text-sm font-bold text-white hover:border-[#d6b36a] hover:text-[#d6b36a] active:border-[#d6b36a] active:text-[#d6b36a] active:scale-95 transition-all flex items-center gap-2">
-              ✉️ kontakt@wolnaa.de
-            </a>
+            <button type="button" onClick={() => setShowContact(true)}
+              className="inline-flex h-14 w-56 items-center justify-center rounded-md border border-white/15 text-sm font-bold text-white hover:border-[#d6b36a] hover:text-[#d6b36a] active:border-[#d6b36a] active:text-[#d6b36a] active:scale-95 transition-all">
+              Kontakt
+            </button>
           </div>
         </div>
       </section>
@@ -710,6 +778,7 @@ export default function Home() {
       </footer>
 
       <CookieBanner />
+      {showContact && <ContactModal onClose={() => setShowContact(false)} />}
       {showLegal && <LegalModal type={showLegal} content={legalContent[showLegal!] ?? ""} onClose={closeLegal} />}
     </main>
   );
