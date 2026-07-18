@@ -103,6 +103,53 @@ function EmptyState() {
   );
 }
 
+
+function FeaturedEvent({ event }: { event: EventItem }) {
+  return (
+    <a href={createEventLink(event)} className="group mb-12 grid overflow-hidden rounded-3xl border border-white/10 bg-zinc-950/70 md:grid-cols-[1.15fr_0.85fr]">
+      <div className="relative min-h-[320px] overflow-hidden bg-zinc-950 md:min-h-[420px]">
+        {event.image_url ? (
+          <img src={event.image_url} alt={event.title} className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy" decoding="async" />
+        ) : (
+          <Image src="/wolnaa-logo.png" alt="WOLNAA" width={360} height={140} className="absolute left-1/2 top-1/2 h-auto w-56 -translate-x-1/2 -translate-y-1/2 object-contain opacity-80" />
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/25 to-transparent" />
+      </div>
+
+      <div className="flex flex-col justify-center p-7 md:p-10">
+        <p className="mb-4 text-xs font-bold uppercase tracking-[0.28em] text-[#d6b36a]">
+          Nächstes Event
+        </p>
+
+        <h3 className="text-3xl font-semibold leading-tight md:text-5xl">
+          {event.title}
+        </h3>
+
+        <p className="mt-5 text-sm leading-relaxed text-zinc-400 md:text-base">
+          {formatDate(event.date)}{event.time && ` · ${event.time}`}
+          {event.city && ` · ${event.city}`}
+          {event.location && ` · ${event.location}`}
+        </p>
+
+        {event.description && (
+          <p className="mt-5 line-clamp-3 text-sm leading-7 text-zinc-400">
+            {event.description}
+          </p>
+        )}
+
+        <div className="mt-8 flex flex-wrap items-center gap-4">
+          <span className="text-lg font-bold text-[#d6b36a]">
+            ab {getStartingPrice(event)} €
+          </span>
+          <span className="inline-flex h-12 items-center justify-center rounded-full bg-[#d6b36a] px-6 text-sm font-bold text-black transition-colors group-hover:bg-[#ead08d]">
+            Tickets ansehen
+          </span>
+        </div>
+      </div>
+    </a>
+  );
+}
+
 function LegalModal({ type, content, onClose }: { type: LegalType; content: string; onClose: () => void }) {
   const titles: Record<string, string> = {
     impressum: "Impressum", datenschutz: "Datenschutzerklärung",
@@ -232,6 +279,9 @@ export default function Home() {
     ["agb", "AGB"], ["teilnahme", "Teilnahmebedingungen"], ["widerruf", "Widerrufsrecht"],
   ];
 
+  const featuredEvent = mounted && events.length > 0 ? events[0] : null;
+  const remainingEvents = featuredEvent ? events.slice(1) : events;
+
   return (
     <main className="min-h-screen bg-black text-white overflow-hidden">
       <header className="fixed left-0 right-0 top-0 z-50 border-b border-white/10 bg-black/65 backdrop-blur-xl">
@@ -280,12 +330,15 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="events" className="max-w-7xl mx-auto px-6 py-10">
-        <p className="text-[#d6b36a] uppercase tracking-[0.26em] text-sm mb-3">Upcoming</p>
-        <h2 className="text-4xl md:text-5xl font-semibold mb-12">Kommende Veranstaltungen</h2>
-        <div className="grid md:grid-cols-3 gap-8">
+      <section id="events" className="mx-auto max-w-7xl px-6 py-16">
+        <p className="mb-3 text-sm uppercase tracking-[0.26em] text-[#d6b36a]">Upcoming</p>
+        <h2 className="mb-10 text-4xl font-semibold md:text-5xl">Kommende Veranstaltungen</h2>
+
+        {featuredEvent && <FeaturedEvent event={featuredEvent} />}
+
+        <div className="grid gap-8 md:grid-cols-3">
           {mounted && events.length === 0 && <EmptyState />}
-          {mounted && events.map(event => <EventCard key={event.id} event={event} />)}
+          {mounted && remainingEvents.map(event => <EventCard key={event.id} event={event} />)}
         </div>
       </section>
 
