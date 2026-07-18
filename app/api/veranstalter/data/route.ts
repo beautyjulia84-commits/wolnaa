@@ -13,7 +13,19 @@ export async function GET(req: Request) {
   const { data: v } = await supabase.from('veranstalter').select('*').eq('id', authedId).single();
   if (!v) return NextResponse.json({ error: 'Nicht gefunden' }, { status: 404 });
 
-  const { data: ev } = await supabase.from('events').select('id,title,date,tickets_sold,total_revenue').eq('veranstalter_id', authedId).order('date', { ascending: false }).limit(5);
+  const { data: ev, error: eventsError } = await supabase
+    .from('events')
+    .select('id,title,date,tickets_sold,total_revenue')
+    .eq('veranstalter_id', authedId)
+    .order('date', { ascending: false })
+    .limit(5);
 
-  return NextResponse.json({ veranstalter: v, events: ev || [] });
+  if (eventsError) {
+    return NextResponse.json({ error: 'Events konnten nicht geladen werden.' }, { status: 500 });
+  }
+
+  return NextResponse.json(
+    { veranstalter: v, events: ev || [] },
+    { headers: { 'Cache-Control': 'no-store' } }
+  );
 }

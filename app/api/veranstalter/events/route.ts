@@ -77,7 +77,10 @@ export async function GET(req: Request) {
     .order('date', { ascending: false });
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json({ events: data || [] });
+  return NextResponse.json(
+    { events: data || [] },
+    { headers: { 'Cache-Control': 'no-store' } }
+  );
 }
 
 export async function POST(req: Request) {
@@ -131,4 +134,43 @@ export async function PUT(req: Request) {
   } catch (err: any) {
     return NextResponse.json({ error: err?.message || 'Event konnte nicht gespeichert werden.' }, { status: 500 });
   }
+}
+
+export async function DELETE(req: Request) {
+  const supabase = await getSupabase();
+  const authedId = getAuthedVeranstalterId(req);
+  const { searchParams } = new URL(req.url);
+  const id = searchParams.get('id');
+
+  if (!authedId) return NextResponse.json({ error: 'Nicht angemeldet.' }, { status: 401 });
+  if (!id) return NextResponse.json({ error: 'Event-ID fehlt.' }, { status: 400 });
+
+  const veranstalter = await getVeranstalter(supabase, authedId);
+  if (!veranstalter) return NextResponse.json({ error: 'Kein Zugriff.' }, { status: 403 });
+
+  const { data: event, error: eventError } = await supabase
+    .from('events')
+    .select('id, tickets_sold')
+    .eq('id', id)
+    .eq('veranstalter_id', authedId)
+    .single();
+
+  if (eventError || !event) {
+    return NextResponse.json({ error: 'Event nicht gefunden oder kein Zugriff.' }, { status: 404 });
+  }
+  if ((event.tickets_sold || 0) > 0) {
+    return NextResponse.json(
+      { error: 'Events mit verkauften Tickets können nicht gelöscht werden.' },
+      { status: 409 }
+    );
+  }
+
+  const { error } = await supabase
+    .from('events')
+    .delete()
+    .eq('id', id)
+    .eq('veranstalter_id', authedId);
+
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  return NextResponse.json({ success: true });
 }

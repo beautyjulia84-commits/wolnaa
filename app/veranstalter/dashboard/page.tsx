@@ -12,15 +12,16 @@ export default function VeranstalterDashboard() {
   useEffect(() => {
     const load = async () => {
       try {
-        const res = await fetch('/api/veranstalter/data');
+        const res = await fetch('/api/veranstalter/data', { cache: 'no-store' });
         const json = await res.json();
 
-        if (!res.ok || !json.veranstalter) {
+        if (res.status === 401 || res.status === 403 || !json.veranstalter) {
           localStorage.removeItem('veranstalter_id');
           document.cookie = 'veranstalter_id=;max-age=0;path=/';
           window.location.href = '/veranstalter/login';
           return;
         }
+        if (!res.ok) throw new Error(json.error || 'Dashboard konnte nicht geladen werden.');
 
         localStorage.setItem('veranstalter_name', json.veranstalter?.firmenname || '');
         setVeranstalter(json.veranstalter);
@@ -34,7 +35,7 @@ export default function VeranstalterDashboard() {
           stripeOk: !!json.veranstalter.stripe_charges_enabled,
         });
       } catch (e) {
-        setError('Dashboard konnte nicht geladen werden.');
+        setError(e instanceof Error ? e.message : 'Dashboard konnte nicht geladen werden.');
       } finally {
         setLoading(false);
       }
@@ -102,7 +103,10 @@ export default function VeranstalterDashboard() {
                   <td style={{ padding:'16px 24px', color:'#111', fontSize:'14px' }}>{e.tickets_sold||0}</td>
                   <td style={{ padding:'16px 24px', color:'#111', fontSize:'14px', fontWeight:'500' }}>€{((e.total_revenue||0)/100).toFixed(2)}</td>
                   <td style={{ padding:'16px 24px', textAlign:'right' }}>
-                    <Link href={`/veranstalter/events/${e.id}/teilnehmer`} style={{ color:'#111827', border:'1px solid #d1d5db', borderRadius:'8px', padding:'7px 12px', textDecoration:'none', fontSize:'13px', fontWeight:600, whiteSpace:'nowrap' }}>Tickets ansehen</Link>
+                    <div style={{ display:'flex', justifyContent:'flex-end', gap:'8px' }}>
+                      <Link href={`/veranstalter/events/${e.id}`} style={{ color:'#111827', border:'1px solid #d1d5db', borderRadius:'8px', padding:'7px 12px', textDecoration:'none', fontSize:'13px', fontWeight:600, whiteSpace:'nowrap' }}>Bearbeiten</Link>
+                      <Link href={`/veranstalter/events/${e.id}/teilnehmer`} style={{ color:'#fff', background:'#111827', border:'1px solid #111827', borderRadius:'8px', padding:'7px 12px', textDecoration:'none', fontSize:'13px', fontWeight:600, whiteSpace:'nowrap' }}>Tickets ansehen</Link>
+                    </div>
                   </td>
                 </tr>
               ))}

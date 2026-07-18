@@ -7,11 +7,12 @@ export default function VeranstalterEvents() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [filter, setFilter] = useState<'alle'|'kommend'|'vergangen'>('alle');
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   useEffect(() => {
     const load = async () => {
       try {
-        const res = await fetch('/api/veranstalter/events');
+        const res = await fetch('/api/veranstalter/events', { cache: 'no-store' });
         const json = await res.json();
 
         if (!res.ok) {
@@ -28,6 +29,24 @@ export default function VeranstalterEvents() {
     };
     load();
   }, []);
+
+  async function deleteEvent(event: any) {
+    if (!window.confirm(`„${event.title}“ wirklich löschen?`)) return;
+    setDeletingId(event.id);
+    setError('');
+    try {
+      const res = await fetch(`/api/veranstalter/events?id=${encodeURIComponent(event.id)}`, {
+        method: 'DELETE',
+      });
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(json.error || 'Event konnte nicht gelöscht werden.');
+      setEvents(current => current.filter(item => item.id !== event.id));
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'Event konnte nicht gelöscht werden.');
+    } finally {
+      setDeletingId(null);
+    }
+  }
 
   const now = new Date();
   const filtered = events.filter(e => {
@@ -74,12 +93,14 @@ export default function VeranstalterEvents() {
                     {e.location && ` · ${e.location}`} · {isPast ? 'Abgeschlossen' : 'Kommend'}
                   </p>
                 </div>
-                <div style={{ display:'flex', alignItems:'center', gap:'16px', marginLeft:'24px' }}>
+                <div style={{ display:'flex', alignItems:'center', gap:'10px', marginLeft:'24px' }}>
                   <div style={{ textAlign:'center' }}>
                     <p style={{ margin:0, fontSize:'20px', fontWeight:'700', color:'#111' }}>{e.tickets_sold||0}</p>
                     <p style={{ margin:0, fontSize:'12px', color:'#9ca3af' }}>Tickets</p>
                   </div>
-                  <Link href={`/veranstalter/events/${e.id}/teilnehmer`} style={{ padding:'9px 16px', border:'1px solid #111827', borderRadius:'8px', background:'#111827', color:'#fff', textDecoration:'none', fontSize:'13px', fontWeight:'600', whiteSpace:'nowrap' }}>Tickets/Kunden ansehen</Link>
+                  <Link href={`/veranstalter/events/${e.id}`} style={{ padding:'9px 14px', border:'1px solid #d1d5db', borderRadius:'8px', color:'#111827', textDecoration:'none', fontSize:'13px', fontWeight:'600', whiteSpace:'nowrap' }}>Bearbeiten</Link>
+                  <Link href={`/veranstalter/events/${e.id}/teilnehmer`} style={{ padding:'9px 14px', border:'1px solid #111827', borderRadius:'8px', background:'#111827', color:'#fff', textDecoration:'none', fontSize:'13px', fontWeight:'600', whiteSpace:'nowrap' }}>Tickets/Kunden</Link>
+                  <button onClick={() => deleteEvent(e)} disabled={deletingId === e.id} style={{ padding:'9px 14px', border:'1px solid #fecaca', borderRadius:'8px', background:'#fff', color:'#dc2626', fontSize:'13px', fontWeight:'600', whiteSpace:'nowrap', cursor:deletingId === e.id ? 'wait' : 'pointer', opacity:deletingId === e.id ? .6 : 1 }}>{deletingId === e.id ? 'Löschen…' : 'Löschen'}</button>
                 </div>
               </div>
             );
