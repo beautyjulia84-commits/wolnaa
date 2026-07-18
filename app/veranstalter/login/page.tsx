@@ -53,9 +53,7 @@ export default function VeranstalterLogin() {
       <div style={{width:'100%',maxWidth:'420px',padding:'0 16px'}}>
         <div style={{background:'#fff',borderRadius:'16px',padding:'40px',boxShadow:'0 4px 24px rgba(0,0,0,0.07)',border:'1px solid #f0f0f0'}}>
           <div style={{textAlign:'center',marginBottom:'32px'}}>
-            <div style={{display:'inline-flex',alignItems:'center',justifyContent:'center',background:'#000',borderRadius:'14px',padding:'12px 18px',margin:'0 auto 14px'}}>
-              <img src="/wolnaa-logo.png" alt="Wolnaa" style={{height:'52px',width:'auto',display:'block'}} />
-            </div>
+            <img src="/wolnaa-logo-gold-header.png" alt="Wolnaa" style={{height:'40px',width:'auto',display:'block',margin:'0 auto 16px'}} />
             <p style={{margin:0,color:'#6b7280',fontSize:'14px'}}>Veranstalter-Portal</p>
           </div>
           {error && <div style={{background:'#fef2f2',border:'1px solid #fecaca',borderRadius:'8px',padding:'12px',marginBottom:'20px'}}><p style={{color:'#dc2626',fontSize:'14px',margin:0}}>{error}</p></div>}
@@ -76,7 +74,7 @@ export default function VeranstalterLogin() {
               style={{width:'100%',padding:'12px 14px',border:'1px solid #d1d5db',borderRadius:'8px',fontSize:'15px',outline:'none',color:'#111',boxSizing:'border-box' as const}} />
           </div>
           <button onClick={handleSubmit} disabled={loading || !email.trim() || !password}
-            style={{width:'100%',padding:'13px',background:loading||!email.trim()||!password?'#d1d5db':'#facc15',color:'#111',border:'none',borderRadius:'8px',fontSize:'15px',fontWeight:'700',cursor:loading||!email.trim()||!password?'not-allowed':'pointer'}}>
+            style={{width:'100%',padding:'13px',background:loading||!email.trim()||!password?'#d1d5db':'#d6b36a',color:'#111',border:'none',borderRadius:'8px',fontSize:'15px',fontWeight:'700',cursor:loading||!email.trim()||!password?'not-allowed':'pointer'}}>
             {loading ? 'Prüfe...' : 'Einloggen'}
           </button>
           <button type="button" onClick={requestPasswordReset} disabled={loading} style={{width:'100%',marginTop:'12px',padding:'8px',border:'none',background:'transparent',color:'#6b7280',fontSize:'13px',cursor:'pointer'}}>Passwort festlegen oder vergessen?</button>

@@ -39,13 +39,13 @@ export default function AdminPasswortFestlegen() {
         <img src="/wolnaa-logo-gold-header.png" alt="Wolnaa" className="h-10 w-auto mb-7" />
         <h1 className="mb-2 text-2xl font-bold">Passwort festlegen</h1>
         <p className="mb-6 text-sm text-zinc-500">Wähle ein sicheres Passwort für dein Administratorkonto.</p>
-        {success ? <><p className="text-green-700">Dein Passwort wurde gespeichert.</p><a href="/admin-login" className="mt-5 block rounded-lg bg-yellow-400 p-3 text-center font-bold text-zinc-950 no-underline">Zur Anmeldung</a></> : !ready ? <p className="text-sm text-red-600">Der Link ist ungültig oder abgelaufen. Bitte fordere auf der Loginseite einen neuen Link an.</p> : <>
+        {success ? <><p className="text-green-700">Dein Passwort wurde gespeichert.</p><a href="/admin-login" className="mt-5 block rounded-lg bg-[#d6b36a] p-3 text-center font-bold text-zinc-950 no-underline">Zur Anmeldung</a></> : !ready ? <p className="text-sm text-red-600">Der Link ist ungültig oder abgelaufen. Bitte fordere auf der Loginseite einen neuen Link an.</p> : <>
           {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
           <label className="mb-1.5 block text-sm text-zinc-700">Neues Passwort</label>
-          <input type="password" value={password} onChange={event => setPassword(event.target.value)} autoComplete="new-password" className="mb-4 w-full rounded-lg border border-zinc-300 p-3 text-zinc-950 outline-none focus:border-yellow-400" />
+          <input type="password" value={password} onChange={event => setPassword(event.target.value)} autoComplete="new-password" className="mb-4 w-full rounded-lg border border-zinc-300 p-3 text-zinc-950 outline-none focus:border-[#d6b36a]" />
           <label className="mb-1.5 block text-sm text-zinc-700">Passwort wiederholen</label>
-          <input type="password" value={repeat} onChange={event => setRepeat(event.target.value)} autoComplete="new-password" className="mb-5 w-full rounded-lg border border-zinc-300 p-3 text-zinc-950 outline-none focus:border-yellow-400" />
-          <button onClick={save} disabled={loading} className="w-full rounded-lg bg-yellow-400 p-3.5 font-bold text-zinc-950 disabled:opacity-50">{loading ? "Speichert…" : "Passwort speichern"}</button>
+          <input type="password" value={repeat} onChange={event => setRepeat(event.target.value)} autoComplete="new-password" className="mb-5 w-full rounded-lg border border-zinc-300 p-3 text-zinc-950 outline-none focus:border-[#d6b36a]" />
+          <button onClick={save} disabled={loading} className="w-full rounded-lg bg-[#d6b36a] p-3.5 font-bold text-zinc-950 hover:bg-[#c5a15b] disabled:opacity-50">{loading ? "Speichert…" : "Passwort speichern"}</button>
         </>}
       </div>
     </main>

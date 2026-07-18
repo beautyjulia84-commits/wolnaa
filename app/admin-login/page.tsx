@@ -71,13 +71,13 @@ export default function AdminLoginPage() {
 
         <div className="mb-4">
           <label className="mb-1.5 block text-sm font-medium text-zinc-700">E-Mail-Adresse</label>
-          <input type="email" value={email} onChange={event => setEmail(event.target.value)} placeholder="kontakt@wolnaa.de" autoComplete="email" className="w-full rounded-lg border border-zinc-300 px-3.5 py-3 text-[15px] text-zinc-950 outline-none focus:border-yellow-400" />
+          <input type="email" value={email} onChange={event => setEmail(event.target.value)} placeholder="kontakt@wolnaa.de" autoComplete="email" className="w-full rounded-lg border border-zinc-300 px-3.5 py-3 text-[15px] text-zinc-950 outline-none focus:border-[#d6b36a]" />
         </div>
         <div className="mb-4">
           <label className="mb-1.5 block text-sm font-medium text-zinc-700">Passwort</label>
-          <input type="password" value={password} onChange={event => setPassword(event.target.value)} placeholder="••••••••" autoComplete="current-password" className="w-full rounded-lg border border-zinc-300 px-3.5 py-3 text-[15px] text-zinc-950 outline-none focus:border-yellow-400" />
+          <input type="password" value={password} onChange={event => setPassword(event.target.value)} placeholder="••••••••" autoComplete="current-password" className="w-full rounded-lg border border-zinc-300 px-3.5 py-3 text-[15px] text-zinc-950 outline-none focus:border-[#d6b36a]" />
         </div>
-        <button type="submit" disabled={loading || !email.trim() || !password} className="w-full rounded-lg bg-yellow-400 py-3.5 text-[15px] font-bold text-zinc-950 hover:bg-yellow-300 disabled:cursor-not-allowed disabled:bg-zinc-300">
+        <button type="submit" disabled={loading || !email.trim() || !password} className="w-full rounded-lg bg-[#d6b36a] py-3.5 text-[15px] font-bold text-zinc-950 hover:bg-[#c5a15b] disabled:cursor-not-allowed disabled:bg-zinc-300">
           {loading ? "Prüfe..." : "Einloggen"}
         </button>
         <button type="button" onClick={requestPasswordReset} disabled={loading} className="mt-3 w-full border-0 bg-transparent p-2 text-sm text-zinc-500 hover:text-zinc-950 disabled:opacity-50">Passwort festlegen oder vergessen?</button>
