@@ -489,7 +489,7 @@ export default function Home() {
       <header className="fixed left-0 right-0 top-0 z-50 border-b border-white/10 bg-black/65 backdrop-blur-xl">
         <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-5 md:px-8">
           <a href="/" aria-label="WOLNAA Startseite" className="flex items-center">
-            <Image src="/wolnaa-logo-gold-header.png" alt="WOLNAA" width={260} height={96} priority className="h-11 w-auto object-contain md:h-12" />
+            <Image src="/wolnaa-logo-gold-header.png" alt="WOLNAA" width={260} height={96} priority className="h-8 w-auto object-contain md:h-9" />
           </a>
 
           <nav className="hidden items-center gap-8 text-sm font-bold uppercase tracking-[0.22em] text-white/75 md:flex">
