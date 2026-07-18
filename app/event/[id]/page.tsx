@@ -195,7 +195,7 @@ export default function EventPage() {
           <div className="max-w-2xl mx-auto flex items-center justify-between">
             <div>
               <p className="text-xs text-zinc-500 uppercase tracking-widest">Ab</p>
-              <p className="text-2xl font-black text-yellow-400">{n.tickets.length > 0 ? formatMoney(toMoney(n.tickets[0].price)) : "Kostenlos"}</p>
+              <p className="text-2xl font-black text-yellow-400">{n.tickets.length > 0 ? formatMoney(toMoney(n.tickets[0].price)) : "Kostenlos"}</p><p className="mt-1 text-xs text-zinc-500">inkl. 19% MwSt.</p>
             </div>
             <button onClick={() => setStep("tickets")} className="bg-yellow-400 text-black font-black px-8 py-4 rounded-2xl text-base hover:bg-yellow-300 transition-colors">Tickets kaufen →</button>
           </div>
@@ -212,7 +212,7 @@ export default function EventPage() {
             <div className="px-6 py-5 space-y-3">
               {n.tickets.map((ticket, i) => (
                 <div key={i} className="flex items-center justify-between bg-zinc-900 border border-zinc-800 rounded-2xl px-5 py-4">
-                  <div><p className="font-bold text-base">{ticket.name || "Ticket"}</p><p className="text-yellow-400 font-bold mt-0.5">{formatMoney(toMoney(ticket.price))}</p></div>
+                  <div><p className="font-bold text-base">{ticket.name || "Ticket"}</p><p className="text-yellow-400 font-bold mt-0.5">{formatMoney(toMoney(ticket.price))}</p><p className="mt-1 text-[11px] text-zinc-500">inkl. 19% MwSt.</p></div>
                   <div className="flex items-center gap-2">
                     <button onClick={() => setTicketQtys(p => ({ ...p, [i]: Math.max(0, (p[i] ?? 0) - 1) }))} className="w-9 h-9 rounded-full border border-zinc-700 flex items-center justify-center font-bold hover:border-yellow-400 hover:text-yellow-400 transition-colors text-lg">−</button>
                     <span className="w-6 text-center font-bold">{ticketQtys[i] ?? 0}</span>
@@ -263,7 +263,7 @@ export default function EventPage() {
             <div className="sticky bottom-0 bg-[#111] border-t border-zinc-800 px-6 py-5">
               {hasSelection && (
                 <div className="flex items-center justify-between mb-4">
-                  <div><p className="text-zinc-500 text-xs">Gesamt</p>{appliedDiscount && <p className="text-green-400 text-xs">− {toDiscountPercent(appliedDiscount.percent)}% Rabatt</p>}<p className="text-2xl font-black text-yellow-400">{formatMoney(total)}</p></div>
+                  <div><p className="text-zinc-500 text-xs">Gesamt</p>{appliedDiscount && <p className="text-green-400 text-xs">− {toDiscountPercent(appliedDiscount.percent)}% Rabatt</p>}<p className="text-2xl font-black text-yellow-400">{formatMoney(total)}</p><p className="mt-1 text-[11px] text-zinc-500">inkl. 19% MwSt.</p></div>
                   <p className="text-zinc-600 text-xs">{totalTickets} Ticket{totalTickets !== 1 ? "s" : ""}</p>
                 </div>
               )}
@@ -289,7 +289,7 @@ export default function EventPage() {
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-end justify-center" onClick={() => setStep("tickets")}>
           <div className="w-full max-w-2xl bg-[#111] border-t border-zinc-800 rounded-t-3xl" onClick={e => e.stopPropagation()}>
             <div className="px-6 pt-6 pb-4 border-b border-zinc-800 flex items-center justify-between">
-              <div><h2 className="text-lg font-black">Bestellung abschließen</h2><p className="text-zinc-500 text-sm mt-0.5">{totalTickets} Ticket{totalTickets !== 1 ? "s" : ""} · <span className="text-yellow-400 font-bold">{formatMoney(total)}</span></p></div>
+              <div><h2 className="text-lg font-black">Bestellung abschließen</h2><p className="text-zinc-500 text-sm mt-0.5">{totalTickets} Ticket{totalTickets !== 1 ? "s" : ""} · <span className="text-yellow-400 font-bold">{formatMoney(total)}</span></p><p className="mt-1 text-[11px] text-zinc-500">inkl. 19% MwSt.</p></div>
               <button onClick={() => setStep("tickets")} className="w-9 h-9 rounded-full border border-zinc-700 flex items-center justify-center text-zinc-400 hover:text-white">✕</button>
             </div>
             <div className="px-6 py-5 space-y-4">

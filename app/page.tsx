@@ -160,7 +160,10 @@ function EventCard({ event, lang }: { event: EventItem; lang: Lang }) {
         <h3 className="text-2xl font-bold mt-3 leading-tight">{event.title}</h3>
         <p className="text-zinc-400 mt-2 text-sm">{event.city}{event.location && ` · ${event.location}`}</p>
         <div className="mt-5 flex items-center justify-between">
-          <p className="text-[#d6b36a] font-bold text-lg">{t.from} {getStartingPrice(event)} €</p>
+          <div>
+            <p className="text-[#d6b36a] font-bold text-lg">{t.from} {getStartingPrice(event)} €</p>
+            <p className="mt-1 text-[11px] text-zinc-500">inkl. 19% MwSt.</p>
+          </div>
           {event.lounges && event.lounge_list?.length > 0 && (
             <span className="text-xs text-zinc-400 border border-zinc-700 rounded-full px-3 py-1">Lounge</span>
           )}
@@ -223,15 +226,10 @@ function FeaturedEvent({ event, lang }: { event: EventItem; lang: Lang }) {
           {event.location && ` · ${event.location}`}
         </p>
 
-        {event.description && (
-          <p className="mt-5 line-clamp-3 text-sm leading-7 text-zinc-400">
-            {event.description}
-          </p>
-        )}
-
         <div className="mt-8 flex flex-wrap items-center gap-4">
-          <span className="text-lg font-bold text-[#d6b36a]">
-            {t.from} {getStartingPrice(event)} €
+          <span>
+            <span className="block text-lg font-bold text-[#d6b36a]">{t.from} {getStartingPrice(event)} €</span>
+            <span className="mt-1 block text-[11px] text-zinc-500">inkl. 19% MwSt.</span>
           </span>
           <span className="inline-flex h-12 items-center justify-center rounded-full bg-[#d6b36a] px-6 text-sm font-bold text-black transition-colors group-hover:bg-[#ead08d]">
             {t.viewTickets}
