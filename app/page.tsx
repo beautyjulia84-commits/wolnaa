@@ -574,6 +574,24 @@ export default function Home() {
           animation: wolnaaSoftFloat 12s ease-in-out infinite;
         }
 
+        .wolnaa-page .moments-track {
+          scrollbar-width: thin;
+          scrollbar-color: rgba(214, 179, 106, 0.55) rgba(255, 255, 255, 0.06);
+        }
+
+        .wolnaa-page .moments-track::-webkit-scrollbar {
+          height: 5px;
+        }
+
+        .wolnaa-page .moments-track::-webkit-scrollbar-track {
+          background: rgba(255, 255, 255, 0.06);
+        }
+
+        .wolnaa-page .moments-track::-webkit-scrollbar-thumb {
+          border-radius: 999px;
+          background: rgba(214, 179, 106, 0.55);
+        }
+
         @media (prefers-reduced-motion: reduce) {
           .wolnaa-page .reveal-section {
             opacity: 1;
@@ -677,22 +695,26 @@ export default function Home() {
           </p>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-4">
-          {[0, 1, 2, 3].map((item) => (
-            <div key={item} className={`motion-card wolnaa-hover-glow relative overflow-hidden rounded-md bg-zinc-950 ${item === 0 ? "md:col-span-2 md:row-span-2 min-h-[420px]" : "min-h-[260px]"}`}>
-              <video
-                className="absolute inset-0 h-full w-full object-cover"
-                src="/hero-wolnaa.mp4"
-                autoPlay
-                muted
-                loop
-                playsInline
-                preload="metadata"
+        <div className="moments-track -mx-6 flex snap-x snap-mandatory gap-4 overflow-x-auto px-6 pb-5 [scroll-padding-inline:1.5rem]">
+          {[
+            { src: "/moments/wolnaa-night-01.jpg", alt: "Wolnaa Partynacht auf der Tanzfläche" },
+            { src: "/moments/wolnaa-night-02.jpg", alt: "Gast bei einem Wolnaa Event" },
+            { src: "/moments/wolnaa-night-03.jpg", alt: "Wolnaa Eventmoment an der Bar" },
+            { src: "/moments/wolnaa-night-04.jpg", alt: "Volle Tanzfläche bei Wolnaa" },
+          ].map(photo => (
+            <div key={photo.src} className="motion-card group relative aspect-[3/4] w-[82vw] max-w-[440px] shrink-0 snap-center overflow-hidden rounded-md bg-zinc-950 md:w-[38vw] lg:w-[30vw]">
+              <Image
+                src={photo.src}
+                alt={photo.alt}
+                fill
+                sizes="(max-width: 767px) 82vw, (max-width: 1023px) 38vw, 30vw"
+                className="object-cover transition-transform duration-700 group-hover:scale-[1.02]"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-black/5" />
             </div>
           ))}
         </div>
+        <p className="mt-3 text-xs uppercase tracking-[0.18em] text-zinc-600">Seitlich wischen oder scrollen →</p>
       </section>
 
       <section className="reveal-section max-w-5xl mx-auto px-6 pb-20 text-center">
