@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const { data: authData, error: authError } = await supabaseAdmin.auth.admin.inviteUserByEmail(email, {
-      redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/veranstalter/dashboard`,
+      redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/veranstalter/passwort-festlegen`,
     });
     if (authError) return NextResponse.json({ error: authError.message }, { status: 400 });
 

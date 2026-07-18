@@ -11,7 +11,7 @@ function VeranstalterLayoutInner({ children }: { children: React.ReactNode }) {
   const [firmenname, setFirmenname] = useState('');
 
   useEffect(() => {
-    if (pathname === '/veranstalter/login') { setReady(true); return; }
+    if (pathname === '/veranstalter/login' || pathname === '/veranstalter/passwort-festlegen') { setReady(true); return; }
 
     let cancelled = false;
 
@@ -48,7 +48,7 @@ function VeranstalterLayoutInner({ children }: { children: React.ReactNode }) {
     </div>
   );
 
-  if (pathname === '/veranstalter/login') return <>{children}</>;
+  if (pathname === '/veranstalter/login' || pathname === '/veranstalter/passwort-festlegen') return <>{children}</>;
 
   const links = [
     { href:'/veranstalter/dashboard', label:'Dashboard', icon:'📊' },
