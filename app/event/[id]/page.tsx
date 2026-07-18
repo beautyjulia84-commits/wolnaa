@@ -1,5 +1,4 @@
 "use client";
-import Image from "next/image";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -173,23 +172,16 @@ export default function EventPage() {
 
   return (
     <div className="min-h-screen bg-black text-white">
-      <header className="fixed left-0 right-0 top-0 z-50 border-b border-white/10 bg-black/65 backdrop-blur-xl">
-        <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-5 md:px-8">
-          <Link href="/" aria-label="WOLNAA Startseite" className="flex items-center">
-            <Image src="/wolnaa-logo-gold-header.png" alt="WOLNAA" width={260} height={96} priority className="h-11 w-auto object-contain md:h-12" />
-          </Link>
-          <Link href="/" className="text-xs font-bold uppercase tracking-[0.18em] text-white/70 transition-colors hover:text-[#d6b36a]">
-            Zurück
-          </Link>
-        </div>
-      </header>
-
       <div className="relative h-[68vh] min-h-[520px] overflow-hidden">
         {n.imageUrl ? <img src={n.imageUrl} alt={event.title} className="w-full h-full object-cover" /> : <div className="w-full h-full bg-gradient-to-br from-zinc-900 to-black" />}
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/35 to-black/20" />
       </div>
 
       <div className="max-w-3xl mx-auto px-5 -mt-40 relative z-10 pb-44">
+        <Link href="/" className="mb-8 inline-flex items-center text-xs font-bold uppercase tracking-[0.18em] text-white/70 transition-colors hover:text-[#d6b36a]">
+          ← Zurück
+        </Link>
+
         <div className="mb-10">
           <p className="mb-4 text-xs font-bold uppercase tracking-[0.28em] text-[#d6b36a]">WOLNAA EVENT</p>
           <h1 className="text-4xl font-semibold leading-tight mb-6 md:text-6xl">{event.title}</h1>
