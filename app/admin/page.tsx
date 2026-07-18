@@ -190,15 +190,15 @@ function VeranstalterEinladen({ adminPw }: { adminPw: string }) {
   return (
     <div>
       <h1 className="text-lg font-bold mb-5">Veranstalter einladen</h1>
-      {msg && <div className="bg-green-950 border border-green-700 rounded-xl p-3 mb-4 text-green-400 text-sm">{msg}</div>}
-      {error && <div className="bg-red-950 border border-red-700 rounded-xl p-3 mb-4 text-red-400 text-sm">{error}</div>}
+      {msg && <div className="bg-green-50 border border-green-200 rounded-xl p-3 mb-4 text-green-700 text-sm">{msg}</div>}
+      {error && <div className="bg-red-50 border border-red-200 rounded-xl p-3 mb-4 text-red-700 text-sm">{error}</div>}
       <div className="mb-4">
         <label className="block text-xs text-zinc-600 mb-1">Firmenname</label>
-        <input value={firmenname} onChange={e => setFirmenname(e.target.value)} placeholder="z.B. Event GmbH" className="w-full p-3 bg-zinc-800 border border-zinc-700 rounded-xl text-white text-sm" />
+        <input value={firmenname} onChange={e => setFirmenname(e.target.value)} placeholder="z.B. Event GmbH" className="w-full p-3 bg-white border border-zinc-300 rounded-xl text-zinc-950 text-sm outline-none focus:border-yellow-400" />
       </div>
       <div className="mb-5">
         <label className="block text-xs text-zinc-600 mb-1">E-Mail Adresse</label>
-        <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="veranstalter@email.de" className="w-full p-3 bg-zinc-800 border border-zinc-700 rounded-xl text-white text-sm" />
+        <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="veranstalter@email.de" className="w-full p-3 bg-white border border-zinc-300 rounded-xl text-zinc-950 text-sm outline-none focus:border-yellow-400" />
       </div>
       <button onClick={handleSubmit} disabled={loading} className="w-full py-3 bg-yellow-400 text-black font-bold rounded-xl text-sm disabled:opacity-50">
         {loading ? "Sende..." : "✉️ Einladung senden"}
@@ -211,6 +211,7 @@ export default function AdminPage() {
   const [authed, setAuthed] = useState(false);
   const [pw, setPw] = useState(""); const [pwErr, setPwErr] = useState(""); const [adminPw, setAdminPw] = useState("");
   const [tab, setTab] = useState<Tab>("events");
+  const [menuOpen, setMenuOpen] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [ev, setEv] = useState<EventItem>(EMPTY);
   const [evIdx, setEvIdx] = useState<string | null>(null); // now stores Supabase ID
@@ -425,14 +426,14 @@ export default function AdminPage() {
 
   if (!authed) {
     return (
-      <main className="min-h-screen bg-zinc-950 flex items-center justify-center p-6">
+      <main className="min-h-screen bg-zinc-50 flex items-center justify-center p-6 text-zinc-950">
         <div className="w-full max-w-sm">
           <div className="text-center mb-8">
             <img src="/wolnaa-logo.png" alt="Wolnaa" className="h-16 w-auto mx-auto mb-4" />
-            <h1 className="text-2xl font-bold text-white">Admin</h1>
+            <h1 className="text-2xl font-bold text-zinc-950">Admin</h1>
             <p className="text-zinc-600 text-sm mt-1">Bitte anmelden</p>
           </div>
-          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 space-y-4">
+          <div className="bg-white border border-zinc-200 rounded-2xl p-6 space-y-4 shadow-sm">
             <div>
               <label className={lbl}>Passwort</label>
               <input type="password" value={pw} onChange={e => { setPw(e.target.value); setPwErr(""); }} onKeyDown={e => e.key === "Enter" && login()} placeholder="••••••••" className={inp} autoFocus />
@@ -447,29 +448,40 @@ export default function AdminPage() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-white flex flex-col">
-      <header className="bg-zinc-900 border-b border-zinc-800 sticky top-0 z-40">
+    <div className="min-h-screen bg-zinc-50 text-zinc-950 flex flex-col">
+      <header className="bg-white/95 border-b border-zinc-200 sticky top-0 z-40 backdrop-blur-xl">
         <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between gap-4">
           <div className="flex items-center gap-2 shrink-0">
             <img src="/wolnaa-logo.png" alt="Wolnaa" className="h-8 w-auto" />
             <span className="font-bold text-sm hidden sm:block">Admin</span>
-            <span className="rounded-full border border-yellow-400/40 px-2 py-0.5 text-[10px] font-bold text-yellow-400">v2</span>
           </div>
-          <nav className="hidden md:flex items-center gap-0.5 flex-1 justify-center">
-            {tabs.map(t => (
-              <button key={t.key} onClick={() => setTab(t.key)} className={`px-5 py-2 rounded-lg text-sm font-medium transition-colors ${tab === t.key ? "bg-yellow-400 text-black" : "text-zinc-700 hover:text-white hover:bg-zinc-800"}`}>{t.label}</button>
-            ))}
-          </nav>
-          <div className="flex items-center gap-2 shrink-0">
-            <Link href="/" className="hidden sm:flex items-center gap-1.5 rounded-lg border border-zinc-700 text-zinc-300 text-xs px-3 py-1.5 hover:border-yellow-400 hover:text-yellow-400 transition-colors">
-              ← Zur Website
-            </Link>
-            <button onClick={logout} className="text-zinc-600 text-xs hover:text-white">Logout</button>
+          <div className="relative shrink-0">
+            <button
+              type="button"
+              aria-label="Admin-Menü öffnen"
+              aria-expanded={menuOpen}
+              onClick={() => setMenuOpen(open => !open)}
+              className="flex h-10 w-10 flex-col items-center justify-center gap-1.5 rounded-xl border border-zinc-200 bg-white text-zinc-950 shadow-sm transition-colors hover:border-yellow-400"
+            >
+              <span className="h-0.5 w-5 rounded-full bg-current" />
+              <span className="h-0.5 w-5 rounded-full bg-current" />
+              <span className="h-0.5 w-5 rounded-full bg-current" />
+            </button>
+            {menuOpen && (
+              <div className="absolute right-0 top-12 w-56 overflow-hidden rounded-2xl border border-zinc-200 bg-white p-2 shadow-xl">
+                {tabs.map(t => (
+                  <button key={t.key} onClick={() => { setTab(t.key); setMenuOpen(false); }} className={`w-full rounded-xl px-4 py-3 text-left text-sm font-semibold transition-colors ${tab === t.key ? "bg-yellow-400 text-black" : "text-zinc-700 hover:bg-zinc-100 hover:text-black"}`}>{t.label}</button>
+                ))}
+                <div className="my-2 border-t border-zinc-200" />
+                <Link href="/" onClick={() => setMenuOpen(false)} className="block rounded-xl px-4 py-3 text-sm font-medium text-zinc-600 hover:bg-zinc-100 hover:text-black">Zur Website</Link>
+                <button onClick={logout} className="w-full rounded-xl px-4 py-3 text-left text-sm font-medium text-red-600 hover:bg-red-50">Logout</button>
+              </div>
+            )}
           </div>
         </div>
       </header>
 
-      <main className="flex-1 max-w-5xl mx-auto w-full px-4 py-6 pb-24 md:pb-8">
+      <main className="flex-1 max-w-5xl mx-auto w-full px-4 py-6 pb-10">
 
         {/* Events */}
         {tab === "events" && (
@@ -481,16 +493,16 @@ export default function AdminPage() {
             {evLoading ? (
               <div className="flex justify-center py-12"><div className="w-6 h-6 border-2 border-yellow-400 border-t-transparent rounded-full animate-spin" /></div>
             ) : events.length === 0 ? (
-              <div className="text-center py-16 rounded-2xl border-2 border-dashed border-zinc-800">
+              <div className="text-center py-16 rounded-2xl border-2 border-dashed border-zinc-300 bg-white">
                 <p className="text-zinc-600 text-sm mb-3">Noch keine Events vorhanden.</p>
                 <button onClick={openNew} className="rounded-xl bg-yellow-400 text-black font-bold px-4 py-2 text-sm">Event erstellen</button>
               </div>
             ) : (
               <div className="space-y-2">
                 {events.map((e) => (
-                  <div key={e.id} className="bg-zinc-900 border border-zinc-800 rounded-2xl p-3 hover:border-zinc-700 transition-colors">
+                  <div key={e.id} className="bg-white border border-zinc-200 rounded-2xl p-3 shadow-sm hover:border-zinc-300 transition-colors">
                     <div className="flex items-center gap-3">
-                      {e.imageUrl ? <img src={e.imageUrl} alt="" className="w-12 h-12 rounded-xl object-cover shrink-0" /> : <div className="w-12 h-12 rounded-xl bg-zinc-800 shrink-0" />}
+                      {e.imageUrl ? <img src={e.imageUrl} alt="" className="w-12 h-12 rounded-xl object-cover shrink-0" /> : <div className="w-12 h-12 rounded-xl bg-zinc-100 shrink-0" />}
                       <div className="flex-1 min-w-0">
                         <p className="font-semibold text-sm truncate">{e.title}</p>
                         <p className="text-zinc-600 text-xs">{e.city}{e.location ? ` · ${e.location}` : ""}</p>
@@ -498,9 +510,9 @@ export default function AdminPage() {
                       </div>
                     </div>
                     <div className="flex gap-2 mt-3 pt-3 border-t border-zinc-200">
-                      <button onClick={() => openEdit(e)} className="flex-1 rounded-xl border border-zinc-700 text-zinc-300 text-xs py-2 hover:border-yellow-400 hover:text-yellow-400 transition-colors font-medium">Bearbeiten</button>
-                      <button onClick={() => showEventTickets(e.id)} className="flex-1 rounded-xl border border-zinc-700 text-zinc-300 text-xs py-2 hover:border-yellow-400 hover:text-yellow-400 transition-colors font-medium">Tickets</button>
-                      <button onClick={() => delEv(e.id!)} className="flex-1 rounded-xl border border-zinc-800 text-zinc-600 text-xs py-2 hover:border-red-500/50 hover:text-red-400 transition-colors font-medium">Löschen</button>
+                      <button onClick={() => openEdit(e)} className="flex-1 rounded-xl border border-zinc-300 text-zinc-700 text-xs py-2 hover:border-yellow-400 hover:text-black transition-colors font-medium">Bearbeiten</button>
+                      <button onClick={() => showEventTickets(e.id)} className="flex-1 rounded-xl border border-zinc-300 text-zinc-700 text-xs py-2 hover:border-yellow-400 hover:text-black transition-colors font-medium">Tickets</button>
+                      <button onClick={() => delEv(e.id!)} className="flex-1 rounded-xl border border-zinc-200 text-zinc-500 text-xs py-2 hover:border-red-300 hover:text-red-600 transition-colors font-medium">Löschen</button>
                     </div>
                   </div>
                 ))}
@@ -518,7 +530,7 @@ export default function AdminPage() {
             </div>
             <div className="grid grid-cols-3 gap-3 mb-5">
               {[{ l: "Tickets", v: filtered.length }, { l: "Eingecheckt", v: selectedCheckedIn }, { l: "Umsatz", v: `€${selectedRevenue.toFixed(2)}` }].map(s => (
-                <div key={s.l} className="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 text-center">
+                <div key={s.l} className="bg-white border border-zinc-200 rounded-2xl p-4 text-center shadow-sm">
                   <p className="text-xl font-bold text-yellow-400">{s.v}</p>
                   <p className="text-zinc-600 text-xs mt-0.5">{s.l}</p>
                 </div>
@@ -526,48 +538,48 @@ export default function AdminPage() {
             </div>
             <div className="flex gap-2 mb-4">
               {selectedTicketEvent ? (
-                <div className="flex-1 rounded-xl border border-zinc-700 px-4 py-3 text-sm text-zinc-300">
+                <div className="flex-1 rounded-xl border border-zinc-300 bg-white px-4 py-3 text-sm text-zinc-700">
                   {selectedTicketEvent.title}
                 </div>
               ) : (
-                <div className="flex-1 rounded-xl border border-zinc-700 px-4 py-3 text-sm text-zinc-600">
+                <div className="flex-1 rounded-xl border border-zinc-300 bg-white px-4 py-3 text-sm text-zinc-500">
                   Wähle unten eine Veranstaltung aus.
                 </div>
               )}
-              {selectedTicketEvent && <button onClick={() => setSelectedTicketEventId("")} className="rounded-xl border border-zinc-700 px-4 text-zinc-700 hover:text-white text-sm transition-colors">Wechseln</button>}
-              <button onClick={() => loadTickets(selectedTicketEvent)} className="rounded-xl border border-zinc-700 px-4 text-zinc-700 hover:text-white text-sm transition-colors">↻</button>
+              {selectedTicketEvent && <button onClick={() => setSelectedTicketEventId("")} className="rounded-xl border border-zinc-300 bg-white px-4 text-zinc-700 hover:border-yellow-400 hover:text-black text-sm transition-colors">Wechseln</button>}
+              <button onClick={() => loadTickets(selectedTicketEvent)} className="rounded-xl border border-zinc-300 bg-white px-4 text-zinc-700 hover:border-yellow-400 hover:text-black text-sm transition-colors">↻</button>
             </div>
             {ticketLoading ? (
               <div className="flex justify-center py-12"><div className="w-6 h-6 border-2 border-yellow-400 border-t-transparent rounded-full animate-spin" /></div>
             ) : !selectedTicketEvent ? (
               <div className="space-y-2">
                 {eventTicketStats.length === 0 ? (
-                  <div className="text-center py-12 rounded-2xl border border-zinc-800 text-zinc-600 text-sm">Keine Veranstaltungen vorhanden.</div>
+                  <div className="text-center py-12 rounded-2xl border border-zinc-200 bg-white text-zinc-500 text-sm">Keine Veranstaltungen vorhanden.</div>
                 ) : eventTicketStats.map(({ event, total, checkedIn, revenue }) => (
-                  <button key={event.id || event.title} onClick={() => { setSelectedTicketEventId(event.id || ""); loadTickets(event); }} className="w-full bg-zinc-900 border border-zinc-800 rounded-2xl p-4 hover:border-yellow-400 transition-colors text-left">
+                  <button key={event.id || event.title} onClick={() => { setSelectedTicketEventId(event.id || ""); loadTickets(event); }} className="w-full bg-white border border-zinc-200 rounded-2xl p-4 shadow-sm hover:border-yellow-400 transition-colors text-left">
                     <div className="flex items-center justify-between gap-4">
                       <div className="min-w-0">
-                        <p className="font-semibold text-sm truncate text-white">{event.title}</p>
+                        <p className="font-semibold text-sm truncate text-zinc-950">{event.title}</p>
                         <p className="text-zinc-600 text-xs mt-1">{event.date}{event.location ? ` · ${event.location}` : ""}</p>
                       </div>
                       <div className="flex items-center gap-5 shrink-0 text-right">
                         <div><p className="text-yellow-400 font-bold text-sm">{total}</p><p className="text-zinc-600 text-xs">Tickets</p></div>
                         <div><p className="text-green-400 font-bold text-sm">{checkedIn}</p><p className="text-zinc-600 text-xs">Check-in</p></div>
-                        <div><p className="text-white font-bold text-sm">€{revenue.toFixed(2)}</p><p className="text-zinc-600 text-xs">Umsatz</p></div>
+                        <div><p className="text-zinc-950 font-bold text-sm">€{revenue.toFixed(2)}</p><p className="text-zinc-600 text-xs">Umsatz</p></div>
                       </div>
                     </div>
                   </button>
                 ))}
               </div>
             ) : (
-              <div className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
+              <div className="bg-white border border-zinc-200 rounded-2xl overflow-hidden shadow-sm">
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
-                    <thead><tr className="border-b border-zinc-800">{["Name & E-Mail", "Event", "Betrag", "Status", "Check-in", ""].map(h => <th key={h} className="text-left text-zinc-600 font-medium px-4 py-3 text-xs uppercase tracking-wide whitespace-nowrap">{h}</th>)}</tr></thead>
+                    <thead><tr className="border-b border-zinc-200 bg-zinc-50">{["Name & E-Mail", "Event", "Betrag", "Status", "Check-in", ""].map(h => <th key={h} className="text-left text-zinc-600 font-medium px-4 py-3 text-xs uppercase tracking-wide whitespace-nowrap">{h}</th>)}</tr></thead>
                     <tbody>
                       {filtered.length === 0 ? <tr><td colSpan={6} className="text-center text-zinc-600 py-10 text-sm">Keine Einträge für diese Veranstaltung.</td></tr>
                         : filtered.map(t => (
-                          <tr key={t.id} className="border-b border-zinc-800/50 hover:bg-zinc-800/20 transition-colors">
+                          <tr key={t.id} className="border-b border-zinc-100 hover:bg-zinc-50 transition-colors">
                             <td className="px-4 py-3"><p className="font-semibold text-sm">{t.customer_name}</p><p className="text-zinc-600 text-xs">{t.customer_email}</p></td>
                             <td className="px-4 py-3 text-zinc-700 text-xs whitespace-nowrap">{t.event_title}</td>
                             <td className="px-4 py-3 font-bold text-sm whitespace-nowrap">€{t.amount.toFixed(2)}</td>
@@ -591,9 +603,9 @@ export default function AdminPage() {
               <div><h1 className="text-lg font-bold">Rechtliches</h1><p className="text-zinc-600 text-xs mt-0.5">Texte verwalten</p></div>
               <button onClick={saveLegal} className={`rounded-xl font-bold px-4 py-2 text-sm transition-colors ${legalSaved ? "bg-green-500 text-white" : "bg-yellow-400 text-black hover:bg-yellow-300"}`}>{legalSaved ? "✓ Gespeichert" : "Speichern"}</button>
             </div>
-            <div className="flex gap-1 mb-4 bg-zinc-900 border border-zinc-800 rounded-xl p-1 overflow-x-auto">
+            <div className="flex gap-1 mb-4 bg-white border border-zinc-200 rounded-xl p-1 overflow-x-auto shadow-sm">
               {(Object.keys(LEGAL_LABELS) as LegalKey[]).map(k => (
-                <button key={k} onClick={() => setLegalTab(k)} className={`shrink-0 text-xs font-medium px-3 py-2 rounded-lg transition-colors ${legalTab === k ? "bg-yellow-400 text-black" : "text-zinc-600 hover:text-white"}`}>{LEGAL_LABELS[k]}</button>
+                <button key={k} onClick={() => setLegalTab(k)} className={`shrink-0 text-xs font-medium px-3 py-2 rounded-lg transition-colors ${legalTab === k ? "bg-yellow-400 text-black" : "text-zinc-600 hover:bg-zinc-100 hover:text-black"}`}>{LEGAL_LABELS[k]}</button>
               ))}
             </div>
             <textarea value={legal[legalTab]} onChange={e => setLegal(p => ({ ...p, [legalTab]: e.target.value }))} placeholder={`${LEGAL_LABELS[legalTab]} hier eingeben...`} rows={20} className={inp + " resize-none"} />
@@ -614,15 +626,6 @@ export default function AdminPage() {
           </div>
         )}
       </main>
-
-      {/* Mobile Bottom Nav */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-zinc-200">
-        <div className="flex">
-          {tabs.map(t => (
-            <button key={t.key} onClick={() => setTab(t.key)} className={`flex-1 py-3.5 text-center text-xs font-semibold transition-colors border-t-2 ${tab === t.key ? "text-yellow-400 border-yellow-400 bg-zinc-800/50" : "text-zinc-600 border-transparent"}`}>{t.label}</button>
-          ))}
-        </div>
-      </nav>
 
       {/* Event Form */}
       {showForm && (
