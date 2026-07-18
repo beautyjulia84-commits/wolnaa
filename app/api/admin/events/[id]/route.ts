@@ -14,6 +14,20 @@ export async function DELETE(req: NextRequest, ctx: { params: Promise<{ id: stri
 
   const { id } = await ctx.params;
 
+  const { data: event, error: eventError } = await supabase
+    .from("events")
+    .select("id")
+    .eq("id", id)
+    .is("veranstalter_id", null)
+    .maybeSingle();
+
+  if (eventError) {
+    return NextResponse.json({ error: eventError.message }, { status: 500 });
+  }
+  if (!event) {
+    return NextResponse.json({ error: "Event nicht gefunden oder kein Admin-Event." }, { status: 404 });
+  }
+
   await supabase
     .from("tickets")
     .update({ event_id: null })
@@ -22,7 +36,8 @@ export async function DELETE(req: NextRequest, ctx: { params: Promise<{ id: stri
   const { error } = await supabase
     .from("events")
     .delete()
-    .eq("id", id);
+    .eq("id", id)
+    .is("veranstalter_id", null);
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });

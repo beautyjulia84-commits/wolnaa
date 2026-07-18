@@ -48,6 +48,8 @@ function eventToRow(event: AdminEvent) {
     lounges: event.lounges ?? false,
     lounge_list: event.loungeList ?? [],
     discount_codes: event.discountCodes ?? [],
+    veranstalter_id: null,
+    stripe_account_id: null,
   };
 }
 
@@ -59,13 +61,17 @@ export async function GET(req: NextRequest) {
   const { data, error } = await supabase
     .from("events")
     .select("*")
+    .is("veranstalter_id", null)
     .order("created_at", { ascending: false });
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  return NextResponse.json({ events: data ?? [] });
+  return NextResponse.json(
+    { events: data ?? [] },
+    { headers: { "Cache-Control": "no-store" } }
+  );
 }
 
 export async function POST(req: NextRequest) {
@@ -104,13 +110,19 @@ export async function PUT(req: NextRequest) {
     return NextResponse.json({ error: "Eventname fehlt." }, { status: 400 });
   }
 
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from("events")
     .update(eventToRow(event))
-    .eq("id", event.id);
+    .eq("id", event.id)
+    .is("veranstalter_id", null)
+    .select("id")
+    .maybeSingle();
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+  if (!data) {
+    return NextResponse.json({ error: "Event nicht gefunden oder kein Admin-Event." }, { status: 404 });
   }
 
   return NextResponse.json({ success: true });
