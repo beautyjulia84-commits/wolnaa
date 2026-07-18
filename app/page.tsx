@@ -433,11 +433,11 @@ export default function Home() {
       </section>
 
       {/* FAQ */}
-      <section className="max-w-5xl mx-auto px-4 pb-10">
-        <div className="px-6 py-10">
-          <p className="text-[#d6b36a] uppercase tracking-[0.26em] text-xs mb-3 text-center">FAQ</p>
-          <h2 className="text-3xl md:text-4xl font-semibold mb-8 text-center">Häufige Fragen</h2>
-          <div className="space-y-4 max-w-2xl mx-auto">
+      <section className="mx-auto max-w-5xl px-6 py-20">
+        <div>
+          <p className="mb-4 text-center text-xs font-bold uppercase tracking-[0.28em] text-[#d6b36a]">FAQ</p>
+          <h2 className="mb-12 text-center text-4xl font-semibold md:text-5xl">Häufige Fragen</h2>
+          <div className="mx-auto max-w-3xl divide-y divide-white/10 border-y border-white/10">
             {[
               { q: "Wie alt muss ich sein?", a: "Unsere Events sind ausschließlich für Personen ab 18 Jahren. Ein gültiger Ausweis wird beim Einlass kontrolliert." },
               { q: "Wie erhalte ich mein Ticket?", a: "Nach erfolgreicher Zahlung erhältst du dein Ticket mit QR-Code sofort per E-Mail." },
@@ -445,12 +445,12 @@ export default function Home() {
               { q: "Gibt es Lounges?", a: "Bei ausgewählten Events bieten wir exklusive VIP Lounges an. Die Verfügbarkeit siehst du direkt auf der Event-Seite." },
               { q: "Wo kann ich parken?", a: "Parkmöglichkeiten findest du in der Nähe des Veranstaltungsortes. Die genaue Adresse ist auf der Event-Seite verlinkt." },
             ].map((item, i) => (
-              <details key={i} className="group border border-white/10 rounded-2xl overflow-hidden">
-                <summary className="flex items-center justify-between px-5 py-4 cursor-pointer font-semibold text-sm hover:text-[#d6b36a] transition-colors list-none">
+              <details key={i} className="group">
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-6 py-6 text-left text-base font-semibold text-white transition-colors hover:text-[#d6b36a] md:text-lg">
                   {item.q}
-                  <span className="text-zinc-500 group-open:rotate-180 transition-transform">▼</span>
+                  <span className="text-sm text-[#d6b36a] transition-transform group-open:rotate-45">+</span>
                 </summary>
-                <p className="px-5 pb-4 text-zinc-400 text-sm leading-relaxed">{item.a}</p>
+                <p className="pb-6 text-sm leading-7 text-zinc-400 md:text-base">{item.a}</p>
               </details>
             ))}
           </div>
