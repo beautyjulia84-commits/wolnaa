@@ -82,6 +82,8 @@ async function uploadImage(file: File, adminPw: string): Promise<string> {
 
 const inp = "w-full rounded-xl border border-zinc-300 bg-white focus:border-yellow-400 px-4 py-3 text-black placeholder:text-zinc-600 outline-none transition-all text-sm";
 const lbl = "block text-xs font-semibold text-zinc-700 mb-1.5 uppercase tracking-wide";
+const saleEndDate = (value: string) => value.slice(0, 10);
+const saleEndTime = (value: string) => value.includes("T") ? value.slice(11, 16) : "";
 
 function Toggle({ value, onChange, label }: { value: boolean; onChange: (v: boolean) => void; label: string }) {
   return (
@@ -648,9 +650,30 @@ export default function AdminPage() {
                     </div>
                   </div>
                   <div>
-                    <label className={lbl}>Online-Verkauf bis</label>
-                    <input type="datetime-local" value={ev.onlineSaleEndsAt} onChange={e => f("onlineSaleEndsAt", e.target.value)} className={inp} />
-                    <p className="text-zinc-600 text-xs mt-1">Nach diesem Zeitpunkt können online keine Tickets mehr gekauft werden.</p>
+                    <label className={lbl}>Online-Verkauf endet</label>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <span className="block text-xs text-zinc-500 mb-1.5">Datum</span>
+                        <input
+                          type="date"
+                          value={saleEndDate(ev.onlineSaleEndsAt)}
+                          onChange={e => f("onlineSaleEndsAt", e.target.value ? `${e.target.value}T${saleEndTime(ev.onlineSaleEndsAt) || "23:59"}` : "")}
+                          className={inp}
+                        />
+                      </div>
+                      <div>
+                        <span className="block text-xs text-zinc-500 mb-1.5">Uhrzeit</span>
+                        <input
+                          type="time"
+                          step="300"
+                          value={saleEndTime(ev.onlineSaleEndsAt)}
+                          disabled={!saleEndDate(ev.onlineSaleEndsAt)}
+                          onChange={e => f("onlineSaleEndsAt", `${saleEndDate(ev.onlineSaleEndsAt)}T${e.target.value}`)}
+                          className={`${inp} disabled:opacity-50 disabled:cursor-not-allowed`}
+                        />
+                      </div>
+                    </div>
+                    <p className="text-zinc-600 text-xs mt-1.5">Danach ist kein Online-Ticketkauf mehr möglich.</p>
                   </div>
                 </div>
               </div>

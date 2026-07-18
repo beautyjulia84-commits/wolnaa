@@ -60,6 +60,9 @@ const labelStyle = {
   textTransform: 'uppercase' as const,
 };
 
+const saleEndDate = (value: string) => value.slice(0, 10);
+const saleEndTime = (value: string) => value.includes('T') ? value.slice(11, 16) : '';
+
 function rowToForm(row: any): EventFormState {
   return {
     id: row.id,
@@ -221,8 +224,30 @@ export default function VeranstalterEventForm({ eventId }: { eventId?: string })
               <div><label style={labelStyle}>Uhrzeit</label><input style={inputStyle} placeholder="22:00" value={form.time} onChange={e => setField('time', e.target.value.replace(/[^0-9:]/g, '').slice(0, 5))} /></div>
             </div>
             <div>
-              <label style={labelStyle}>Online-Verkauf bis</label>
-              <input type="datetime-local" style={inputStyle} value={form.onlineSaleEndsAt} onChange={e => setField('onlineSaleEndsAt', e.target.value)} />
+              <label style={labelStyle}>Online-Verkauf endet</label>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <div>
+                  <span style={{ display: 'block', color: '#6b7280', fontSize: '12px', marginBottom: '5px' }}>Datum</span>
+                  <input
+                    type="date"
+                    style={inputStyle}
+                    value={saleEndDate(form.onlineSaleEndsAt)}
+                    onChange={e => setField('onlineSaleEndsAt', e.target.value ? `${e.target.value}T${saleEndTime(form.onlineSaleEndsAt) || '23:59'}` : '')}
+                  />
+                </div>
+                <div>
+                  <span style={{ display: 'block', color: '#6b7280', fontSize: '12px', marginBottom: '5px' }}>Uhrzeit</span>
+                  <input
+                    type="time"
+                    step="300"
+                    style={{ ...inputStyle, opacity: saleEndDate(form.onlineSaleEndsAt) ? 1 : 0.55 }}
+                    value={saleEndTime(form.onlineSaleEndsAt)}
+                    disabled={!saleEndDate(form.onlineSaleEndsAt)}
+                    onChange={e => setField('onlineSaleEndsAt', `${saleEndDate(form.onlineSaleEndsAt)}T${e.target.value}`)}
+                  />
+                </div>
+              </div>
+              <p style={{ color: '#6b7280', fontSize: '12px', margin: '7px 0 0' }}>Danach ist kein Online-Ticketkauf mehr möglich.</p>
             </div>
           </div>
         </section>
