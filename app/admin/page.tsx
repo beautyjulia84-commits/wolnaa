@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import jsQR from "jsqr";
 
-type Tab = "events" | "tickets" | "rechtliches" | "scanner" | "veranstalter" | "einstellungen";
+type Tab = "events" | "besucher" | "tickets" | "rechtliches" | "scanner" | "veranstalter" | "einstellungen";
 type LegalKey = "impressum" | "datenschutz" | "agb" | "teilnahme" | "widerruf";
 type TicketType = { name: string; price: string; quantity: string };
 type Lounge = { name: string; persons: string; price: string };
@@ -26,6 +26,14 @@ type TicketRow = {
 };
 
 type ScanResult = { valid: boolean; reason?: string; customerName?: string; eventTitle?: string; amount?: number; };
+type AnalyticsData = {
+  days: Record<string, { views: number; visits: number }>;
+  paths: Record<string, number>;
+  referrers: Record<string, number>;
+  devices: Record<string, number>;
+};
+
+const EMPTY_ANALYTICS: AnalyticsData = { days: {}, paths: {}, referrers: {}, devices: {} };
 
 const LEGAL_LABELS: Record<LegalKey, string> = {
   impressum: "Impressum", datenschutz: "Datenschutz",
@@ -231,6 +239,9 @@ export default function AdminPage() {
   const [accountLoading, setAccountLoading] = useState(false);
   const [accountMessage, setAccountMessage] = useState("");
   const [accountError, setAccountError] = useState("");
+  const [analytics, setAnalytics] = useState<AnalyticsData>(EMPTY_ANALYTICS);
+  const [analyticsLoading, setAnalyticsLoading] = useState(false);
+  const [analyticsDays, setAnalyticsDays] = useState<7 | 30>(7);
 
   useEffect(() => {
     // Middleware schützt die Route - wenn wir hier sind, sind wir eingeloggt
@@ -248,6 +259,17 @@ export default function AdminPage() {
     });
     const data = await res.json().catch(() => ({}));
     if (res.ok) setAccountEmail(data.email || "");
+  }
+
+  async function loadAnalytics() {
+    setAnalyticsLoading(true);
+    const res = await fetch("/api/admin/analytics", {
+      headers: adminPw ? { "x-admin-token": adminPw } : undefined,
+      cache: "no-store",
+    });
+    const data = await res.json().catch(() => EMPTY_ANALYTICS);
+    if (res.ok) setAnalytics({ ...EMPTY_ANALYTICS, ...data });
+    setAnalyticsLoading(false);
   }
 
   async function saveAccount() {
@@ -453,12 +475,25 @@ export default function AdminPage() {
 
   const tabs: { key: Tab; label: string }[] = [
     { key: "events", label: "Events" },
+    { key: "besucher", label: "Besucher" },
     { key: "tickets", label: "Tickets" },
     { key: "rechtliches", label: "Rechtliches" },
     { key: "scanner", label: "Scanner" },
     { key: "veranstalter", label: "Veranstalter" },
     { key: "einstellungen", label: "Einstellungen" },
   ];
+
+  const analyticsDates = Array.from({ length: analyticsDays }, (_, index) => {
+    const date = new Date();
+    date.setDate(date.getDate() - (analyticsDays - 1 - index));
+    return new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Berlin" }).format(date);
+  });
+  const analyticsPeriod = analyticsDates.map(date => ({ date, ...(analytics.days[date] ?? { views: 0, visits: 0 }) }));
+  const periodViews = analyticsPeriod.reduce((sum, day) => sum + day.views, 0);
+  const periodVisits = analyticsPeriod.reduce((sum, day) => sum + day.visits, 0);
+  const maxViews = Math.max(1, ...analyticsPeriod.map(day => day.views));
+  const topEntries = (entries: Record<string, number>) => Object.entries(entries).sort((a, b) => b[1] - a[1]).slice(0, 5);
+  const totalDevices = Object.values(analytics.devices).reduce((sum, count) => sum + count, 0);
 
   if (!authed) {
     return (
@@ -491,7 +526,7 @@ export default function AdminPage() {
             {menuOpen && (
               <div className="absolute right-0 top-12 w-56 overflow-hidden rounded-2xl border border-zinc-200 bg-white p-2 shadow-xl">
                 {tabs.map(t => (
-                  <button key={t.key} onClick={() => { setTab(t.key); setMenuOpen(false); }} className={`w-full rounded-xl px-4 py-3 text-left text-sm font-semibold transition-colors ${tab === t.key ? "bg-[#d6b36a] text-black" : "text-zinc-700 hover:bg-zinc-100 hover:text-black"}`}>{t.label}</button>
+                  <button key={t.key} onClick={() => { setTab(t.key); if (t.key === "besucher") loadAnalytics(); setMenuOpen(false); }} className={`w-full rounded-xl px-4 py-3 text-left text-sm font-semibold transition-colors ${tab === t.key ? "bg-[#d6b36a] text-black" : "text-zinc-700 hover:bg-zinc-100 hover:text-black"}`}>{t.label}</button>
                 ))}
                 <div className="my-2 border-t border-zinc-200" />
                 <Link href="/" onClick={() => setMenuOpen(false)} className="block rounded-xl px-4 py-3 text-sm font-medium text-zinc-600 hover:bg-zinc-100 hover:text-black">Zur Website</Link>
@@ -539,6 +574,98 @@ export default function AdminPage() {
                 ))}
               </div>
             )}
+          </div>
+        )}
+
+        {/* Besucher */}
+        {tab === "besucher" && (
+          <div>
+            <div className="mb-5 flex items-start justify-between gap-4">
+              <div>
+                <h1 className="text-lg font-bold">Website-Besucher</h1>
+                <p className="mt-0.5 text-xs text-zinc-600">Anonymisierte Besuche und Seitenaufrufe</p>
+              </div>
+              <button onClick={loadAnalytics} disabled={analyticsLoading} className="rounded-xl border border-zinc-300 bg-white px-4 py-2 text-sm font-semibold text-zinc-700 hover:border-[#d6b36a] disabled:opacity-50">
+                {analyticsLoading ? "Lädt…" : "↻ Aktualisieren"}
+              </button>
+            </div>
+
+            <div className="mb-5 inline-flex rounded-xl border border-zinc-200 bg-white p-1 shadow-sm">
+              {([7, 30] as const).map(days => (
+                <button key={days} onClick={() => setAnalyticsDays(days)} className={`rounded-lg px-4 py-2 text-xs font-bold ${analyticsDays === days ? "bg-[#d6b36a] text-black" : "text-zinc-600 hover:bg-zinc-100"}`}>
+                  {days} Tage
+                </button>
+              ))}
+            </div>
+
+            <div className="mb-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
+              {[
+                { label: "Besuche", value: periodVisits },
+                { label: "Seitenaufrufe", value: periodViews },
+                { label: "Seiten je Besuch", value: periodVisits ? (periodViews / periodVisits).toFixed(1) : "0" },
+                { label: "Heute", value: analytics.days[analyticsDates.at(-1) ?? ""]?.visits ?? 0 },
+              ].map(item => (
+                <div key={item.label} className="rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm">
+                  <p className="text-2xl font-bold text-[#9b7435]">{item.value}</p>
+                  <p className="mt-1 text-xs text-zinc-600">{item.label}</p>
+                </div>
+              ))}
+            </div>
+
+            <div className="mb-5 rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm">
+              <div className="mb-5 flex items-center justify-between">
+                <h2 className="text-sm font-bold">Verlauf</h2>
+                <span className="text-xs text-zinc-500">Seitenaufrufe pro Tag</span>
+              </div>
+              <div className="flex h-44 items-end gap-1.5 sm:gap-3">
+                {analyticsPeriod.map(day => (
+                  <div key={day.date} className="flex h-full min-w-0 flex-1 flex-col items-center justify-end gap-2" title={`${day.date}: ${day.views} Aufrufe, ${day.visits} Besuche`}>
+                    <span className="text-[10px] font-semibold text-zinc-500">{day.views || ""}</span>
+                    <div className="w-full min-h-1 rounded-t-md bg-[#d6b36a]" style={{ height: `${Math.max(3, (day.views / maxViews) * 100)}%` }} />
+                    <span className="text-[9px] text-zinc-500">{new Date(`${day.date}T12:00:00`).toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit" })}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="grid gap-5 md:grid-cols-2">
+              {[
+                { title: "Beliebte Seiten", entries: topEntries(analytics.paths), empty: "Noch keine Seitenaufrufe" },
+                { title: "Herkunft", entries: topEntries(analytics.referrers), empty: "Noch keine Herkunftsdaten" },
+              ].map(block => (
+                <div key={block.title} className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm">
+                  <h2 className="mb-4 text-sm font-bold">{block.title}</h2>
+                  {block.entries.length ? (
+                    <div className="space-y-3">
+                      {block.entries.map(([label, count]) => (
+                        <div key={label} className="flex items-center justify-between gap-4 text-sm">
+                          <span className="truncate text-zinc-700">{label}</span>
+                          <span className="font-bold text-[#9b7435]">{count}</span>
+                        </div>
+                      ))}
+                    </div>
+                  ) : <p className="text-sm text-zinc-500">{block.empty}</p>}
+                </div>
+              ))}
+
+              <div className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm md:col-span-2">
+                <h2 className="mb-4 text-sm font-bold">Geräte</h2>
+                <div className="grid grid-cols-2 gap-3">
+                  {["Mobil", "Desktop"].map(device => {
+                    const count = analytics.devices[device] ?? 0;
+                    const percent = totalDevices ? Math.round((count / totalDevices) * 100) : 0;
+                    return (
+                      <div key={device} className="rounded-xl bg-zinc-50 p-4">
+                        <div className="flex justify-between text-sm"><span>{device}</span><strong>{percent}%</strong></div>
+                        <div className="mt-3 h-2 overflow-hidden rounded-full bg-zinc-200"><div className="h-full rounded-full bg-[#d6b36a]" style={{ width: `${percent}%` }} /></div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+
+            <p className="mt-5 text-xs leading-5 text-zinc-500">Die Statistik speichert nur zusammengefasste Werte. Namen, E-Mail-Adressen und vollständige IP-Adressen werden nicht erfasst. Ein Besuch beginnt beim Öffnen oder Neuladen der Website.</p>
           </div>
         )}
 

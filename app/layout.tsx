@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
+import AnalyticsTracker from "@/components/AnalyticsTracker";
 import { Bebas_Neue, DM_Sans } from "next/font/google";
 import "./globals.css";
 
@@ -112,6 +113,7 @@ export default function RootLayout({
         </Script>
       </head>
       <body className="min-h-full flex flex-col text-white">
+        <AnalyticsTracker />
         {children}
       </body>
     </html>
