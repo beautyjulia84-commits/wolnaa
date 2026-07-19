@@ -220,7 +220,7 @@ function VeranstalterEinladen({ adminPw }: { adminPw: string }) {
 export default function AdminPage() {
   const [authed, setAuthed] = useState(false);
   const [adminPw, setAdminPw] = useState("");
-  const [tab, setTab] = useState<Tab>("events");
+  const [tab, setTab] = useState<Tab>("besucher");
   const [menuOpen, setMenuOpen] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [ev, setEv] = useState<EventItem>(EMPTY);
@@ -253,7 +253,7 @@ export default function AdminPage() {
   }, []);
 
   useEffect(() => {
-    if (authed) { loadEvents(); loadLegal(); loadAccount(); }
+    if (authed) { loadEvents(); loadLegal(); loadAccount(); loadAnalytics(); }
   }, [authed]);
 
   async function loadAccount() {
