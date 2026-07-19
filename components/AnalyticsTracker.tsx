@@ -18,7 +18,7 @@ export default function AnalyticsTracker() {
       catch { referrer = "Unbekannt"; }
     }
 
-    fetch("/api/site-visit", {
+    fetch("/api/runtime/sync", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

@@ -243,6 +243,7 @@ export default function AdminPage() {
   const [accountError, setAccountError] = useState("");
   const [analytics, setAnalytics] = useState<AnalyticsData>(EMPTY_ANALYTICS);
   const [analyticsLoading, setAnalyticsLoading] = useState(false);
+  const [analyticsError, setAnalyticsError] = useState("");
   const [analyticsDays, setAnalyticsDays] = useState<7 | 30>(7);
 
   useEffect(() => {
@@ -265,12 +266,18 @@ export default function AdminPage() {
 
   async function loadAnalytics() {
     setAnalyticsLoading(true);
-    const res = await fetch("/api/admin/site-stats", {
-      headers: adminPw ? { "x-admin-token": adminPw } : undefined,
-      cache: "no-store",
-    });
-    const data = await res.json().catch(() => EMPTY_ANALYTICS);
-    if (res.ok) setAnalytics({ ...EMPTY_ANALYTICS, ...data });
+    setAnalyticsError("");
+    try {
+      const res = await fetch("/api/admin/overview", {
+        headers: adminPw ? { "x-admin-token": adminPw } : undefined,
+        cache: "no-store",
+      });
+      const data = await res.json().catch(() => EMPTY_ANALYTICS);
+      if (res.ok) setAnalytics({ ...EMPTY_ANALYTICS, ...data });
+      else setAnalyticsError(data.error || "Besucherdaten konnten nicht geladen werden.");
+    } catch {
+      setAnalyticsError("Besucherdaten konnten nicht geladen werden.");
+    }
     setAnalyticsLoading(false);
   }
 
@@ -607,6 +614,7 @@ export default function AdminPage() {
                 </button>
               ))}
             </div>
+            {analyticsError && <div className="mb-5 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">{analyticsError}</div>}
 
             <div className="mb-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
               {[

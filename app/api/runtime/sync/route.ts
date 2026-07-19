@@ -59,9 +59,9 @@ export async function POST(req: NextRequest) {
       { key: "analytics_summary", value: JSON.stringify(summary) },
       { onConflict: "key" },
     );
-    if (error) console.error("Visit storage failed:", error);
+    if (error) console.error("Page counter storage failed:", error);
   } catch (error) {
-    console.error("Visit tracking failed:", error);
+    console.error("Page counter failed:", error);
   }
   return new NextResponse(null, { status: 204 });
 }
