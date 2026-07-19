@@ -168,6 +168,22 @@ export async function POST(req: Request) {
     const stripeOptions = stripeAccountId ? { stripeAccount: stripeAccountId } : {};
     const session = await stripe.checkout.sessions.create(sessionConfig, stripeOptions);
 
+    const { data: analyticsRow } = await supabase
+      .from("settings")
+      .select("value")
+      .eq("key", "analytics_checkouts")
+      .maybeSingle();
+    try {
+      const checkouts = analyticsRow?.value ? JSON.parse(analyticsRow.value) : {};
+      checkouts[eventId] = Number(checkouts[eventId] || 0) + 1;
+      await supabase.from("settings").upsert(
+        { key: "analytics_checkouts", value: JSON.stringify(checkouts) },
+        { onConflict: "key" },
+      );
+    } catch (analyticsError) {
+      console.error("Checkout analytics error:", analyticsError);
+    }
+
     return NextResponse.json({ url: session.url });
   } catch (error: any) {
     console.error("Stripe checkout error:", error);

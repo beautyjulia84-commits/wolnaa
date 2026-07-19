@@ -31,9 +31,11 @@ type AnalyticsData = {
   paths: Record<string, number>;
   referrers: Record<string, number>;
   devices: Record<string, number>;
+  checkouts: Record<string, number>;
+  events: Array<{ id: string; title: string; slug?: string | null; tickets_sold?: number | null; total_revenue?: number | null }>;
 };
 
-const EMPTY_ANALYTICS: AnalyticsData = { days: {}, paths: {}, referrers: {}, devices: {} };
+const EMPTY_ANALYTICS: AnalyticsData = { days: {}, paths: {}, referrers: {}, devices: {}, checkouts: {}, events: [] };
 
 const LEGAL_LABELS: Record<LegalKey, string> = {
   impressum: "Impressum", datenschutz: "Datenschutz",
@@ -494,6 +496,14 @@ export default function AdminPage() {
   const maxViews = Math.max(1, ...analyticsPeriod.map(day => day.views));
   const topEntries = (entries: Record<string, number>) => Object.entries(entries).sort((a, b) => b[1] - a[1]).slice(0, 5);
   const totalDevices = Object.values(analytics.devices).reduce((sum, count) => sum + count, 0);
+  const eventConversions = analytics.events.map(event => {
+    const slug = event.slug || event.title.toLowerCase().replace(/\s+/g, "-").replace(/[^\w-]+/g, "");
+    const views = analytics.paths[`/event/${slug}`] ?? analytics.paths[`/event/${event.id}`] ?? 0;
+    const checkouts = analytics.checkouts[event.id] ?? 0;
+    const sold = Number(event.tickets_sold || 0);
+    const revenue = Number(event.total_revenue || 0) / 100;
+    return { ...event, views, checkouts, sold, revenue, conversion: views ? (sold / views) * 100 : 0 };
+  }).sort((a, b) => b.views - a.views || b.sold - a.sold);
 
   if (!authed) {
     return (
@@ -662,6 +672,40 @@ export default function AdminPage() {
                     );
                   })}
                 </div>
+              </div>
+            </div>
+
+            <div className="mt-5 overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm">
+              <div className="border-b border-zinc-200 px-5 py-4">
+                <h2 className="text-sm font-bold">Event-Aufrufe und Verkäufe</h2>
+                <p className="mt-1 text-xs text-zinc-500">Seit Aktivierung der Besucherstatistik</p>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-[720px] text-sm">
+                  <thead>
+                    <tr className="bg-zinc-50 text-left text-[11px] uppercase tracking-wide text-zinc-500">
+                      {['Event', 'Aufrufe', 'Checkouts', 'Tickets', 'Kaufquote', 'Umsatz'].map(label => <th key={label} className="px-4 py-3 font-semibold">{label}</th>)}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {eventConversions.length === 0 ? (
+                      <tr><td colSpan={6} className="px-5 py-10 text-center text-zinc-500">Noch keine Eventdaten vorhanden.</td></tr>
+                    ) : eventConversions.map(event => (
+                      <tr key={event.id} className="border-t border-zinc-100">
+                        <td className="max-w-[240px] px-4 py-3 font-semibold text-zinc-900"><span className="block truncate">{event.title}</span></td>
+                        <td className="px-4 py-3 text-zinc-700">{event.views}</td>
+                        <td className="px-4 py-3 text-zinc-700">{event.checkouts}</td>
+                        <td className="px-4 py-3 font-bold text-[#9b7435]">{event.sold}</td>
+                        <td className="px-4 py-3">
+                          <span className={`rounded-full px-2.5 py-1 text-xs font-bold ${event.conversion >= 5 ? 'bg-green-50 text-green-700' : 'bg-zinc-100 text-zinc-600'}`}>
+                            {event.conversion.toFixed(1)}%
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 font-semibold text-zinc-900">{event.revenue.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' })}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             </div>
 
