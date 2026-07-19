@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
-type AnalyticsSummary = {
+type VisitSummary = {
   days: Record<string, { views: number; visits: number }>;
   paths: Record<string, number>;
   referrers: Record<string, number>;
@@ -9,7 +9,7 @@ type AnalyticsSummary = {
   updatedAt?: string;
 };
 
-const EMPTY: AnalyticsSummary = { days: {}, paths: {}, referrers: {}, devices: {} };
+const EMPTY: VisitSummary = { days: {}, paths: {}, referrers: {}, devices: {} };
 
 function clean(value: unknown, fallback: string, maxLength = 160) {
   return typeof value === "string" && value.trim()
@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
       { auth: { persistSession: false } },
     );
     const { data } = await supabase.from("settings").select("value").eq("key", "analytics_summary").maybeSingle();
-    let summary: AnalyticsSummary = structuredClone(EMPTY);
+    let summary: VisitSummary = structuredClone(EMPTY);
     if (data?.value) {
       try { summary = { ...summary, ...JSON.parse(data.value) }; }
       catch { /* Beschädigte Altdaten werden verworfen. */ }
@@ -55,12 +55,13 @@ export async function POST(req: NextRequest) {
     const cutoffKey = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Berlin" }).format(cutoff);
     summary.days = Object.fromEntries(Object.entries(summary.days).filter(([date]) => date >= cutoffKey));
 
-    await supabase.from("settings").upsert(
+    const { error } = await supabase.from("settings").upsert(
       { key: "analytics_summary", value: JSON.stringify(summary) },
       { onConflict: "key" },
     );
+    if (error) console.error("Visit storage failed:", error);
   } catch (error) {
-    console.error("Analytics tracking failed:", error);
+    console.error("Visit tracking failed:", error);
   }
   return new NextResponse(null, { status: 204 });
 }

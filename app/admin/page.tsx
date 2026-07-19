@@ -265,7 +265,7 @@ export default function AdminPage() {
 
   async function loadAnalytics() {
     setAnalyticsLoading(true);
-    const res = await fetch("/api/admin/analytics", {
+    const res = await fetch("/api/admin/site-stats", {
       headers: adminPw ? { "x-admin-token": adminPw } : undefined,
       cache: "no-store",
     });
