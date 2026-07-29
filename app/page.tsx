@@ -463,6 +463,7 @@ function ContactModal({ onClose, lang }: { onClose: () => void; lang: Lang }) {
 
 export default function Home() {
   const [events, setEvents] = useState<EventItem[]>([]);
+  const [eventsLoading, setEventsLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
   const [showLegal, setShowLegal] = useState<LegalType>(null);
   const [legalContent, setLegalContent] = useState<Record<string, string>>({});
@@ -494,33 +495,38 @@ export default function Home() {
   }, []);
 
   async function loadEvents() {
-    const { data, error } = await sb
-      .from("events")
-      .select("*")
-      .order("created_at", { ascending: true });
+    setEventsLoading(true);
+    try {
+      const { data, error } = await sb
+        .from("events")
+        .select("*")
+        .order("created_at", { ascending: true });
 
-    if (error) {
-      console.error("Events laden Fehler:", error);
-      setEvents([]);
-      return;
-    }
-
-    const rows = (data ?? []).map((row: any) => row.data ?? row);
-    const enriched = await Promise.all(rows.map(async (event: EventItem) => {
-      try {
-        const response = await fetch(`/api/events/${event.id}/availability`, { cache: "no-store" });
-        const availability = await response.json();
-        if (!response.ok) return event;
-        return {
-          ...event,
-          active_ticket_price: availability.activeTicket?.price ?? null,
-          sold_out: availability.soldOut,
-        };
-      } catch {
-        return event;
+      if (error) {
+        console.error("Events laden Fehler:", error);
+        setEvents([]);
+        return;
       }
-    }));
-    setEvents(enriched);
+
+      const rows = (data ?? []).map((row: any) => row.data ?? row);
+      const enriched = await Promise.all(rows.map(async (event: EventItem) => {
+        try {
+          const response = await fetch(`/api/events/${event.id}/availability`, { cache: "no-store" });
+          const availability = await response.json();
+          if (!response.ok) return event;
+          return {
+            ...event,
+            active_ticket_price: availability.activeTicket?.price ?? null,
+            sold_out: availability.soldOut,
+          };
+        } catch {
+          return event;
+        }
+      }));
+      setEvents(enriched);
+    } finally {
+      setEventsLoading(false);
+    }
   }
 
   async function loadLegal() {
@@ -758,7 +764,12 @@ export default function Home() {
         {featuredEvent && <FeaturedEvent event={featuredEvent} lang={lang} />}
 
         <div className="grid gap-8 md:grid-cols-3">
-          {mounted && events.length === 0 && <EmptyState lang={lang} />}
+          {mounted && eventsLoading && (
+            <div className="col-span-3 flex min-h-40 items-center justify-center">
+              <div className="h-7 w-7 animate-spin rounded-full border-2 border-[#d6b36a]/25 border-t-[#d6b36a]" aria-label="Events werden geladen" />
+            </div>
+          )}
+          {mounted && !eventsLoading && events.length === 0 && <EmptyState lang={lang} />}
           {mounted && remainingEvents.map(event => <EventCard key={event.id} event={event} lang={lang} />)}
         </div>
       </section>
