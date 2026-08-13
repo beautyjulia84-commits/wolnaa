@@ -19,12 +19,13 @@ export default function VeranstalterLogin() {
         body: JSON.stringify({ email: email.trim(), password }),
         credentials: 'include',
       });
-      if (res.redirected) {
-        window.location.href = res.url;
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setError(data.error || 'Fehler beim Einloggen.');
+      } else {
+        window.location.replace(data.redirectTo || '/veranstalter/dashboard');
         return;
       }
-      const data = await res.json();
-      if (data.error) setError(data.error);
     } catch(e) {
       setError('Fehler beim Einloggen.');
     }

@@ -15,7 +15,7 @@ export async function GET(req: Request) {
 
   const { data: ev, error: eventsError } = await supabase
     .from('events')
-    .select('id,title,date,tickets_sold,total_revenue')
+    .select('id,title,date')
     .eq('veranstalter_id', authedId)
     .order('date', { ascending: false })
     .limit(5);
@@ -24,8 +24,26 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: 'Events konnten nicht geladen werden.' }, { status: 500 });
   }
 
+  const eventIds = (ev || []).map(event => event.id);
+  const { data: tickets, error: ticketsError } = eventIds.length
+    ? await supabase.from('tickets').select('event_id,amount,status').in('event_id', eventIds)
+    : { data: [], error: null };
+
+  if (ticketsError) {
+    return NextResponse.json({ error: 'Ticketzahlen konnten nicht geladen werden.' }, { status: 500 });
+  }
+
+  const eventsWithStats = (ev || []).map(event => {
+    const paidTickets = (tickets || []).filter(ticket => ticket.event_id === event.id && ticket.status !== 'cancelled');
+    return {
+      ...event,
+      tickets_sold: paidTickets.length,
+      total_revenue: Math.round(paidTickets.reduce((sum, ticket) => sum + Number(ticket.amount || 0), 0) * 100),
+    };
+  });
+
   return NextResponse.json(
-    { veranstalter: v, events: ev || [] },
+    { veranstalter: v, events: eventsWithStats },
     { headers: { 'Cache-Control': 'no-store' } }
   );
 }
