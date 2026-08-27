@@ -472,6 +472,38 @@ export default function Home() {
   const t = I18N[lang];
 
   useEffect(() => {
+    let redirected = false;
+    const redirectRecovery = (role?: string) => {
+      if (redirected) return;
+      redirected = true;
+      const destination = role === "admin"
+        ? "/admin-passwort-festlegen"
+        : "/veranstalter/passwort-festlegen";
+      window.location.replace(destination);
+    };
+
+    const recoveryInUrl = () => {
+      const hash = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+      const search = new URLSearchParams(window.location.search);
+      return hash.get("type") === "recovery" || search.get("type") === "recovery";
+    };
+
+    const { data: authListener } = sb.auth.onAuthStateChange((event, session) => {
+      if (event === "PASSWORD_RECOVERY" && session) {
+        redirectRecovery(session.user.app_metadata?.role);
+      }
+    });
+
+    if (recoveryInUrl()) {
+      sb.auth.getSession().then(({ data }) => {
+        if (data.session) redirectRecovery(data.session.user.app_metadata?.role);
+      });
+    }
+
+    return () => authListener.subscription.unsubscribe();
+  }, []);
+
+  useEffect(() => {
     setMounted(true);
     loadEvents();
     loadLegal();
