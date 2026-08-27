@@ -12,7 +12,8 @@ export async function POST(req: Request) {
     return NextResponse.json({ success: true });
   }
 
-  const redirectTo = new URL("/admin-passwort-festlegen", req.url).toString();
+  const appUrl = (process.env.NEXT_PUBLIC_APP_URL || new URL(req.url).origin).replace(/\/$/, "");
+  const redirectTo = `${appUrl}/admin-passwort-festlegen`;
   const authClient = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!

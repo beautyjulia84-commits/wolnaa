@@ -9,8 +9,9 @@ export async function POST(req: Request) {
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   );
+  const appUrl = (process.env.NEXT_PUBLIC_APP_URL || new URL(req.url).origin).replace(/\/$/, '');
   await supabase.auth.resetPasswordForEmail(email.trim().toLowerCase(), {
-    redirectTo: new URL('/veranstalter/passwort-festlegen', req.url).toString(),
+    redirectTo: `${appUrl}/veranstalter/passwort-festlegen`,
   });
 
   // Immer dieselbe Antwort, damit keine registrierten E-Mail-Adressen verraten werden.
