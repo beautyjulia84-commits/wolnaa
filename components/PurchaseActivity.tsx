@@ -21,19 +21,26 @@ export default function PurchaseActivity({ lang }: { lang: "de" | "ru" }) {
   useEffect(() => {
     if (!activities.length || dismissed) return;
 
-    let revealTimer = window.setTimeout(() => setVisible(true), 4500);
-    const rotateTimer = window.setInterval(() => {
-      setVisible(false);
-      window.clearTimeout(revealTimer);
-      revealTimer = window.setTimeout(() => {
-        setIndex(current => (current + 1) % activities.length);
-        setVisible(true);
-      }, 600);
-    }, 12000);
+    let hideTimer: number;
+    let pauseTimer: number;
+
+    const showActivity = () => {
+      setVisible(true);
+      hideTimer = window.setTimeout(() => {
+        setVisible(false);
+        pauseTimer = window.setTimeout(() => {
+          setIndex(current => (current + 1) % activities.length);
+          showActivity();
+        }, 8000);
+      }, 3500);
+    };
+
+    const revealTimer = window.setTimeout(showActivity, 3500);
 
     return () => {
       window.clearTimeout(revealTimer);
-      window.clearInterval(rotateTimer);
+      window.clearTimeout(hideTimer);
+      window.clearTimeout(pauseTimer);
     };
   }, [activities, dismissed]);
 
