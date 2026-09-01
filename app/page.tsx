@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useEffect, useState, useCallback, type FormEvent } from "react";
 import { createClient } from "@supabase/supabase-js";
+import PurchaseActivity from "@/components/PurchaseActivity";
 
 const sb = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -927,6 +928,7 @@ export default function Home() {
       </footer>
 
       <CookieBanner lang={lang} />
+      <PurchaseActivity lang={lang} />
       {showContact && <ContactModal lang={lang} onClose={() => setShowContact(false)} />}
       {showLegal && <LegalModal lang={lang} type={showLegal} content={legalContent[showLegal!] ?? ""} onClose={closeLegal} />}
     </main>
