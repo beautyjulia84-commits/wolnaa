@@ -124,7 +124,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Der Gesamtbetrag ist ungültig. Bitte lade die Seite neu." }, { status: 400 });
     }
 
-    let stripeAccountId: string | null = event.stripe_account_id || null;
+    const stripeAccountId: string | null = event.stripe_account_id || null;
     let platformFeeAmount = 0;
 
     if (stripeAccountId) {
@@ -162,11 +162,11 @@ export async function POST(req: Request) {
     if (stripeAccountId) {
       sessionConfig.payment_intent_data = {
         application_fee_amount: platformFeeAmount,
+        transfer_data: { destination: stripeAccountId },
       };
     }
 
-    const stripeOptions = stripeAccountId ? { stripeAccount: stripeAccountId } : {};
-    const session = await stripe.checkout.sessions.create(sessionConfig, stripeOptions);
+    const session = await stripe.checkout.sessions.create(sessionConfig);
 
     const { data: analyticsRow } = await supabase
       .from("settings")

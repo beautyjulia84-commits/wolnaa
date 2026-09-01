@@ -7,16 +7,29 @@ import { Suspense } from "react";
 function SuccessContent() {
   const params = useSearchParams();
   const [show, setShow] = useState(false);
+  const [ticketStatus, setTicketStatus] = useState<"sending" | "sent" | "error">(
+    params.get("session_id") ? "sending" : "error"
+  );
 
   useEffect(() => {
     setTimeout(() => setShow(true), 100);
+    const sessionId = params.get("session_id");
+    if (sessionId) {
+      fetch("/api/fulfill-checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sessionId }),
+      }).then(response => {
+        setTicketStatus(response.ok ? "sent" : "error");
+      }).catch(() => setTicketStatus("error"));
+    }
     if (typeof window !== "undefined" && (window as any).ttq) {
       (window as any).ttq.track("CompletePayment", {
         content_name: "WOLNAA Ticket",
         currency: "EUR",
       });
     }
-  }, []);
+  }, [params]);
 
   return (
     <main className="min-h-screen bg-[#0a0a0a] text-white flex items-center justify-center px-6">
@@ -40,13 +53,15 @@ function SuccessContent() {
 
         <h1 className="text-4xl font-black mb-3 tracking-tight">Zahlung erfolgreich!</h1>
         <p className="text-zinc-400 mb-6 leading-relaxed text-sm">
-          Dein Ticket wurde bestätigt. Du erhältst gleich eine E-Mail mit deinem druckbaren PDF-Ticket im Anhang.
+          {ticketStatus === "sending" && "Deine Zahlung wurde bestätigt. Dein PDF-Ticket wird gerade erstellt und per E-Mail versendet."}
+          {ticketStatus === "sent" && "Dein Ticket wurde bestätigt und an deine E-Mail-Adresse gesendet."}
+          {ticketStatus === "error" && "Deine Zahlung war erfolgreich. Falls die Ticket-E-Mail nicht gleich ankommt, kontaktiere bitte kontakt@wolnaa.de."}
         </p>
 
         {/* Info Box */}
         <div className="bg-zinc-900/60 border border-zinc-800 rounded-2xl p-5 mb-8 text-left space-y-3">
           {[
-            { icon: "📧", text: "Ticket-E-Mail wird gesendet" },
+            { icon: "📧", text: ticketStatus === "sent" ? "Ticket-E-Mail wurde gesendet" : ticketStatus === "error" ? "Ticketversand wird geprüft" : "Ticket-E-Mail wird gesendet" },
             { icon: "📱", text: "QR-Code beim Einlass vorzeigen" },
             { icon: "🔒", text: "Ticket ist nur einmal gültig" },
           ].map((item, i) => (
