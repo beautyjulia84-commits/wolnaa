@@ -5,6 +5,7 @@ import { useEffect, useState, useCallback, type FormEvent } from "react";
 import { createClient } from "@supabase/supabase-js";
 import PurchaseActivity from "@/components/PurchaseActivity";
 import DiscountWheelPopup from '@/components/DiscountWheelPopup';
+import ClubAtmosphere from '@/components/ClubAtmosphere';
 
 const sb = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -792,25 +793,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="reveal-section mx-auto grid max-w-7xl gap-10 px-6 py-20 md:grid-cols-[0.9fr_1.1fr] md:items-end">
-        <div>
-          <p className="mb-4 text-xs font-bold uppercase tracking-[0.28em] text-[#d6b36a]">
-            {t.aboutEyebrow}
-          </p>
-          <h2 className="text-4xl font-semibold leading-tight md:text-6xl">
-            {t.aboutTitle}
-          </h2>
-        </div>
-
-        <div className="space-y-6 text-base leading-8 text-zinc-400 md:text-lg">
-          <p>
-            {t.aboutText1}
-          </p>
-          <p>
-            {t.aboutText2}
-          </p>
-        </div>
-      </section>
+      <ClubAtmosphere lang={lang} />
 
       <section id="events" className="reveal-section mx-auto max-w-7xl px-6 py-16">
         <p className="mb-3 text-sm uppercase tracking-[0.26em] text-[#d6b36a]">{t.upcoming}</p>
