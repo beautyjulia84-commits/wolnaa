@@ -802,7 +802,7 @@ export default function Home() {
         <p className="mb-3 text-sm uppercase tracking-[0.26em] text-[#d6b36a]">{t.upcoming}</p>
         <h2 className="mb-10 text-4xl font-semibold md:text-5xl">{t.upcomingTitle}</h2>
 
-        {featuredEvent && <FeaturedEvent event={featuredEvent} lang={lang} />}
+        {featuredEvent && <div className="md:hidden"><FeaturedEvent event={featuredEvent} lang={lang} /></div>}
 
         <div className="grid gap-8 md:grid-cols-3">
           {mounted && eventsLoading && (
@@ -811,7 +811,10 @@ export default function Home() {
             </div>
           )}
           {mounted && !eventsLoading && events.length === 0 && <EmptyState lang={lang} />}
-          {mounted && remainingEvents.map(event => <EventCard key={event.id} event={event} lang={lang} />)}
+          {mounted && remainingEvents.map(event => <div key={event.id} className="md:hidden"><EventCard event={event} lang={lang} /></div>)}
+        </div>
+        <div className="hidden grid-cols-2 items-stretch gap-8 md:grid">
+          {mounted && events.map(event => <EventCard key={event.id} event={event} lang={lang} />)}
         </div>
       </section>
 
