@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 type Reward = { percent: number; expiresAt: number; used: boolean };
 const segments = [5,10,15,20,25,5,10,15,20,25,5,10,15,20,25,10,15,20,25,15];
 const wheelBackground = `conic-gradient(${segments.map((_, i) => `${i % 2 ? '#171717' : i % 4 ? '#ead08d' : '#b88a41'} ${i*18}deg ${(i+1)*18-0.7}deg, #f6e3ab ${(i+1)*18-0.7}deg ${(i+1)*18}deg`).join(',')})`;
-export default function DiscountWheel({ eventId, onReward }: { eventId: string; onReward: (percent: number) => void }) {
+export default function DiscountWheel({ eventId, onReward, onSpinComplete }: { eventId: string; onReward: (percent: number) => void; onSpinComplete?: () => void }) {
   const [reward, setReward] = useState<Reward | null>(null);
   const [spinning, setSpinning] = useState(false);
   const [rotation, setRotation] = useState(0);
@@ -33,7 +33,7 @@ export default function DiscountWheel({ eventId, onReward }: { eventId: string; 
       const matches = segments.map((percent,index) => percent === data.reward.percent ? index : -1).filter(index => index >= 0);
       const index = matches[Math.floor(Math.random()*matches.length)];
       setRotation(1800 + 360 - (index * 18 + 9));
-      window.setTimeout(() => { setReward(data.reward); setSpinning(false); }, 4200);
+      window.setTimeout(() => { setReward(data.reward); setSpinning(false); onSpinComplete?.(); }, 4200);
     } catch (e) { setError(e instanceof Error ? e.message : 'Bitte erneut versuchen.'); setSpinning(false); }
   }
   return <section className="rounded-3xl bg-[radial-gradient(ellipse_at_top,#d6b36a18,transparent_65%)] px-5 pb-6 pt-9 text-center">

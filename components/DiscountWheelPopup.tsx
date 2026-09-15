@@ -1,27 +1,20 @@
 'use client';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import DiscountWheel from './DiscountWheel';
 const ignoreReward = () => {};
 export default function DiscountWheelPopup() {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   useEffect(() => {
-    let timer: number;
-    const schedule = () => {
-      if (!localStorage.getItem('wolnaa-cookie-consent') || sessionStorage.getItem('wolnaa-wheel-popup')) return;
-      window.clearTimeout(timer);
-      timer = window.setTimeout(() => {
+    let cancelled = false;
         fetch('/api/discount-wheel', { cache: 'no-store' }).then(r => r.json()).then(data => {
-          if (!data.reward && Date.now() < new Date('2026-10-02T23:59:00+02:00').getTime()) {
-            sessionStorage.setItem('wolnaa-wheel-popup', 'shown');
+          if (!cancelled && !data.reward && Date.now() < new Date('2026-10-02T23:59:00+02:00').getTime()) {
             setOpen(true);
           }
         }).catch(() => {});
-      }, 2500);
-    };
-    schedule();
-    window.addEventListener('wolnaa-consent-change', schedule);
-    return () => { window.clearTimeout(timer); window.removeEventListener('wolnaa-consent-change', schedule); };
+    return () => { cancelled = true; };
   }, []);
   useEffect(() => {
     if (!open) return;
@@ -36,7 +29,7 @@ export default function DiscountWheelPopup() {
     {open && <div role="dialog" aria-modal="true" aria-label="Rabatt-Glücksrad Nürnberg" className="fixed inset-0 z-[9000] flex items-center justify-center bg-black/80 p-3 backdrop-blur-md" onClick={() => setOpen(false)}>
       <div className="relative max-h-[94dvh] w-full max-w-lg overflow-y-auto rounded-3xl border border-[#d6b36a]/40 bg-[#0c0c0c] shadow-[0_0_100px_#d6b36a20]" onClick={e => e.stopPropagation()}>
         <button autoFocus aria-label="Schließen" onClick={() => setOpen(false)} className="absolute right-3 top-3 z-20 flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-black text-xl text-white">×</button>
-        <DiscountWheel eventId="d3a2c95d-893d-4ee4-8645-b28ec7f61063" onReward={ignoreReward} />
+        <DiscountWheel eventId="d3a2c95d-893d-4ee4-8645-b28ec7f61063" onReward={ignoreReward} onSpinComplete={() => router.push('/event/wolnaa--indoor-festival')} />
         <Link href="/event/wolnaa--indoor-festival" className="mx-6 mb-6 block rounded-lg border border-[#d6b36a]/40 py-3 text-center text-sm font-semibold text-[#d6b36a]">Zum Nürnberger Indoor Festival →</Link>
       </div>
     </div>}
