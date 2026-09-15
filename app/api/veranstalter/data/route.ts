@@ -26,7 +26,7 @@ export async function GET(req: Request) {
 
   const eventIds = (ev || []).map(event => event.id);
   const { data: tickets, error: ticketsError } = eventIds.length
-    ? await supabase.from('tickets').select('event_id,amount,status').in('event_id', eventIds)
+    ? await supabase.from('tickets').select('event_id,amount,status').in('event_id', eventIds).not('ticket_id', 'like', 'WOLNAA-GIVEAWAY-%')
     : { data: [], error: null };
 
   if (ticketsError) {

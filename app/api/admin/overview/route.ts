@@ -16,7 +16,7 @@ export async function GET(req: NextRequest) {
   const [{ data, error }, { data: events, error: eventsError }, { data: tickets, error: ticketsError }] = await Promise.all([
     supabase.from("settings").select("key,value").in("key", ["analytics_summary", "analytics_checkouts"]),
     supabase.from("events").select("id,title,slug").order("date", { ascending: false }),
-    supabase.from("tickets").select("event_id,event_title,amount,status"),
+    supabase.from("tickets").select("event_id,event_title,amount,status").not("ticket_id", "like", "WOLNAA-GIVEAWAY-%"),
   ]);
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   if (eventsError) return NextResponse.json({ error: eventsError.message }, { status: 500 });

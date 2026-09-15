@@ -18,6 +18,7 @@ export async function GET() {
     .from("tickets")
     .select("event_id,event_title,customer_email,created_at")
     .in("status", ["paid", "checked_in"])
+    .not("ticket_id", "like", "WOLNAA-GIVEAWAY-%")
     .order("created_at", { ascending: false })
     .limit(120);
 

@@ -55,7 +55,7 @@ export default function TeilnehmerPage() {
   }, [tickets, search]);
 
   const checkedIn = tickets.filter(t => t.status === 'checked_in').length;
-  const paid = tickets.filter(t => t.status !== 'cancelled').length;
+  const paid = tickets.filter(t => t.status !== 'cancelled' && !t.ticket_id?.startsWith('WOLNAA-GIVEAWAY-')).length;
   const revenue = tickets.reduce((sum, t) => sum + Number(t.amount || 0), 0);
 
   async function toggleCheckIn(ticket: any) {
