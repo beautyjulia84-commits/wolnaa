@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useEffect, useState, useCallback, type FormEvent } from "react";
 import { createClient } from "@supabase/supabase-js";
 import PurchaseActivity from "@/components/PurchaseActivity";
+import DiscountWheelPopup from '@/components/DiscountWheelPopup';
 
 const sb = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -344,16 +345,23 @@ function CookieBanner({ lang }: { lang: Lang }) {
   useEffect(() => {
     const consent = localStorage.getItem('wolnaa-cookie-consent');
     if (!consent) setVisible(true);
+    const open = () => setVisible(true);
+    window.addEventListener('wolnaa-open-cookie-settings', open);
+    return () => window.removeEventListener('wolnaa-open-cookie-settings', open);
   }, []);
 
   function accept() {
     localStorage.setItem('wolnaa-cookie-consent', 'all');
+    window.dispatchEvent(new Event('wolnaa-consent-change'));
     setVisible(false);
   }
 
   function decline() {
+    const wasAll = localStorage.getItem('wolnaa-cookie-consent') === 'all';
     localStorage.setItem('wolnaa-cookie-consent', 'necessary');
+    window.dispatchEvent(new Event('wolnaa-consent-change'));
     setVisible(false);
+    if (wasAll) window.location.reload();
   }
 
   if (!visible) return null;
@@ -370,8 +378,8 @@ function CookieBanner({ lang }: { lang: Lang }) {
       <div>
         <p style={{ color: '#fff', fontWeight: 700, fontSize: 15, marginBottom: 6 }}>🍪 {t.cookieTitle}</p>
         <p style={{ color: '#a1a1aa', fontSize: 13, lineHeight: 1.6 }}>
-          {t.cookieText}{' '}
-          <button onClick={() => {}} style={{ color: '#d6b36a', background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, padding: 0 }}>{t.legalPrivacy}</button>
+          {lang === 'de' ? 'Notwendige Funktionen bleiben aktiv. Mit „Alle akzeptieren“ erlaubst du zusätzlich TikTok-Werbetracking. Das Glücksrad-Aktionscookie erfordert eine separate Einwilligung am Rad.' : 'Необходимые функции остаются активными. «Принять все» разрешает рекламное отслеживание TikTok. Для cookie колеса скидок требуется отдельное согласие.'}{' '}
+          <a href="/datenschutz" style={{ color: '#d6b36a', fontSize: 13 }}>{t.legalPrivacy}</a>
         </p>
       </div>
       <div style={{ display: 'flex', gap: 10 }}>
@@ -381,7 +389,7 @@ function CookieBanner({ lang }: { lang: Lang }) {
           fontWeight: 700, fontSize: 14, cursor: 'pointer',
         }}>{t.acceptAll}</button>
         <button onClick={decline} style={{
-          flex: 1, background: 'transparent', color: '#a1a1aa',
+          flex: 1, background: '#d6b36a', color: '#000',
           border: '1px solid #333', borderRadius: 12, padding: '10px 16px',
           fontWeight: 600, fontSize: 14, cursor: 'pointer',
         }}>{t.necessaryOnly}</button>
@@ -924,12 +932,14 @@ export default function Home() {
           ))}
         </div>
         <p className="text-zinc-500 text-sm mb-3">© {new Date().getFullYear()} WOLNAA</p>
+        <button className="text-xs text-zinc-400 underline" onClick={() => window.dispatchEvent(new Event('wolnaa-open-cookie-settings'))}>Cookie-Einstellungen</button>
 
       </footer>
 
       <CookieBanner lang={lang} />
       <a href="/gluecksrad-teilnahmebedingungen" className="block pb-6 text-center text-xs text-zinc-500 underline">Teilnahmebedingungen Rabatt-Glücksrad Nürnberg</a>
       <PurchaseActivity lang={lang} />
+      <DiscountWheelPopup />
       {showContact && <ContactModal lang={lang} onClose={() => setShowContact(false)} />}
       {showLegal && <LegalModal lang={lang} type={showLegal} content={legalContent[showLegal!] ?? ""} onClose={closeLegal} />}
     </main>
