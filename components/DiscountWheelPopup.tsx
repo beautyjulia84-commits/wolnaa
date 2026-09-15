@@ -6,16 +6,7 @@ import DiscountWheel from './DiscountWheel';
 const ignoreReward = () => {};
 export default function DiscountWheelPopup() {
   const router = useRouter();
-  const [open, setOpen] = useState(false);
-  useEffect(() => {
-    let cancelled = false;
-        fetch('/api/discount-wheel', { cache: 'no-store' }).then(r => r.json()).then(data => {
-          if (!cancelled && !data.reward && Date.now() < new Date('2026-10-02T23:59:00+02:00').getTime()) {
-            setOpen(true);
-          }
-        }).catch(() => {});
-    return () => { cancelled = true; };
-  }, []);
+  const [open, setOpen] = useState(() => Date.now() < new Date('2026-10-02T23:59:00+02:00').getTime());
   useEffect(() => {
     if (!open) return;
     const previous = document.body.style.overflow;
