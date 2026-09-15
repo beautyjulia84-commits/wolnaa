@@ -231,7 +231,6 @@ function EventCard({ event, lang }: { event: EventItem; lang: Lang }) {
             <span className="text-xs text-zinc-400 border border-zinc-700 rounded-md px-3 py-1">Lounge</span>
           )}
         </div>
-        <div className="mt-6 border-t border-white/10 pt-4 text-sm font-semibold tracking-wide text-white/75 transition-colors duration-300 group-hover:text-[#d6b36a]">{t.openEvent} →</div>
       </div>
     </a>
   );
@@ -293,9 +292,6 @@ function FeaturedEvent({ event, lang }: { event: EventItem; lang: Lang }) {
           <span>
             <span className="block text-lg font-bold text-[#d6b36a]">{event.sold_out ? t.soldOut : `${t.from} ${getStartingPrice(event)} €`}</span>
             <span className="mt-1 block text-[11px] text-zinc-500">{t.vatIncluded}</span>
-          </span>
-          <span className="inline-flex h-12 items-center justify-center rounded-md bg-[#d6b36a] px-6 text-sm font-bold text-black transition-colors group-hover:bg-[#ead08d]">
-            {t.viewTickets}
           </span>
         </div>
       </div>
