@@ -11,6 +11,7 @@ export default function DiscountWheel({ eventId, onReward, onSpinComplete }: { e
   const [error, setError] = useState('');
   const [remaining, setRemaining] = useState(0);
   const [accepted, setAccepted] = useState(false);
+  const [cookieAccepted, setCookieAccepted] = useState(false);
   useEffect(() => {
     fetch('/api/discount-wheel', { cache: 'no-store' }).then(r => r.json()).then(data => setReward(data.reward)).catch(() => {});
   }, []);
@@ -47,10 +48,12 @@ export default function DiscountWheel({ eventId, onReward, onSpinComplete }: { e
         <span className="absolute left-1/2 top-1/2 flex h-16 w-16 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-[#d6b36a] bg-black text-[10px] font-bold tracking-wider text-[#d6b36a]">WOLNAA</span>
       </div>
     </div>
-    {!reward && <label className="mx-auto mb-4 flex max-w-md items-start gap-3 text-left text-xs leading-5 text-zinc-400"><input type="checkbox" checked={accepted} onChange={e => setAccepted(e.target.checked)} className="mt-1 accent-[#d6b36a]" />Ich bin mindestens 18 Jahre alt, akzeptiere die verlinkten Teilnahmebedingungen und willige in das Aktionscookie für Gewinn und Browserbegrenzung bis spätestens 03.10.2026 ein. Keine Trackingnutzung. Widerruf durch Löschen des Cookies; dann geht ein nicht eingelöster Gewinn verloren.</label>}
-    {reward ? <p className="font-semibold text-[#d6b36a]">{reward.used ? 'Dein Rabatt wurde bereits beim Checkout eingesetzt.' : remaining ? `${reward.percent} % Rabatt gewonnen! Automatisch beim Ticketkauf · noch ${Math.floor(remaining/60)}:${String(remaining%60).padStart(2,'0')}` : 'Dein Rabatt ist abgelaufen. In diesem Browser wurde bereits gedreht.'}</p> : <button disabled={spinning || !accepted} onClick={spin} className="rounded-md bg-[#d6b36a] px-8 py-3 font-bold text-black disabled:opacity-50">{spinning ? 'Das Rad dreht …' : 'Jetzt kostenlos drehen'}</button>}
+    {!reward && <div className="mx-auto mb-4 max-w-md space-y-3 text-left text-xs leading-5 text-zinc-400">
+      <label className="flex items-start gap-3"><input type="checkbox" checked={accepted} onChange={e => setAccepted(e.target.checked)} className="mt-1 accent-[#d6b36a]" /><span>Ich bin mindestens 18 Jahre alt und akzeptiere die <a href="/gluecksrad-teilnahmebedingungen" target="_blank" rel="noopener noreferrer" className="text-[#d6b36a] underline">Teilnahmebedingungen</a>.</span></label>
+      <label className="flex items-start gap-3"><input type="checkbox" checked={cookieAccepted} onChange={e => setCookieAccepted(e.target.checked)} className="mt-1 accent-[#d6b36a]" /><span>Ich stimme dem Aktionscookie zu: Es speichert meinen Gewinn und begrenzt die Teilnahme. <a href="/gluecksrad-teilnahmebedingungen" target="_blank" rel="noopener noreferrer" className="text-[#d6b36a] underline">Details & Widerruf</a>.</span></label>
+    </div>}
+    {reward ? <p className="font-semibold text-[#d6b36a]">{reward.used ? 'Dein Rabatt wurde bereits beim Checkout eingesetzt.' : remaining ? `${reward.percent} % Rabatt gewonnen! Automatisch beim Ticketkauf · noch ${Math.floor(remaining/60)}:${String(remaining%60).padStart(2,'0')}` : 'Dein Rabatt ist abgelaufen. In diesem Browser wurde bereits gedreht.'}</p> : <button disabled={spinning || !accepted || !cookieAccepted} onClick={spin} className="rounded-md bg-[#d6b36a] px-8 py-3 font-bold text-black disabled:opacity-50">{spinning ? 'Das Rad dreht …' : 'Jetzt kostenlos drehen'}</button>}
     {error && <p className="mt-3 text-sm text-red-400">{error}</p>}
-    <p className="mt-4 text-xs text-zinc-500">20 Felder: 3 × 5 %, 4 × 10 %, 5 × 15 %, 4 × 20 %, 4 × 25 %. Chancen: 15 %, 20 %, 25 %, 20 %, 20 %.</p>
     <a href="/gluecksrad-teilnahmebedingungen" target="_blank" rel="noopener noreferrer" className="mt-3 inline-block text-xs text-[#d6b36a] underline">Teilnahmebedingungen & Datenschutz</a>
   </section>;
 }
