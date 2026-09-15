@@ -9,18 +9,22 @@ export default function DiscountWheelPopup() {
   const [open, setOpen] = useState(false);
   useEffect(() => {
     if (Date.now() >= new Date('2026-10-02T23:59:00+02:00').getTime()) return;
-    const timer = window.setTimeout(() => {
+    let cancelled = false;
+    async function showForVisit() {
       try {
-        if (localStorage.getItem('wolnaa-wheel-popup-nuernberg-2026')) return;
-        localStorage.setItem('wolnaa-wheel-popup-nuernberg-2026', 'shown');
         if (sessionStorage.getItem('wolnaa-wheel-popup')) return;
+        const response = await fetch('/api/discount-wheel', { cache: 'no-store' });
+        if (!response.ok) return;
+        const data = await response.json();
+        if (cancelled || data.reward) return;
+        sessionStorage.setItem('wolnaa-wheel-popup', 'shown');
+        setOpen(true);
       } catch {
-        // If storage is unavailable, avoid repeatedly interrupting visitors.
-        return;
+        // Do not interrupt visitors when reward or session storage is unavailable.
       }
-      setOpen(true);
-    }, 0);
-    return () => window.clearTimeout(timer);
+    }
+    void showForVisit();
+    return () => { cancelled = true; };
   }, []);
   useEffect(() => {
     if (!open) return;
