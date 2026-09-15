@@ -76,7 +76,7 @@ export default function PurchaseActivity({ lang }: { lang: "de" | "ru" }) {
   return (
     <aside
       aria-live="polite"
-      className={`fixed bottom-5 left-4 z-40 w-[calc(100%-2rem)] max-w-sm rounded-xl border border-white/10 bg-zinc-950/95 p-4 shadow-2xl shadow-black/60 backdrop-blur-xl transition-all duration-500 md:bottom-7 md:left-7 ${visible ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-5 opacity-0"}`}
+      className={`fixed bottom-5 left-4 z-40 w-[calc(100%-2rem)] max-w-sm rounded-xl border border-white/15 bg-zinc-950/75 p-4 shadow-2xl shadow-black/40 backdrop-blur-xl transition-all duration-500 md:bottom-7 md:left-7 ${visible ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-5 opacity-0"}`}
     >
       <button
         type="button"
