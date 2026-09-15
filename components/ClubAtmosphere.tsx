@@ -20,6 +20,7 @@ export default function ClubAtmosphere({lang}:{lang:'de'|'ru'}) {
     <div ref={background} aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-[100lvh] min-h-[620px] bg-cover bg-[position:55%_45%] md:bg-[position:center_35%] will-change-transform" style={{backgroundImage:'url(/club-atmosphere-wolnaa.jpg)'}} />
     <div className="absolute inset-0 bg-gradient-to-b from-black/65 via-black/75 to-black/95" />
     <div aria-hidden="true" className="pointer-events-none absolute inset-0" style={{background:'radial-gradient(ellipse at 8% 25%, rgba(8,18,85,.65), transparent 65%), radial-gradient(ellipse at 95% 35%, rgba(150,5,25,.50), transparent 65%), linear-gradient(120deg, transparent 10%, rgba(12,25,100,.25) 32%, transparent 48%, rgba(135,5,22,.25) 70%, transparent 95%)'}} />
+    <div aria-hidden="true" className="pointer-events-none absolute inset-0" style={{background:'linear-gradient(to bottom, #000 0%, rgba(0,0,0,.88) 12%, transparent 38%, transparent 60%, rgba(0,0,0,.85) 85%, #000 100%)'}} />
     <div className="reveal-section relative mx-auto flex min-h-[540px] max-w-7xl flex-col justify-end px-6 py-16 md:min-h-[620px] md:py-24">
       <p className="mb-5 text-xs font-bold uppercase tracking-[.3em] text-[#ead08d]">NIGHTLIFE</p>
       <h2 className="max-w-2xl text-5xl font-semibold leading-[1.05] tracking-tight text-white md:text-7xl">{lang==='de' ? 'Mehr als eine Nacht.' : 'Больше, чем просто ночь.'}</h2>
