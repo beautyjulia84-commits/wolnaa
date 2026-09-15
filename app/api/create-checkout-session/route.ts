@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
+import { influencerPercent, combinedWheelPercent } from '@/lib/wheel-promotion';
 import { acquisitionSource } from '@/lib/analytics';
 import { createClient } from "@supabase/supabase-js";
 import { getTicketPhase, normalizeTicketName } from "@/lib/ticket-phases";
@@ -115,12 +116,13 @@ export async function POST(req: Request) {
       if (eventId !== WHEEL_EVENT_ID || !wheelReward || wheelReward.used || wheelReward.expiresAt <= Date.now()) {
         return NextResponse.json({ error: 'Der Glücksrad-Rabatt ist abgelaufen oder bereits eingesetzt. Bitte lade die Seite neu.' }, { status: 400 });
       }
-      if (discountCode || ticketSubtotal <= 0) return NextResponse.json({ error: 'Der Glücksrad-Rabatt gilt nur für Tickets und ist nicht kombinierbar.' }, { status: 400 });
-      discountPercent = wheelReward.percent;
+      if (ticketSubtotal <= 0 || (discountCode && !influencerPercent(eventId,discountCode))) return NextResponse.json({ error: 'Zum Glücksrad ist nur ein Code möglich: einfachwowa oder janchik.' }, { status: 400 });
+      discountPercent = combinedWheelPercent(wheelReward.percent,influencerPercent(eventId,discountCode));
       appliedDiscountCode = `GLUECKSRAD-${wheelReward.percent}`;
     }
-    if (discountCode) {
-      const foundDiscount = configuredDiscounts.find((entry: any) => normalizeName(entry.code) === normalizeName(discountCode));
+    if (discountCode && !wheelReward) {
+      const extra = influencerPercent(eventId,discountCode);
+      const foundDiscount = extra ? {code:String(discountCode).trim().toLowerCase(),percent:extra} : configuredDiscounts.find((entry: any) => normalizeName(entry.code) === normalizeName(discountCode));
       if (!foundDiscount) {
         return NextResponse.json({ error: "Rabattcode ist ungültig." }, { status: 400 });
       }
@@ -131,7 +133,8 @@ export async function POST(req: Request) {
       appliedDiscountCode = String(foundDiscount.code || "");
     }
 
-    const totalAmount = Math.round((subtotal - (wheelReward ? ticketSubtotal : subtotal) * discountPercent / 100) * 100);
+    if (wheelReward && discountCode) appliedDiscountCode += `+${String(discountCode).trim().toLowerCase()}`;
+    const totalAmount = Math.round((subtotal - (wheelReward || influencerPercent(eventId,discountCode) ? ticketSubtotal : subtotal) * discountPercent / 100) * 100);
 
     if (!Number.isFinite(totalAmount) || totalAmount <= 0) {
       return NextResponse.json({ error: "Der Gesamtbetrag ist ungültig. Bitte lade die Seite neu." }, { status: 400 });

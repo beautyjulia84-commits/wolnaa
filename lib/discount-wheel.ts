@@ -17,12 +17,12 @@ export function readReward(req: Request): WheelReward | null {
     const actual = Buffer.from(signature, 'base64url');
     if (actual.length !== expected.length || !timingSafeEqual(actual, expected)) return null;
     const reward = JSON.parse(Buffer.from(payload, 'base64url').toString()) as WheelReward;
-    return [5, 10, 15, 20, 25].includes(reward.percent) && Number.isFinite(reward.expiresAt) ? reward : null;
+    return [5, 10, 15, 20, 25, 50].includes(reward.percent) && Number.isFinite(reward.expiresAt) ? reward : null;
   } catch { return null; }
 }
 export function drawReward(): WheelReward {
   const roll = randomInt(100);
-  const percent = roll < 15 ? 5 : roll < 35 ? 10 : roll < 60 ? 15 : roll < 80 ? 20 : 25;
+  const percent = randomInt(300) === 0 ? 50 : roll < 15 ? 5 : roll < 35 ? 10 : roll < 60 ? 15 : roll < 80 ? 20 : 25;
   return { percent, expiresAt: Date.now() + 2 * 60 * 60 * 1000, used: false };
 }
 export const wheelCookieOptions = { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'lax' as const, path: '/', maxAge: Math.max(1, Math.ceil((new Date('2026-10-03T00:00:00Z').getTime() - Date.now()) / 1000)) };

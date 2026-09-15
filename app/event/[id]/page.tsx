@@ -4,6 +4,7 @@ import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 import DiscountWheel from '@/components/DiscountWheel';
+import { influencerPercent, combinedWheelPercent } from '@/lib/wheel-promotion';
 
 const sb = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -136,9 +137,10 @@ export default function EventPage() {
 
   function calcTotal() {
     let t = n.tickets.reduce((s, tk, i) => s + (ticketQtys[i] ?? 0) * toMoney(tk.price), 0);
-    if (wheelPercent) t *= (1 - wheelPercent / 100);
+    const extra = influencerPercent(event!.id,appliedDiscount?.code);
+    if (wheelPercent || extra) t *= (1 - combinedWheelPercent(wheelPercent,extra) / 100);
     if (selectedLounge !== null && n.loungeList[selectedLounge]) t += toMoney(n.loungeList[selectedLounge].price);
-    if (appliedDiscount && !wheelPercent) t *= (1 - toDiscountPercent(appliedDiscount.percent) / 100);
+    if (appliedDiscount && !wheelPercent && !extra) t *= (1 - toDiscountPercent(appliedDiscount.percent) / 100);
     return t;
   }
   const total = calcTotal();
@@ -148,7 +150,9 @@ export default function EventPage() {
     setDiscountError(""); setDiscountSuccess(false);
     const code = discountInput.trim().toUpperCase();
     if (!code) { setDiscountError("Bitte einen Code eingeben."); return; }
-    const found = n.discountCodes.find((d: DiscountCode) => d.code.toUpperCase() === code);
+    const extra = influencerPercent(event!.id,code);
+    if (wheelPercent && !extra) {setAppliedDiscount(null);setDiscountError('Zum Glücksrad gilt nur einfachwowa oder janchik.');return;}
+    const found = extra ? {code,percent:'10'} : n.discountCodes.find((d: DiscountCode) => d.code.toUpperCase() === code);
     if (found && toDiscountPercent(found.percent) > 0) { setAppliedDiscount(found); setDiscountSuccess(true); }
     else if (found) { setAppliedDiscount(null); setDiscountError("Rabattcode ist nicht korrekt konfiguriert."); }
     else { setAppliedDiscount(null); setDiscountError("Ungültiger Rabattcode."); }
@@ -171,7 +175,7 @@ export default function EventPage() {
       if (selectedLounge !== null && n.loungeList[selectedLounge]) lineItems.push({ name: n.loungeList[selectedLounge].name, price: n.loungeList[selectedLounge].price, qty: 1 });
       const res = await fetch("/api/create-checkout-session", {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ eventId: event?.id, eventTitle: event?.title || "", customerName, customerEmail, lineItems, total, ticketId, discountCode: wheelPercent ? null : appliedDiscount?.code ?? null, wheelDiscount: wheelPercent > 0 }),
+        body: JSON.stringify({ eventId: event?.id, eventTitle: event?.title || "", customerName, customerEmail, lineItems, total, ticketId, discountCode: appliedDiscount?.code ?? null, wheelDiscount: wheelPercent > 0 }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Fehler aufgetreten.");
@@ -256,14 +260,14 @@ export default function EventPage() {
                 </>
               )}
               {wheelPercent > 0 && <p className="text-sm text-[#d6b36a]">Dein Glücksrad-Rabatt: {wheelPercent} % auf Tickets – automatisch angewendet.</p>}
-              {hasSelection && !wheelPercent && (
+              {hasSelection && (
                 <div className="bg-black/35 border border-white/10 rounded-md px-5 py-4">
                   <p className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-3">Rabattcode</p>
                   <div className="flex gap-2">
                     <input type="text" value={discountInput} onChange={e => { setDiscountInput(e.target.value.toUpperCase()); setDiscountError(""); setDiscountSuccess(false); setAppliedDiscount(null); }} onKeyDown={e => e.key === "Enter" && applyDiscount()} placeholder="Code eingeben" className="flex-1 bg-zinc-900 border border-zinc-700 focus:border-[#d6b36a] rounded-md px-4 py-3 text-white placeholder:text-zinc-600 outline-none text-sm font-mono uppercase transition-colors" />
                     <button onClick={applyDiscount} className="bg-[#d6b36a] text-black font-bold px-5 py-3 rounded-md text-sm hover:bg-[#ead08d] transition-colors shrink-0">Einlösen</button>
                   </div>
-                  {discountSuccess && appliedDiscount && <p className="text-green-400 text-xs mt-2">✓ {toDiscountPercent(appliedDiscount.percent)}% Rabatt wird angewendet</p>}
+                  {discountSuccess && appliedDiscount && <p className="text-green-400 text-xs mt-2">✓ {toDiscountPercent(appliedDiscount.percent)}{wheelPercent ? ' zusätzliche Prozentpunkte auf Tickets' : '% Rabatt wird angewendet'}</p>}
                   {discountError && <p className="text-red-400 text-xs mt-2">{discountError}</p>}
                 </div>
               )}
@@ -288,7 +292,7 @@ export default function EventPage() {
             <div className="sticky bottom-0 bg-black border-t border-white/10 px-6 py-5">
               {hasSelection && (
                 <div className="flex items-center justify-between mb-4">
-                  <div><p className="text-zinc-500 text-xs">Gesamt</p>{appliedDiscount && <p className="text-green-400 text-xs">− {toDiscountPercent(appliedDiscount.percent)}% Rabatt</p>}<p className="text-2xl font-bold text-[#d6b36a]">{formatMoney(total)}</p><p className="mt-1 text-[11px] text-zinc-500">inkl. 19% MwSt.</p></div>
+                  <div><p className="text-zinc-500 text-xs">Gesamt</p>{(wheelPercent > 0 || appliedDiscount) && <p className="text-green-400 text-xs">− {wheelPercent ? combinedWheelPercent(wheelPercent, influencerPercent(event.id, appliedDiscount?.code)) : toDiscountPercent(appliedDiscount?.percent)}% Rabatt{wheelPercent ? ' auf Tickets' : ''}</p>}<p className="text-2xl font-bold text-[#d6b36a]">{formatMoney(total)}</p><p className="mt-1 text-[11px] text-zinc-500">inkl. 19% MwSt.</p></div>
                   <p className="text-zinc-600 text-xs">{totalTickets} Ticket{totalTickets !== 1 ? "s" : ""}</p>
                 </div>
               )}

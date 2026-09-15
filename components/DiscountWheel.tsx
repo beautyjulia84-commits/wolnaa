@@ -2,8 +2,9 @@
 import { useEffect, useState } from 'react';
 
 type Reward = { percent: number; expiresAt: number; used: boolean };
-const segments = [5,10,15,20,25,5,10,15,20,25,5,10,15,20,25,10,15,20,25,15];
-const wheelBackground = `conic-gradient(${segments.map((_, i) => `${i % 2 ? '#171717' : i % 4 ? '#ead08d' : '#b88a41'} ${i*18}deg ${(i+1)*18-0.7}deg, #f6e3ab ${(i+1)*18-0.7}deg ${(i+1)*18}deg`).join(',')})`;
+const segments = [5,10,15,20,25,5,10,15,20,25,5,10,15,20,25,10,15,20,25,15,50];
+const step = 360 / segments.length;
+const wheelBackground = `conic-gradient(${segments.map((percent, i) => `${percent===50 ? '#f6df9c' : i % 2 ? '#171717' : i % 4 ? '#ead08d' : '#b88a41'} ${i*step}deg ${(i+1)*step-0.7}deg, #f6e3ab ${(i+1)*step-0.7}deg ${(i+1)*step}deg`).join(',')})`;
 export default function DiscountWheel({ eventId, onReward, onSpinComplete }: { eventId: string; onReward: (percent: number) => void; onSpinComplete?: () => void }) {
   const [reward, setReward] = useState<Reward | null>(null);
   const [spinning, setSpinning] = useState(false);
@@ -33,18 +34,19 @@ export default function DiscountWheel({ eventId, onReward, onSpinComplete }: { e
       if (!response.ok) throw new Error(data.error);
       const matches = segments.map((percent,index) => percent === data.reward.percent ? index : -1).filter(index => index >= 0);
       const index = matches[Math.floor(Math.random()*matches.length)];
-      setRotation(1800 + 360 - (index * 18 + 9));
+      setRotation(1800 + 360 - (index * step + step/2));
       window.setTimeout(() => { setReward(data.reward); setSpinning(false); onSpinComplete?.(); }, 4200);
     } catch (e) { setError(e instanceof Error ? e.message : 'Bitte erneut versuchen.'); setSpinning(false); }
   }
   return <section className="rounded-3xl bg-[radial-gradient(ellipse_at_top,#d6b36a18,transparent_65%)] px-5 pb-6 pt-9 text-center">
     <p className="text-xs uppercase tracking-[.2em] text-[#d6b36a]">Nur für Nürnberg</p>
     <h2 className="mt-3 text-3xl font-semibold tracking-tight text-white">Dein Dreh.<br />Deine Nacht. Dein Rabatt.</h2>
-    <p className="mt-2 text-sm text-zinc-400">Kostenlos drehen und garantiert 5–25 % gewinnen. Kein Kauf erforderlich.</p>
+    <p className="mt-2 text-sm text-zinc-400">Kostenlos drehen und 5–50 % gewinnen. 50 %: Chance 1 zu 300. Kein Kauf erforderlich.</p>
     <div className="relative mx-auto my-7 h-72 w-72 max-w-full rounded-full p-2 shadow-[0_0_45px_#d6b36a35]">
       <div className="absolute -top-3 left-1/2 z-10 -translate-x-1/2 text-3xl text-white">▼</div>
       <div className="relative h-full w-full rounded-full border-4 border-[#d6b36a] shadow-xl" style={{ background: wheelBackground, transform: `rotate(${rotation}deg)`, transition: 'transform 4.2s cubic-bezier(.12,.75,.12,1)' }}>
-        {segments.map((percent,index) => <span key={index} className="absolute left-1/2 top-1/2 text-[11px] font-bold" style={{ transform: `translate(-50%,-50%) rotate(${index*18+9}deg) translateY(-103px) rotate(90deg)`, color: index%2 ? '#fff' : '#111' }}>{percent}%</span>)}
+        {segments.map((percent,index) => <span key={index} className="absolute left-1/2 top-1/2 text-[11px] font-bold" style={{ transform: `translate(-50%,-50%) rotate(${index*step+step/2}deg) translateY(-103px) rotate(90deg)`, color: index%2 ? '#fff' : '#111' }}>{percent}%</span>)}
+        <p className="sr-only">Die Größe der dargestellten Felder entspricht nicht den Gewinnchancen; diese stehen in den Teilnahmebedingungen.</p>
         <span className="absolute left-1/2 top-1/2 flex h-16 w-16 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-[#d6b36a] bg-black text-[10px] font-bold tracking-wider text-[#d6b36a]">WOLNAA</span>
       </div>
     </div>
