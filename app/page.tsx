@@ -260,7 +260,7 @@ function EmptyState({ lang }: { lang: Lang }) {
 }
 
 
-function FeaturedEvent({ event, lang }: { event: EventItem; lang: Lang }) {
+function FeaturedEvent({ event, lang, first = false }: { event: EventItem; lang: Lang; first?: boolean }) {
   const t = I18N[lang];
   return (
     <a href={createEventLink(event)} className="event-card motion-card group mb-12 grid overflow-hidden rounded-md border bg-zinc-950/70 md:grid-cols-[1.15fr_0.85fr]">
@@ -273,9 +273,9 @@ function FeaturedEvent({ event, lang }: { event: EventItem; lang: Lang }) {
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/25 to-transparent" />
       </div>
 
-      <div className="flex flex-col justify-center p-7 md:p-10">
+      <div className="flex min-h-[280px] flex-col justify-center p-7 md:p-10">
         <p className="mb-4 text-xs font-bold uppercase tracking-[0.28em] text-[#d6b36a]">
-          {t.nextEvent}
+          {first ? t.nextEvent : t.upcoming}
         </p>
 
         <h3 className="float-text text-3xl font-semibold leading-tight md:text-5xl">
@@ -582,8 +582,6 @@ export default function Home() {
     ["agb", t.legalTerms], ["teilnahme", t.legalParticipation], ["widerruf", t.legalWithdrawal],
   ];
 
-  const featuredEvent = mounted && events.length > 0 ? events[0] : null;
-  const remainingEvents = featuredEvent ? events.slice(1) : events;
 
   return (
     <main className="wolnaa-page min-h-screen bg-black text-white overflow-hidden">
@@ -818,7 +816,9 @@ export default function Home() {
         <p className="mb-3 text-sm uppercase tracking-[0.26em] text-[#d6b36a]">{t.upcoming}</p>
         <h2 className="mb-10 text-4xl font-semibold md:text-5xl">{t.upcomingTitle}</h2>
 
-        {featuredEvent && <div className="md:hidden"><FeaturedEvent event={featuredEvent} lang={lang} /></div>}
+        <div className="md:hidden">
+          {mounted && events.map((event,index) => <FeaturedEvent key={event.id} event={event} lang={lang} first={index === 0} />)}
+        </div>
 
         <div className="grid gap-8 md:grid-cols-3">
           {mounted && eventsLoading && (
@@ -827,7 +827,6 @@ export default function Home() {
             </div>
           )}
           {mounted && !eventsLoading && events.length === 0 && <EmptyState lang={lang} />}
-          {mounted && remainingEvents.map(event => <div key={event.id} className="md:hidden"><EventCard event={event} lang={lang} /></div>)}
         </div>
         <div className="hidden grid-cols-2 items-stretch gap-8 md:grid">
           {mounted && events.map(event => <EventCard key={event.id} event={event} lang={lang} />)}
