@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
+import { acquisitionSource } from '@/lib/analytics';
 import { createClient } from "@supabase/supabase-js";
 import { getTicketPhase, normalizeTicketName } from "@/lib/ticket-phases";
 import { readReward, signReward, WHEEL_COOKIE, WHEEL_EVENT_ID, wheelCookieOptions } from '@/lib/discount-wheel';
@@ -150,6 +151,7 @@ export async function POST(req: Request) {
       mode: "payment",
       customer_email: customerEmail,
       metadata: {
+        acquisitionSource: acquisitionSource(req),
         eventId: eventId || "",
         eventTitle: eventTitle || event.title || "",
         customerName: customerName || "",

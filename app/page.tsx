@@ -378,7 +378,7 @@ function CookieBanner({ lang }: { lang: Lang }) {
       <div>
         <p style={{ color: '#fff', fontWeight: 700, fontSize: 15, marginBottom: 6 }}>🍪 {t.cookieTitle}</p>
         <p style={{ color: '#a1a1aa', fontSize: 13, lineHeight: 1.6 }}>
-          {lang === 'de' ? 'Notwendige Funktionen bleiben aktiv. Mit „Alle akzeptieren“ erlaubst du zusätzlich TikTok-Werbetracking. Das Glücksrad-Aktionscookie erfordert eine separate Einwilligung am Rad.' : 'Необходимые функции остаются активными. «Принять все» разрешает рекламное отслеживание TikTok. Для cookie колеса скидок требуется отдельное согласие.'}{' '}
+          {lang === 'de' ? 'Notwendige Funktionen bleiben aktiv. Mit „Alle akzeptieren“ erlaubst du zusätzlich TikTok-Werbetracking und ein Sitzungscookie zur Zuordnung der Ticketkäufe zu ihrer Herkunft. Das Glücksrad-Aktionscookie erfordert eine separate Einwilligung am Rad.' : 'Необходимые функции остаются активными. «Принять все» разрешает рекламное отслеживание TikTok и cookie сеанса для определения источника покупки билетов. Для cookie колеса скидок требуется отдельное согласие.'}{' '}
           <a href="/datenschutz" style={{ color: '#d6b36a', fontSize: 13 }}>{t.legalPrivacy}</a>
         </p>
       </div>

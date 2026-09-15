@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
+import { recordAnalytics } from '@/lib/analytics';
 import { drawReward, readReward, signReward, WHEEL_COOKIE, WHEEL_EVENT_ID, wheelCookieOptions } from '@/lib/discount-wheel';
 
 export async function GET(req: Request) {
@@ -14,6 +15,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Die Aktion ist beendet.' }, { status: 400 });
   }
   const reward = drawReward();
+  await recordAnalytics({kind:'wheel'});
   const response = NextResponse.json({ reward });
   response.cookies.set(WHEEL_COOKIE, signReward(reward), wheelCookieOptions);
   return response;

@@ -1,4 +1,5 @@
 import type Stripe from "stripe";
+import { recordAnalytics } from '@/lib/analytics';
 import { Resend } from "resend";
 import QRCode from "qrcode";
 import { supabase } from "@/lib/supabase";
@@ -54,6 +55,7 @@ export async function fulfillCheckoutSession(session: Stripe.Checkout.Session) {
 
   const { error: insertError } = await supabase.from("tickets").insert(ticketRows);
   if (insertError) throw new Error(insertError.message);
+  await recordAnalytics({kind:'purchase',source:session.metadata?.acquisitionSource || 'Direkt / unbekannt',count:totalTickets},`purchase:${session.id}`).catch(error => console.error('Purchase analytics failed',error));
 
   const attachments = [];
   for (const [index, id] of ticketIds.entries()) {

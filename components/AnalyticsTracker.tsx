@@ -18,6 +18,13 @@ export default function AnalyticsTracker() {
       catch { referrer = "Unbekannt"; }
     }
 
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('utm_source')) referrer = params.get('utm_source')!.slice(0,100);
+    else if (params.has('gclid')) referrer = 'Google Ads';
+    else if (params.has('fbclid')) referrer = 'Meta (Instagram / Facebook)';
+    else if (/instagram/i.test(referrer)) referrer = 'Instagram';
+    else if (/google/i.test(referrer)) referrer = 'Google';
+    else if (referrer === window.location.hostname) referrer = 'Direkt / unbekannt';
     fetch("/api/runtime/sync", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -26,10 +33,16 @@ export default function AnalyticsTracker() {
         referrer,
         device: window.matchMedia("(max-width: 767px)").matches ? "Mobil" : "Desktop",
         newVisit: !visitSent.current,
+        attributionConsent: localStorage.getItem('wolnaa-cookie-consent') === 'all',
       }),
       keepalive: true,
     }).catch(() => undefined);
     visitSent.current = true;
+    const updateConsent = () => {
+      fetch('/api/runtime/sync', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({path:pathname,referrer,attributionOnly:true,attributionConsent:localStorage.getItem('wolnaa-cookie-consent') === 'all'}),keepalive:true}).catch(() => undefined);
+    };
+    window.addEventListener('wolnaa-consent-change',updateConsent);
+    return () => window.removeEventListener('wolnaa-consent-change',updateConsent);
   }, [pathname]);
 
   return null;

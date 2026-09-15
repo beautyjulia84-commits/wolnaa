@@ -27,6 +27,8 @@ type TicketRow = {
 
 type ScanResult = { valid: boolean; reason?: string; customerName?: string; eventTitle?: string; amount?: number; };
 type AnalyticsData = {
+  wheelSpins?: number;
+  purchaseSources?: Record<string,number>;
   days: Record<string, { views: number; visits: number }>;
   paths: Record<string, number>;
   referrers: Record<string, number>;
@@ -272,7 +274,7 @@ export default function AdminPage() {
         headers: adminPw ? { "x-admin-token": adminPw } : undefined,
         cache: "no-store",
       });
-      const data = await res.json().catch(() => EMPTY_ANALYTICS);
+      const data = await res.json();
       if (res.ok) setAnalytics({ ...EMPTY_ANALYTICS, ...data });
       else setAnalyticsError(data.error || "Besucherdaten konnten nicht geladen werden.");
     } catch {
@@ -622,6 +624,7 @@ export default function AdminPage() {
                 { label: "Seitenaufrufe", value: periodViews },
                 { label: "Seiten je Besuch", value: periodVisits ? (periodViews / periodVisits).toFixed(1) : "0" },
                 { label: "Heute", value: analytics.days[analyticsDates.at(-1) ?? ""]?.visits ?? 0 },
+                { label: "Glücksrad-Drehungen gesamt", value: analytics.wheelSpins ?? 0 },
               ].map(item => (
                 <div key={item.label} className="rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm">
                   <p className="text-2xl font-bold text-[#9b7435]">{item.value}</p>
@@ -649,7 +652,8 @@ export default function AdminPage() {
             <div className="grid gap-5 md:grid-cols-2">
               {[
                 { title: "Beliebte Seiten", entries: topEntries(analytics.paths), empty: "Noch keine Seitenaufrufe" },
-                { title: "Herkunft", entries: topEntries(analytics.referrers), empty: "Noch keine Herkunftsdaten" },
+                { title: "Herkunft der Aufrufe", entries: topEntries(analytics.referrers), empty: "Noch keine Herkunftsdaten" },
+                { title: "Ticketkäufe nach Herkunft (Tickets)", entries: topEntries(analytics.purchaseSources ?? {}), empty: "Wird ab dieser Änderung erfasst; ohne Zuordnung: Direkt / unbekannt" },
               ].map(block => (
                 <div key={block.title} className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm">
                   <h2 className="mb-4 text-sm font-bold">{block.title}</h2>
