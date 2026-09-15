@@ -3,6 +3,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
+import DiscountWheel from '@/components/DiscountWheel';
 
 const sb = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -92,6 +93,7 @@ export default function EventPage() {
   const [loading, setLoading] = useState(false);
   const [checkoutError, setCheckoutError] = useState("");
   const [availability, setAvailability] = useState<Availability | null>(null);
+  const [wheelPercent, setWheelPercent] = useState(0);
 
   useEffect(() => { loadEvent(); }, [id]);
 
@@ -134,8 +136,9 @@ export default function EventPage() {
 
   function calcTotal() {
     let t = n.tickets.reduce((s, tk, i) => s + (ticketQtys[i] ?? 0) * toMoney(tk.price), 0);
+    if (wheelPercent) t *= (1 - wheelPercent / 100);
     if (selectedLounge !== null && n.loungeList[selectedLounge]) t += toMoney(n.loungeList[selectedLounge].price);
-    if (appliedDiscount) t *= (1 - toDiscountPercent(appliedDiscount.percent) / 100);
+    if (appliedDiscount && !wheelPercent) t *= (1 - toDiscountPercent(appliedDiscount.percent) / 100);
     return t;
   }
   const total = calcTotal();
@@ -168,7 +171,7 @@ export default function EventPage() {
       if (selectedLounge !== null && n.loungeList[selectedLounge]) lineItems.push({ name: n.loungeList[selectedLounge].name, price: n.loungeList[selectedLounge].price, qty: 1 });
       const res = await fetch("/api/create-checkout-session", {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ eventId: event?.id, eventTitle: event?.title || "", customerName, customerEmail, lineItems, total, ticketId, discountCode: appliedDiscount?.code ?? null }),
+        body: JSON.stringify({ eventId: event?.id, eventTitle: event?.title || "", customerName, customerEmail, lineItems, total, ticketId, discountCode: wheelPercent ? null : appliedDiscount?.code ?? null, wheelDiscount: wheelPercent > 0 }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Fehler aufgetreten.");
@@ -207,6 +210,7 @@ export default function EventPage() {
           </div>
         </div>
         {event.description && <div className="max-w-2xl border-t border-white/10 pt-6"><p className="text-zinc-400 text-sm leading-7 whitespace-pre-wrap">{event.description}</p></div>}
+        {event.id === 'd3a2c95d-893d-4ee4-8645-b28ec7f61063' && <DiscountWheel eventId={event.id} onReward={setWheelPercent} />}
       </div>
 
       {step === "info" && (
@@ -251,7 +255,8 @@ export default function EventPage() {
                   ))}
                 </>
               )}
-              {hasSelection && (
+              {wheelPercent > 0 && <p className="text-sm text-[#d6b36a]">Dein Glücksrad-Rabatt: {wheelPercent} % auf Tickets – automatisch angewendet.</p>}
+              {hasSelection && !wheelPercent && (
                 <div className="bg-black/35 border border-white/10 rounded-md px-5 py-4">
                   <p className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-3">Rabattcode</p>
                   <div className="flex gap-2">

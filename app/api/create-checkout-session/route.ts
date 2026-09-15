@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { createClient } from "@supabase/supabase-js";
 import { getTicketPhase, normalizeTicketName } from "@/lib/ticket-phases";
+import { readReward, signReward, WHEEL_COOKIE, WHEEL_EVENT_ID, wheelCookieOptions } from '@/lib/discount-wheel';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
@@ -27,7 +28,7 @@ export async function POST(req: Request) {
 
   try {
     const body = await req.json();
-    const { eventTitle, customerName, customerEmail, lineItems = [], ticketId, discountCode, eventId } = body;
+    const { eventTitle, customerName, customerEmail, lineItems = [], ticketId, discountCode, eventId, wheelDiscount } = body;
 
     if (!eventId) {
       return NextResponse.json({ error: "Event-ID fehlt. Bitte Seite neu laden." }, { status: 400 });
@@ -85,6 +86,7 @@ export async function POST(req: Request) {
     }
 
     let subtotal = 0;
+    let ticketSubtotal = 0;
     const checkoutLineItems = (lineItems || [])
       .map((item: any) => {
         const name = String(item.name || "");
@@ -96,6 +98,7 @@ export async function POST(req: Request) {
 
         if (!configured || qty <= 0) return null;
         subtotal += price * qty;
+        if (ticket) ticketSubtotal += price * qty;
         return { name, price: String(price.toFixed(2)), qty };
       })
       .filter(Boolean);
@@ -106,6 +109,15 @@ export async function POST(req: Request) {
 
     let discountPercent = 0;
     let appliedDiscountCode = "";
+    const wheelReward = wheelDiscount ? readReward(req) : null;
+    if (wheelDiscount) {
+      if (eventId !== WHEEL_EVENT_ID || !wheelReward || wheelReward.used || wheelReward.expiresAt <= Date.now()) {
+        return NextResponse.json({ error: 'Der Glücksrad-Rabatt ist abgelaufen oder bereits eingesetzt. Bitte lade die Seite neu.' }, { status: 400 });
+      }
+      if (discountCode || ticketSubtotal <= 0) return NextResponse.json({ error: 'Der Glücksrad-Rabatt gilt nur für Tickets und ist nicht kombinierbar.' }, { status: 400 });
+      discountPercent = wheelReward.percent;
+      appliedDiscountCode = `GLUECKSRAD-${wheelReward.percent}`;
+    }
     if (discountCode) {
       const foundDiscount = configuredDiscounts.find((entry: any) => normalizeName(entry.code) === normalizeName(discountCode));
       if (!foundDiscount) {
@@ -118,7 +130,7 @@ export async function POST(req: Request) {
       appliedDiscountCode = String(foundDiscount.code || "");
     }
 
-    const totalAmount = Math.round(subtotal * (1 - discountPercent / 100) * 100);
+    const totalAmount = Math.round((subtotal - (wheelReward ? ticketSubtotal : subtotal) * discountPercent / 100) * 100);
 
     if (!Number.isFinite(totalAmount) || totalAmount <= 0) {
       return NextResponse.json({ error: "Der Gesamtbetrag ist ungültig. Bitte lade die Seite neu." }, { status: 400 });
@@ -184,7 +196,9 @@ export async function POST(req: Request) {
       console.error("Checkout analytics error:", analyticsError);
     }
 
-    return NextResponse.json({ url: session.url });
+    const response = NextResponse.json({ url: session.url });
+    if (wheelReward) response.cookies.set(WHEEL_COOKIE, signReward({ ...wheelReward, used: true }), wheelCookieOptions);
+    return response;
   } catch (error: any) {
     console.error("Stripe checkout error:", error);
     return NextResponse.json({ error: error.message || "Stripe Fehler" }, { status: 500 });

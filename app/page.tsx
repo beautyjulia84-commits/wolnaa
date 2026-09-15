@@ -928,6 +928,7 @@ export default function Home() {
       </footer>
 
       <CookieBanner lang={lang} />
+      <a href="/gluecksrad-teilnahmebedingungen" className="block pb-6 text-center text-xs text-zinc-500 underline">Teilnahmebedingungen Rabatt-Glücksrad Nürnberg</a>
       <PurchaseActivity lang={lang} />
       {showContact && <ContactModal lang={lang} onClose={() => setShowContact(false)} />}
       {showLegal && <LegalModal lang={lang} type={showLegal} content={legalContent[showLegal!] ?? ""} onClose={closeLegal} />}
