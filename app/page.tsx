@@ -207,7 +207,7 @@ function EventCard({ event, lang }: { event: EventItem; lang: Lang }) {
     setTimeout(() => setTapped(false), 600);
   }
   return (
-    <a href={createEventLink(event)} onTouchStart={handleTouch} className={`motion-card group block overflow-hidden rounded-md border bg-zinc-950/70 transition-all duration-500 hover:-translate-y-1 ${tapped ? "border-[#d6b36a]/60 scale-[0.99]" : "border-white/10 hover:border-white/20 hover:bg-zinc-950"}`}>
+    <a href={createEventLink(event)} onTouchStart={handleTouch} data-tapped={tapped} className="event-card motion-card group block overflow-hidden rounded-md border bg-zinc-950/70">
       <div className="relative h-56 flex items-center justify-center bg-[radial-gradient(circle_at_top,#2b1b00_0%,#111_38%,#000_100%)] overflow-hidden">
         {event.image_url ? (
           <img src={event.image_url} alt={event.title} className="w-full h-56 object-cover transition-transform duration-700 group-hover:scale-[1.02]" loading="lazy" decoding="async" />
@@ -264,7 +264,7 @@ function EmptyState({ lang }: { lang: Lang }) {
 function FeaturedEvent({ event, lang }: { event: EventItem; lang: Lang }) {
   const t = I18N[lang];
   return (
-    <a href={createEventLink(event)} className="wolnaa-hover-glow motion-card group mb-12 grid overflow-hidden rounded-md border border-white/10 bg-zinc-950/70 md:grid-cols-[1.15fr_0.85fr]">
+    <a href={createEventLink(event)} className="event-card motion-card group mb-12 grid overflow-hidden rounded-md border bg-zinc-950/70 md:grid-cols-[1.15fr_0.85fr]">
       <div className="relative min-h-[320px] overflow-hidden bg-zinc-950 md:min-h-[420px]">
         {event.image_url ? (
           <img src={event.image_url} alt={event.title} className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy" decoding="async" />
@@ -645,6 +645,26 @@ export default function Home() {
 
         .wolnaa-page .wolnaa-hover-glow {
           position: relative;
+        }
+        .wolnaa-page .event-card {
+          border-color: rgba(214,179,106,.55);
+          box-shadow: 0 0 16px rgba(214,179,106,.1), inset 0 0 0 1px rgba(214,179,106,.08);
+        }
+        .wolnaa-page .event-card:hover,
+        .wolnaa-page .event-card:focus-visible,
+        .wolnaa-page .event-card:active,
+        .wolnaa-page .event-card[data-tapped="true"] {
+          transform: translateY(-6px) scale(1.025);
+          border-color: rgba(234,208,141,.95);
+          box-shadow: 0 18px 50px rgba(0,0,0,.46), 0 0 30px rgba(214,179,106,.3), inset 0 0 0 1px rgba(234,208,141,.22);
+          outline: none;
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .wolnaa-page .event-card,
+          .wolnaa-page .event-card:hover,
+          .wolnaa-page .event-card:focus-visible,
+          .wolnaa-page .event-card:active,
+          .wolnaa-page .event-card[data-tapped="true"] { transform: none; transition: none; }
         }
 
         .wolnaa-page .wolnaa-hover-glow::before {
