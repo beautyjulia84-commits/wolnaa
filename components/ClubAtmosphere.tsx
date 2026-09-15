@@ -18,8 +18,7 @@ export default function ClubAtmosphere({lang}:{lang:'de'|'ru'}) {
   },[]);
   return <section ref={section} className="relative isolate min-h-[540px] overflow-hidden border-y border-[#d6b36a]/20 bg-zinc-950 md:min-h-[620px]">
     <div ref={background} aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-[100lvh] min-h-[620px] bg-cover bg-[position:55%_45%] md:bg-[position:center_35%] will-change-transform" style={{backgroundImage:'url(/club-atmosphere-wolnaa.jpg)'}} />
-    <div className="absolute inset-0 bg-gradient-to-b from-black/35 via-black/40 to-black/90" />
-    <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,#d6b36a25,transparent_65%)]" />
+    <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/60 to-black/95" />
     <div className="reveal-section relative mx-auto flex min-h-[540px] max-w-7xl flex-col justify-end px-6 py-16 md:min-h-[620px] md:py-24">
       <p className="mb-5 text-xs font-bold tracking-[.3em] text-[#ead08d]">WOLNAA</p>
       <h2 className="max-w-2xl text-5xl font-semibold leading-[1.05] tracking-tight text-white md:text-7xl">{lang==='de' ? 'Mehr als eine Nacht.' : 'Больше, чем просто ночь.'}</h2>
