@@ -57,7 +57,13 @@ export default function PurchaseActivity({ lang }: { lang: "de" | "ru" }) {
 
   const content = (
     <div className="flex min-w-0 items-center gap-3 pr-7">
-      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#d6b36a]/15 text-lg">🎟</span>
+      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-[#d6b36a]/30 bg-gradient-to-br from-[#d6b36a]/20 to-[#d6b36a]/5 text-[#ead08d] shadow-[inset_0_1px_0_#ead08d20]">
+        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6 -rotate-12">
+          <path d="M4 5h16a1 1 0 0 1 1 1v3a3 3 0 0 0 0 6v3a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-3a3 3 0 0 0 0-6V6a1 1 0 0 1 1-1Z" />
+          <path d="M15 5v2m0 3v1m0 3v1m0 3v1" />
+          <path d="m7 12 1.5 1.5L11 11" />
+        </svg>
+      </span>
       <span className="min-w-0">
         <span className="block text-[10px] font-bold uppercase tracking-[0.18em] text-[#d6b36a]">
           {lang === "ru" ? "Недавняя покупка" : "Kürzlich gekauft"}
