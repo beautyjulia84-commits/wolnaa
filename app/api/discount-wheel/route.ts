@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 import { recordAnalytics } from '@/lib/analytics';
+import { claimWheelSpin } from '@/lib/wheel-counter';
 import { drawReward, readReward, signReward, WHEEL_COOKIE, WHEEL_EVENT_ID, wheelCookieOptions } from '@/lib/discount-wheel';
 
 export async function GET(req: Request) {
@@ -14,8 +15,15 @@ export async function POST(req: Request) {
   if (!event || event.date < new Date().toISOString().slice(0, 10) || (event.online_sale_ends_at && new Date(event.online_sale_ends_at).getTime() <= Date.now())) {
     return NextResponse.json({ error: 'Die Aktion ist beendet.' }, { status: 400 });
   }
-  const reward = drawReward();
-  await recordAnalytics({kind:'wheel'});
+  let spinNumber: number;
+  try {
+    spinNumber = await claimWheelSpin(supabase);
+  } catch {
+    return NextResponse.json({ error: 'Das Rad ist gerade nicht verfügbar. Bitte erneut versuchen.' }, { status: 503 });
+  }
+  const reward = drawReward(spinNumber);
+  // Analytics must not discard an already allocated reward (including the 70th).
+  await recordAnalytics({kind:'wheel'}).catch(() => console.error('Wheel analytics could not be recorded'));
   const response = NextResponse.json({ reward });
   response.cookies.set(WHEEL_COOKIE, signReward(reward), wheelCookieOptions);
   return response;
