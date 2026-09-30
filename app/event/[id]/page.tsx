@@ -151,7 +151,7 @@ export default function EventPage() {
     const code = discountInput.trim().toUpperCase();
     if (!code) { setDiscountError("Bitte einen Code eingeben."); return; }
     const extra = influencerPercent(event!.id,code);
-    if (wheelPercent && !extra) {setAppliedDiscount(null);setDiscountError('Zum Glücksrad gilt nur einfachwowa oder janchik.');return;}
+    if (wheelPercent && !extra) {setAppliedDiscount(null);setDiscountError('Zum Glücksrad gilt nur einfachwowa, janchik oder CHRIS.');return;}
     const found = extra ? {code,percent:'10'} : n.discountCodes.find((d: DiscountCode) => d.code.toUpperCase() === code);
     if (found && toDiscountPercent(found.percent) > 0) { setAppliedDiscount(found); setDiscountSuccess(true); }
     else if (found) { setAppliedDiscount(null); setDiscountError("Rabattcode ist nicht korrekt konfiguriert."); }

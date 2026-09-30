@@ -116,7 +116,7 @@ export async function POST(req: Request) {
       if (eventId !== WHEEL_EVENT_ID || !wheelReward || wheelReward.used || wheelReward.expiresAt <= Date.now()) {
         return NextResponse.json({ error: 'Der Glücksrad-Rabatt ist abgelaufen oder bereits eingesetzt. Bitte lade die Seite neu.' }, { status: 400 });
       }
-      if (ticketSubtotal <= 0 || (discountCode && !influencerPercent(eventId,discountCode))) return NextResponse.json({ error: 'Zum Glücksrad ist nur ein Code möglich: einfachwowa oder janchik.' }, { status: 400 });
+      if (ticketSubtotal <= 0 || (discountCode && !influencerPercent(eventId,discountCode))) return NextResponse.json({ error: 'Zum Glücksrad ist nur ein Code möglich: einfachwowa, janchik oder CHRIS.' }, { status: 400 });
       discountPercent = combinedWheelPercent(wheelReward.percent,influencerPercent(eventId,discountCode));
       appliedDiscountCode = `GLUECKSRAD-${wheelReward.percent}`;
     }
