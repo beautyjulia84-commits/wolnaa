@@ -547,6 +547,7 @@ export default function AdminPage() {
                 {tabs.map(t => (
                   <button key={t.key} onClick={() => { setTab(t.key); if (t.key === "besucher") loadAnalytics(); setMenuOpen(false); }} className={`w-full rounded-xl px-4 py-3 text-left text-sm font-semibold transition-colors ${tab === t.key ? "bg-[#d6b36a] text-black" : "text-zinc-700 hover:bg-zinc-100 hover:text-black"}`}>{t.label}</button>
                 ))}
+                <Link href="/admin/promocodes" className="block rounded-xl px-4 py-3 text-sm font-semibold text-zinc-700 hover:bg-zinc-100">Promocode-Auswertung</Link>
                 <div className="my-2 border-t border-zinc-200" />
                 <Link href="/" onClick={() => setMenuOpen(false)} className="block rounded-xl px-4 py-3 text-sm font-medium text-zinc-600 hover:bg-zinc-100 hover:text-black">Zur Website</Link>
                 <button onClick={logout} className="w-full rounded-xl px-4 py-3 text-left text-sm font-medium text-red-600 hover:bg-red-50">Logout</button>

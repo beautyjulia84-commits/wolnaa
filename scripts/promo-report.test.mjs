@@ -1,0 +1,14 @@
+import assert from 'node:assert/strict';
+import { promoReportRow } from '../lib/promo-report.ts';
+const base = { id:'cs_live_test', livemode:true,status:'complete',payment_status:'paid',metadata:{eventId:'event',discountCode:'WHEEL40+EinfachWowa',lineItems:JSON.stringify([{qty:2},{qty:3}])}, payment_intent:{latest_charge:{refunded:false,amount_refunded:0}} };
+const row = s => promoReportRow(s,'event','einfachwowa');
+assert.equal(row(base).tickets,5);
+assert.equal(row(base).refund,'none');
+for (const patch of [{livemode:false},{status:'expired'},{payment_status:'unpaid'},{metadata:{...base.metadata,eventId:'other'}},{metadata:{...base.metadata,discountCode:'noteinfachwowa'}}]) assert.equal(row({...base,...patch}),null);
+assert.equal(row({...base,metadata:{...base.metadata,discountCode:' EINFACHWOWA '}}).tickets,5);
+assert.equal(row({...base,metadata:{...base.metadata,lineItems:'broken'}}).tickets,null);
+assert.equal(row({...base,metadata:{...base.metadata,lineItems:'[{"qty":-1}]'}}).tickets,null);
+assert.equal(row({...base,payment_intent:'pi_unexpanded'}).refund,'unknown');
+assert.equal(row({...base,payment_intent:{latest_charge:{refunded:true,amount_refunded:100}}}).refund,'full');
+assert.equal(row({...base,payment_intent:{latest_charge:{refunded:false,amount_refunded:10}}}).refund,'partial');
+console.log('Promo report tests passed');
