@@ -137,7 +137,7 @@ export default function TeilnehmerPage() {
         ))}
       </div>
 
-      <div className="mb-5"><EventPromoReport eventId={eventId} /></div>
+      <div className="mb-5"><EventPromoReport key={eventId} eventId={eventId} eventTitle={event?.title} eventDate={event?.date} /></div>
       <div style={{ display: 'flex', gap: '10px', marginBottom: '16px' }}>
         <input
           value={search}

@@ -1,49 +1,23 @@
 'use client';
-import { useState } from 'react';
-
-type Row = { id: string; created: number; code: string; tickets: number | null; refund: string; amount: number; currency: string };
+import {useEffect,useState} from 'react';
+import EventPromoReport from '@/components/EventPromoReport';
 export default function PromoReport() {
-  const [code, setCode] = useState('einfachwowa');
-  const [eventId, setEventId] = useState('d3a2c95d-893d-4ee4-8645-b28ec7f61063');
-  const [rows, setRows] = useState<Row[]>([]);
-  const [busy, setBusy] = useState(false);
-  const [complete, setComplete] = useState(false);
-  const [message, setMessage] = useState('');
-  async function run(e: React.FormEvent) {
-    e.preventDefault(); setBusy(true); setComplete(false); setRows([]);
-    const asOf = String(Math.floor(Date.now() / 1000));
-    let cursor = '', scanned = 0;
-    const found = new Map<string, Row>();
-    const cursors = new Set<string>();
-    try {
-      do {
-        setMessage(`${scanned} abgeschlossene Checkouts geprüft …`);
-        const params = new URLSearchParams({ code: code.trim(), eventId: eventId.trim(), asOf, ...(cursor ? { cursor } : {}) });
-        const response = await fetch(`/api/admin/promo-report?${params}`, { cache: 'no-store' });
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.error || 'Auswertung fehlgeschlagen.');
-        for (const row of data.rows) found.set(row.id, row);
-        scanned += data.scanned;
-        cursor = data.next || '';
-        if (cursor && cursors.has(cursor)) throw new Error('Seitennavigation fehlgeschlagen. Ergebnis unvollständig.');
-        cursors.add(cursor);
-      } while (cursor);
-      setRows([...found.values()]); setComplete(true);
-      setMessage(`Vollständig: ${scanned} abgeschlossene Checkouts geprüft. Stand ${new Date(Number(asOf) * 1000).toLocaleString('de-DE')}.`);
-    } catch (error) { setMessage(error instanceof Error ? error.message : 'Auswertung fehlgeschlagen.'); }
-    finally { setBusy(false); }
-  }
-  const sum = (list: Row[]) => list.reduce((n, row) => n + (row.tickets || 0), 0);
-  return <main className="min-h-screen bg-zinc-50 p-6 text-zinc-950"><div className="mx-auto max-w-4xl">
-    <a href="/admin" className="underline">← Adminbereich</a><h1 className="my-6 text-2xl font-bold">Promocode-Auswertung</h1>
-    <p>Bezahlte Live-Bestellungen, einschließlich Kombinationen mit dem Glücksrad. Standardveranstaltung: NEXTIME / WOLNAA Indoor Festival am 02.10.2026.</p>
-    <form onSubmit={run} className="my-6 grid gap-4"><label>Promocode<input required disabled={busy} value={code} onChange={e => setCode(e.target.value)} className="block w-full rounded border p-3" /></label><label>Veranstaltungs-ID<input required disabled={busy} value={eventId} onChange={e => setEventId(e.target.value)} className="block w-full rounded border p-3" /></label><button disabled={busy} className="rounded bg-amber-600 p-3 text-white disabled:opacity-50">{busy ? 'Wird ausgewertet …' : 'Verkäufe auswerten'}</button></form>
-    <p role="status">{message}</p>
-    {complete && <section className="my-6 space-y-4"><h2 className="text-xl font-bold">{sum(rows)} Tickets in {rows.length} bezahlten Bestellungen vor Erstattungen</h2>
-      <p>Ohne Erstattung: {sum(rows.filter(row => row.refund === 'none'))} Tickets. Vollständig erstattet: {sum(rows.filter(row => row.refund === 'full'))} Tickets.</p>
-      <p>Teilweise erstattete Bestellungen: {rows.filter(row => row.refund === 'partial').length}. Erstattungsstatus unbekannt: {rows.filter(row => row.refund === 'unknown').length}. Bestellungen ohne auswertbare Ticketmenge: {rows.filter(row => row.tickets === null).length} (nicht in der Ticketzahl enthalten).</p>
-      <p>Bei Teil-Erstattungen lässt sich die verbleibende Ticketmenge nicht zuverlässig aus dem Erstattungsbetrag bestimmen.</p>
-      <div className="overflow-x-auto"><table className="w-full text-left text-sm"><thead><tr><th>Datum</th><th>Code</th><th>Tickets</th><th>Bestellbetrag</th><th>Erstattung</th></tr></thead><tbody>{rows.map(row => <tr key={row.id} className="border-t"><td className="py-3">{new Date(row.created * 1000).toLocaleString('de-DE')}</td><td>{row.code}</td><td>{row.tickets ?? 'Unbekannt'}</td><td>{new Intl.NumberFormat('de-DE', { style: 'currency', currency: row.currency || 'EUR' }).format(row.amount / 100)}</td><td>{{none:'Keine',full:'Vollständig',partial:'Teilweise',unknown:'Unbekannt'}[row.refund]}</td></tr>)}</tbody></table></div>
-    </section>}
+  const [events,setEvents]=useState<{id:string;title:string;date:string}[]>([]);
+  const [eventId,setEventId]=useState('');
+  const [error,setError]=useState('');
+  const [loading,setLoading]=useState(true);
+  useEffect(()=>{
+    const abort=new AbortController();
+    fetch('/api/admin/promo-events',{cache:'no-store',signal:abort.signal}).then(async res=>{const data=await res.json();if(!res.ok)throw new Error(data.error);setEvents(data.events || []);}).catch(e=>{if(!abort.signal.aborted)setError(e.message || 'Events konnten nicht geladen werden.');}).finally(()=>{if(!abort.signal.aborted)setLoading(false);});
+    return ()=>abort.abort();
+  },[]);
+  const event=events.find(event=>event.id===eventId);
+  return <main className="min-h-screen bg-zinc-50 p-4 text-zinc-950 sm:p-6"><div className="mx-auto max-w-3xl">
+    <a href="/admin" className="underline">← Adminbereich</a>
+    <h1 className="my-6 text-2xl font-bold">Promocode-Verkäufe pro Event</h1>
+    <p>Wähle eine Veranstaltung. Anschließend kannst du ihre Verkäufe nach Promocode durchsuchen. Vergangene Veranstaltungen bleiben auswertbar.</p>
+    {error && <p role="alert" className="my-4 text-red-700">{error}</p>}
+    <label className="my-5 block font-semibold">Veranstaltung<select disabled={loading} value={eventId} onChange={e=>setEventId(e.target.value)} className="mt-2 block min-h-12 w-full rounded-lg border border-zinc-300 bg-white p-3 text-base"><option value="">{loading?'Veranstaltungen werden geladen …':'Bitte Veranstaltung auswählen'}</option>{events.map(event=><option key={event.id} value={event.id}>{event.title} · {new Date(event.date+'T12:00:00').toLocaleDateString('de-DE')}</option>)}</select></label>
+    {event && <EventPromoReport key={event.id} eventId={event.id} eventTitle={event.title} eventDate={event.date} />}
   </div></main>;
 }

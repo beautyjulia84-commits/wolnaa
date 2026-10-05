@@ -2,7 +2,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { summarizePromos, type PromoOrder } from '@/lib/promo-summary';
 
-export default function EventPromoReport({ eventId, adminToken }: { eventId: string; adminToken?: string }) {
+export default function EventPromoReport({ eventId, eventTitle, eventDate, adminToken }: { eventId: string; eventTitle?: string; eventDate?: string; adminToken?: string }) {
+  const [codeFilter, setCodeFilter] = useState('');
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [rows, setRows] = useState<PromoOrder[] | null>(null);
@@ -39,11 +40,14 @@ export default function EventPromoReport({ eventId, adminToken }: { eventId: str
   return <section className="mt-4 min-w-0 border-t border-zinc-200 pt-3 text-zinc-900">
     <button type="button" aria-expanded={open} onClick={() => { setOpen(!open); if (!open && rows === null && !busy) void load(); }} className="min-h-11 text-left text-sm font-semibold underline underline-offset-4">Promocode-Verkäufe {open ? '▴' : '▾'}</button>
     {open && <div className="space-y-3 text-sm">
+      <p className="rounded-lg bg-amber-50 p-3 font-semibold">Auswertung für: {eventTitle || 'ausgewähltes Event'}{eventDate ? ` · ${new Date(eventDate + 'T12:00:00').toLocaleDateString('de-DE')}` : ''}</p>
       {busy && <p role="status">Bezahlte Bestellungen werden ausgewertet …</p>}
       {error && <p role="alert" className="text-red-700">{error}</p>}
       {rows !== null && <>
+        <label className="block">Promocode suchen<input value={codeFilter} onChange={e => setCodeFilter(e.target.value)} placeholder="z. B. EINFACHWOWA" className="mt-1 block min-h-11 w-full rounded-lg border border-zinc-300 p-3" /></label>
+        {rows.length > 0 && !summarizePromos(rows).some(group => group.code.toUpperCase().includes(codeFilter.trim().toUpperCase())) && <p>Keine Verkäufe für diesen Code bei diesem Event gefunden.</p>}
         {rows.length === 0 ? <p>Keine bezahlten Online-Bestellungen für dieses Event gefunden.</p> : <ul className="space-y-2">
-          {summarizePromos(rows).map(group => <li key={group.code} className="rounded-lg bg-zinc-50 p-3">
+          {summarizePromos(rows).filter(group => group.code.toUpperCase().includes(codeFilter.trim().toUpperCase())).map(group => <li key={group.code} className="rounded-lg bg-zinc-50 p-3">
             <div className="flex flex-wrap items-baseline justify-between gap-2"><strong className="break-all">{group.code}</strong><span>{group.tickets} Tickets</span></div>
             <p className="mt-1 text-xs text-zinc-600">{group.orders} Bestellungen · {group.refunded} Tickets vollständig erstattet</p>
             {(group.partial > 0 || group.unknown > 0) && <p className="mt-1 text-xs text-amber-800">{group.partial} Bestellungen teilweise erstattet · {group.unknown} mit unbekannter Ticketmenge oder Erstattungsstatus</p>}

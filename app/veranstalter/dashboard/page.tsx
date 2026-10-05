@@ -1,6 +1,8 @@
 'use client';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import {eventTiming} from '@/lib/event-timing';
+import {useEventClock} from '@/lib/use-event-clock';
 import EventCard from '@/components/veranstalter/EventCard';
 
 export default function VeranstalterDashboard() {
@@ -44,6 +46,8 @@ export default function VeranstalterDashboard() {
     load();
   }, []);
 
+  const now = useEventClock();
+  const currentEvents = events.filter(event => now > 0 && !eventTiming(event,now).ended);
   if (loading) return <p style={{ color:'#666' }}>Laden...</p>;
   if (error) return <p style={{ color:'#dc2626' }}>{error}</p>;
 
@@ -67,6 +71,7 @@ export default function VeranstalterDashboard() {
         </div>
       )}
 
+      <p className="mb-3 text-sm text-zinc-500">Gesamtstatistik einschließlich vergangener Events. <Link href="/veranstalter/events" className="underline">Alle Events und Archiv</Link></p>
       <div className="portal-stats" style={{ marginBottom:32 }}>
         {[
           { label:'Events gesamt', value:stats.totalEvents, bg:'#eff6ff' },
@@ -82,17 +87,17 @@ export default function VeranstalterDashboard() {
 
       <div style={{ background:'#fff', borderRadius:'12px', border:'1px solid #e5e7eb', overflow:'hidden' }}>
         <div style={{ display:'flex', flexWrap:'wrap', gap:'12px', justifyContent:'space-between', alignItems:'center', padding:'20px 24px', borderBottom:'1px solid #f3f4f6' }}>
-          <h2 style={{ margin:0, fontSize:'17px', fontWeight:'600' }}>Meine Events</h2>
+          <h2 style={{ margin:0, fontSize:'17px', fontWeight:'600' }}>Aktuelle & kommende Events</h2>
           <Link href="/veranstalter/events/neu" style={{ background:'#111827', color:'#fff', padding:'8px 16px', borderRadius:'8px', textDecoration:'none', fontSize:'13px' }}>+ Neues Event</Link>
         </div>
 
-        {events.length === 0 ? (
+        {currentEvents.length === 0 ? (
           <div style={{ textAlign:'center', padding:'48px 24px' }}>
-            <p style={{ color:'#6b7280', margin:'0 0 16px' }}>Noch keine Events. Erstelle dein erstes Event!</p>
-            <Link href="/veranstalter/events/neu" style={{ background:'#111827', color:'#fff', padding:'10px 20px', borderRadius:'8px', textDecoration:'none', fontSize:'14px' }}>Erstes Event erstellen</Link>
+            <p style={{ color:'#6b7280', margin:'0 0 16px' }}>Zurzeit keine laufenden oder kommenden Events.</p>
+            <Link href="/veranstalter/events/neu" style={{ background:'#111827', color:'#fff', padding:'10px 20px', borderRadius:'8px', textDecoration:'none', fontSize:'14px' }}>Neues Event erstellen</Link>
           </div>
         ) : (
-          <div className="grid gap-3 p-3 sm:p-5">{events.map(event => <EventCard key={event.id} event={event} onDeleted={id => { setEvents(current => current.filter(e => e.id !== id)); setStats(current => ({...current,totalEvents:Math.max(0,current.totalEvents - 1)})); }} />)}</div>
+          <div className="grid gap-3 p-3 sm:p-5">{currentEvents.map(event => <EventCard key={event.id} event={event} onDeleted={id => { setEvents(current => current.filter(e => e.id !== id)); setStats(current => ({...current,totalEvents:Math.max(0,current.totalEvents - 1)})); }} />)}</div>
         )}
       </div>
     </div>

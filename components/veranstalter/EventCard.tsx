@@ -5,7 +5,7 @@ import EventPromoReport from '@/components/EventPromoReport';
 import { eventTiming, type TimedEvent } from '@/lib/event-timing';
 import { useEventClock } from '@/lib/use-event-clock';
 
-type Event = TimedEvent & { id: string; title: string; location?: string; tickets_sold?: number; total_revenue?: number };
+type Event = TimedEvent & { id: string; title: string; location?: string; tickets_sold?: number; total_revenue?: number; ticket_stats_warning?: string | null };
 export default function EventCard({ event, onDeleted }: { event: Event; onDeleted: (id: string) => void }) {
   const now = useEventClock();
   const confirmationId = useId();
@@ -39,6 +39,7 @@ export default function EventCard({ event, onDeleted }: { event: Event; onDelete
       <div className="mt-3 flex flex-wrap gap-2"><button type="button" autoFocus disabled={busy} onClick={() => setConfirming(false)} className="min-h-11 rounded-lg border border-zinc-300 bg-white px-3">Abbrechen</button><button type="button" disabled={busy} onClick={() => void remove()} className="min-h-11 rounded-lg bg-red-700 px-3 text-white disabled:opacity-50">{busy ? 'Löschen …' : 'Endgültig löschen'}</button></div>
     </div>}
     {error && <p role="alert" className="mt-3 text-sm text-red-700">{error}</p>}
-    <EventPromoReport eventId={event.id} />
+    {event.ticket_stats_warning && <p className="mt-3 text-xs text-amber-800">{event.ticket_stats_warning}</p>}
+    <EventPromoReport eventId={event.id} eventTitle={event.title} eventDate={event.date} />
   </article>;
 }

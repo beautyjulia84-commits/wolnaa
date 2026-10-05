@@ -597,7 +597,7 @@ export default function AdminPage() {
                       <button onClick={() => showEventTickets(e.id)} className="flex-1 rounded-xl border border-zinc-300 text-zinc-700 text-xs py-2 hover:border-[#d6b36a] hover:text-black transition-colors font-medium">Tickets</button>
                       <button onClick={() => delEv(e.id!)} className="flex-1 rounded-xl border border-zinc-200 text-zinc-500 text-xs py-2 hover:border-red-300 hover:text-red-600 transition-colors font-medium">Löschen</button>
                     </div>
-                    {e.id && <EventPromoReport eventId={e.id} adminToken={adminPw} />}
+                    {e.id && <EventPromoReport eventId={e.id} eventTitle={e.title} eventDate={e.date} adminToken={adminPw} />}
                   </div>
                 ))}
               </div>
@@ -628,7 +628,7 @@ export default function AdminPage() {
             <section className="mb-6 space-y-3 rounded-2xl border border-zinc-200 bg-white p-4">
               <h2 className="font-bold">Promocode-Verkäufe pro Event</h2>
               <p className="text-xs text-zinc-500">Admin- und Veranstalter-Events</p>
-              {analytics.events.map(event => <div key={event.id} className="min-w-0"><h3 className="mt-3 break-words text-sm font-semibold">{event.title}</h3><EventPromoReport eventId={event.id} adminToken={adminPw} /></div>)}
+              {analytics.events.map(event => <div key={event.id} className="min-w-0"><h3 className="mt-3 break-words text-sm font-semibold">{event.title}</h3><EventPromoReport eventId={event.id} eventTitle={event.title} adminToken={adminPw} /></div>)}
             </section>
             {analyticsError && <div className="mb-5 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">{analyticsError}</div>}
 

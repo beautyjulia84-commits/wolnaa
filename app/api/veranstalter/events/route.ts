@@ -1,4 +1,5 @@
 import { withEventSchedules, saveEventSchedule } from '@/lib/event-schedules';
+import { withTicketStats } from '@/lib/event-ticket-stats';
 import { validateSchedule } from '@/lib/event-timing';
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
@@ -81,10 +82,12 @@ export async function GET(req: Request) {
     .order('date', { ascending: false });
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json(
-    { events: await withEventSchedules(supabase, data || []) },
-    { headers: { 'Cache-Control': 'no-store' } }
-  );
+  try {
+    return NextResponse.json(
+      { events: await withTicketStats(supabase, await withEventSchedules(supabase, data || [])) },
+      { headers: { 'Cache-Control': 'no-store' } }
+    );
+  } catch { return NextResponse.json({error:'Ticketzahlen konnten nicht geladen werden.'},{status:503}); }
 }
 
 export async function POST(req: Request) {

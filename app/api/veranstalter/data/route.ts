@@ -1,4 +1,5 @@
 import { withEventSchedules } from '@/lib/event-schedules';
+import { withTicketStats } from '@/lib/event-ticket-stats';
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { getAuthedVeranstalterId } from '@/lib/veranstalter-auth';
@@ -25,26 +26,9 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: 'Events konnten nicht geladen werden.' }, { status: 500 });
   }
 
-  const eventIds = (ev || []).map(event => event.id);
-  const { data: tickets, error: ticketsError } = eventIds.length
-    ? await supabase.from('tickets').select('event_id,amount,status').in('event_id', eventIds).not('ticket_id', 'like', 'WOLNAA-GIVEAWAY-%')
-    : { data: [], error: null };
-
-  if (ticketsError) {
-    return NextResponse.json({ error: 'Ticketzahlen konnten nicht geladen werden.' }, { status: 500 });
-  }
-
-  const eventsWithStats = (ev || []).map(event => {
-    const paidTickets = (tickets || []).filter(ticket => ticket.event_id === event.id && ticket.status !== 'cancelled');
-    return {
-      ...event,
-      tickets_sold: paidTickets.length,
-      total_revenue: Math.round(paidTickets.reduce((sum, ticket) => sum + Number(ticket.amount || 0), 0) * 100),
-    };
-  });
-
-  return NextResponse.json(
-    { veranstalter: v, events: await withEventSchedules(supabase, eventsWithStats) },
-    { headers: { 'Cache-Control': 'no-store' } }
-  );
+  try {
+    const scheduled = await withEventSchedules(supabase, ev || []);
+    const events = await withTicketStats(supabase, scheduled);
+    return NextResponse.json({ veranstalter:v, events }, {headers:{'Cache-Control':'no-store'}});
+  } catch { return NextResponse.json({error:'Ticketzahlen konnten nicht geladen werden.'},{status:503}); }
 }
