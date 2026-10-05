@@ -1,10 +1,10 @@
 import type Stripe from 'stripe';
 
-export function promoReportRow(session: Stripe.Checkout.Session, eventId: string, code: string) {
+export function promoReportRow(session: Stripe.Checkout.Session, eventId: string, code = '') {
   const meta = session.metadata || {};
   if (!session.livemode || session.status !== 'complete' || session.payment_status !== 'paid' || meta.eventId !== eventId) return null;
   const codes = (meta.discountCode || '').split('+').map(value => value.trim().toLowerCase());
-  if (!codes.includes(code.trim().toLowerCase())) return null;
+  if (code && !codes.includes(code.trim().toLowerCase())) return null;
   let tickets: number | null = null;
   try {
     const items = JSON.parse(meta.lineItems || 'null');

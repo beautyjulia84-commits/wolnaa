@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import EventCard from '@/components/veranstalter/EventCard';
 
 export default function VeranstalterDashboard() {
   const [stats, setStats] = useState({ totalEvents:0, totalTickets:0, totalUmsatz:0, stripeOk:false });
@@ -57,7 +58,7 @@ export default function VeranstalterDashboard() {
       </div>
 
       {!stats.stripeOk && (
-        <div style={{ background:'#faf7ef', border:'1px solid #d6b36a', borderRadius:'12px', padding:'16px 20px', marginBottom:'24px', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+        <div style={{ background:'#faf7ef', border:'1px solid #d6b36a', borderRadius:'12px', padding:'16px 20px', marginBottom:'24px', display:'flex', flexWrap:'wrap', gap:'12px', justifyContent:'space-between', alignItems:'center' }}>
           <div>
             <p style={{ margin:'0 0 2px', fontWeight:'600', color:'#765725', fontSize:'14px' }}>Stripe-Konto nicht verbunden</p>
             <p style={{ margin:0, color:'#8a6932', fontSize:'13px' }}>Verbinde dein Stripe-Konto um Tickets zu verkaufen.</p>
@@ -66,7 +67,7 @@ export default function VeranstalterDashboard() {
         </div>
       )}
 
-      <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:'16px', marginBottom:'32px' }}>
+      <div className="portal-stats" style={{ marginBottom:32 }}>
         {[
           { label:'Events gesamt', value:stats.totalEvents, bg:'#eff6ff' },
           { label:'Tickets verkauft', value:stats.totalTickets, bg:'#f0fdf4' },
@@ -80,7 +81,7 @@ export default function VeranstalterDashboard() {
       </div>
 
       <div style={{ background:'#fff', borderRadius:'12px', border:'1px solid #e5e7eb', overflow:'hidden' }}>
-        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', padding:'20px 24px', borderBottom:'1px solid #f3f4f6' }}>
+        <div style={{ display:'flex', flexWrap:'wrap', gap:'12px', justifyContent:'space-between', alignItems:'center', padding:'20px 24px', borderBottom:'1px solid #f3f4f6' }}>
           <h2 style={{ margin:0, fontSize:'17px', fontWeight:'600' }}>Meine Events</h2>
           <Link href="/veranstalter/events/neu" style={{ background:'#111827', color:'#fff', padding:'8px 16px', borderRadius:'8px', textDecoration:'none', fontSize:'13px' }}>+ Neues Event</Link>
         </div>
@@ -91,27 +92,7 @@ export default function VeranstalterDashboard() {
             <Link href="/veranstalter/events/neu" style={{ background:'#111827', color:'#fff', padding:'10px 20px', borderRadius:'8px', textDecoration:'none', fontSize:'14px' }}>Erstes Event erstellen</Link>
           </div>
         ) : (
-          <table style={{ width:'100%', borderCollapse:'collapse' }}>
-            <thead><tr style={{ background:'#f9fafb' }}>
-              {['Event','Datum','Tickets','Umsatz',''].map(h => <th key={h} style={{ padding:'12px 24px', textAlign:'left', fontSize:'12px', fontWeight:'600', color:'#6b7280', textTransform:'uppercase' }}>{h}</th>)}
-            </tr></thead>
-            <tbody>
-              {events.map((e:any, i:number) => (
-                <tr key={e.id} style={{ borderTop: i===0?'none':'1px solid #f3f4f6' }}>
-                  <td style={{ padding:'16px 24px', fontWeight:'500', color:'#111', fontSize:'14px' }}>{e.title}</td>
-                  <td style={{ padding:'16px 24px', color:'#6b7280', fontSize:'14px' }}>{new Date(e.date).toLocaleDateString('de-DE',{day:'2-digit',month:'short',year:'numeric'})}</td>
-                  <td style={{ padding:'16px 24px', color:'#111', fontSize:'14px' }}>{e.tickets_sold||0}</td>
-                  <td style={{ padding:'16px 24px', color:'#111', fontSize:'14px', fontWeight:'500' }}>€{((e.total_revenue||0)/100).toFixed(2)}</td>
-                  <td style={{ padding:'16px 24px', textAlign:'right' }}>
-                    <div style={{ display:'flex', justifyContent:'flex-end', gap:'8px' }}>
-                      <Link href={`/veranstalter/events/${e.id}`} style={{ color:'#111827', border:'1px solid #d1d5db', borderRadius:'8px', padding:'7px 12px', textDecoration:'none', fontSize:'13px', fontWeight:600, whiteSpace:'nowrap' }}>Bearbeiten</Link>
-                      <Link href={`/veranstalter/events/${e.id}/teilnehmer`} style={{ color:'#fff', background:'#111827', border:'1px solid #111827', borderRadius:'8px', padding:'7px 12px', textDecoration:'none', fontSize:'13px', fontWeight:600, whiteSpace:'nowrap' }}>Tickets ansehen</Link>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <div className="grid gap-3 p-3 sm:p-5">{events.map(event => <EventCard key={event.id} event={event} onDeleted={id => { setEvents(current => current.filter(e => e.id !== id)); setStats(current => ({...current,totalEvents:Math.max(0,current.totalEvents - 1)})); }} />)}</div>
         )}
       </div>
     </div>

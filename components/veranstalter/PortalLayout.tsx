@@ -1,4 +1,5 @@
 'use client';
+import './portal.css';
 import { Suspense } from 'react';
 import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
@@ -67,14 +68,14 @@ function VeranstalterLayoutInner({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <div style={{minHeight:'100vh',background:'#fff',overflowX:'hidden',color:'#18181b'}}>
+    <div className="veranstalter-portal" style={{minHeight:'100vh',background:'#fff',overflowX:'hidden',color:'#18181b'}}>
       <header style={{background:'rgba(255,255,255,.96)',borderBottom:'1px solid #e5e7eb',padding:'0 16px',position:'sticky',top:0,zIndex:40,backdropFilter:'blur(14px)'}}>
         <div style={{maxWidth:'1100px',margin:'0 auto',display:'flex',justifyContent:'space-between',alignItems:'center',height:'64px'}}>
           <Link href="/veranstalter/dashboard" style={{display:'flex',alignItems:'center',gap:'10px',textDecoration:'none',minWidth:0}}>
             <img src="/wolnaa-logo-gold-header.png" alt="Wolnaa" style={{height:'28px',width:'auto',display:'block',flexShrink:0}} />
             <div style={{minWidth:0}}>
               <p style={{margin:0,color:'#18181b',fontSize:'13px',fontWeight:700}}>Veranstalter</p>
-              <p style={{margin:'2px 0 0',color:'#71717a',fontSize:'11px',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis',maxWidth:'180px'}}>{firmenname}</p>
+              <p style={{margin:'2px 0 0',color:'#71717a',fontSize:'11px',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis',maxWidth:'min(180px, 36vw)'}}>{firmenname}</p>
             </div>
           </Link>
           <div style={{position:'relative',flexShrink:0}}>
@@ -83,7 +84,7 @@ function VeranstalterLayoutInner({ children }: { children: React.ReactNode }) {
               aria-label="Veranstalter-Menü öffnen"
               aria-expanded={menuOpen}
               onClick={() => setMenuOpen(open => !open)}
-              style={{width:'40px',height:'40px',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:'5px',border:'1px solid #e5e7eb',borderRadius:'12px',background:'#fff',color:'#18181b',cursor:'pointer',boxShadow:'0 1px 3px rgba(0,0,0,.06)'}}
+              style={{width:'44px',height:'44px',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:'5px',border:'1px solid #e5e7eb',borderRadius:'12px',background:'#fff',color:'#18181b',cursor:'pointer',boxShadow:'0 1px 3px rgba(0,0,0,.06)'}}
             >
               <span style={{width:'20px',height:'2px',borderRadius:'999px',background:'currentColor'}} />
               <span style={{width:'20px',height:'2px',borderRadius:'999px',background:'currentColor'}} />

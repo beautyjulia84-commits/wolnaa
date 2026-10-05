@@ -216,19 +216,19 @@ export default function VeranstalterEventForm({ eventId }: { eventId?: string })
           <h2 style={{ margin: '0 0 16px', fontSize: '16px', color: '#111' }}>Allgemein</h2>
           <div style={{ display: 'grid', gap: '14px' }}>
             <div><label style={labelStyle}>Event-Name *</label><input style={inputStyle} value={form.title} onChange={e => setField('title', e.target.value)} /></div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+            <div className="portal-form-grid">
               <div><label style={labelStyle}>Stadt</label><input style={inputStyle} value={form.city} onChange={e => setField('city', e.target.value)} /></div>
               <div><label style={labelStyle}>Location</label><input style={inputStyle} value={form.location} onChange={e => setField('location', e.target.value)} /></div>
             </div>
             <div><label style={labelStyle}>Adresse</label><input style={inputStyle} value={form.address} onChange={e => setField('address', e.target.value)} /></div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+            <div className="portal-form-grid">
               <div><label style={labelStyle}>Datum *</label><input type="date" style={inputStyle} value={form.date} onChange={e => setField('date', e.target.value)} /></div>
               <div><label style={labelStyle}>Uhrzeit</label><input style={inputStyle} placeholder="22:00" value={form.time} onChange={e => setField('time', e.target.value.replace(/[^0-9:]/g, '').slice(0, 5))} /></div>
             </div>
             <div><label style={labelStyle}>Veranstaltungsende (deutsche Ortszeit)</label><input type="datetime-local" style={inputStyle} value={form.eventEndsAt || defaultEndLocal(form.date)} onChange={e => setField('eventEndsAt', e.target.value)} /><p style={{color:'#6b7280',fontSize:'12px'}}>Ab dann nicht mehr öffentlich sichtbar. Bei Nachtveranstaltungen den Folgetag wählen. Standard: Folgetag 05:00.</p></div>
             <div>
               <label style={labelStyle}>Online-Verkauf endet (deutsche Ortszeit)</label>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+              <div className="portal-form-grid">
                 <div>
                   <span style={{ display: 'block', color: '#6b7280', fontSize: '12px', marginBottom: '5px' }}>Datum</span>
                   <input
@@ -294,7 +294,7 @@ export default function VeranstalterEventForm({ eventId }: { eventId?: string })
                   <strong style={{ fontSize: '13px', color: '#374151' }}>Phase {index + 1}</strong>
                   <button onClick={() => setField('tickets', form.tickets.filter((_, i) => i !== index))} style={{ border: 'none', background: 'transparent', color: '#dc2626', cursor: 'pointer' }}>Entfernen</button>
                 </div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px' }}>
+                <div className="portal-form-grid portal-form-grid-three">
                   <input style={inputStyle} placeholder="Name" value={ticket.name} onChange={e => setTicket(index, 'name', e.target.value)} />
                   <input style={inputStyle} placeholder="Preis EUR" inputMode="decimal" value={ticket.price} onChange={e => setTicket(index, 'price', e.target.value)} />
                   <input style={inputStyle} placeholder={index === form.tickets.length - 1 ? "Menge (leer = unbegrenzt)" : "Kontingent"} inputMode="numeric" value={ticket.quantity} onChange={e => setTicket(index, 'quantity', e.target.value.replace(/\D/g, ''))} />
@@ -319,7 +319,7 @@ export default function VeranstalterEventForm({ eventId }: { eventId?: string })
                     <strong style={{ fontSize: '13px', color: '#374151' }}>Lounge {index + 1}</strong>
                     <button onClick={() => setField('loungeList', form.loungeList.filter((_, i) => i !== index))} style={{ border: 'none', background: 'transparent', color: '#dc2626', cursor: 'pointer' }}>Entfernen</button>
                   </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px' }}>
+                  <div className="portal-form-grid portal-form-grid-three">
                     <input style={inputStyle} placeholder="Name" value={lounge.name} onChange={e => setLounge(index, 'name', e.target.value)} />
                     <input style={inputStyle} placeholder="Personen" inputMode="numeric" value={lounge.persons} onChange={e => setLounge(index, 'persons', e.target.value)} />
                     <input style={inputStyle} placeholder="Preis EUR" inputMode="decimal" value={lounge.price} onChange={e => setLounge(index, 'price', e.target.value)} />
@@ -339,7 +339,7 @@ export default function VeranstalterEventForm({ eventId }: { eventId?: string })
           <div style={{ display: 'grid', gap: '12px' }}>
             {form.discountCodes.length === 0 && <p style={{ color: '#6b7280', margin: 0 }}>Keine Rabattcodes.</p>}
             {form.discountCodes.map((code, index) => (
-              <div key={index} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr auto', gap: '10px' }}>
+              <div key={index} className="portal-code-row">
                 <input style={inputStyle} placeholder="CODE" value={code.code} onChange={e => setDiscount(index, 'code', e.target.value.toUpperCase())} />
                 <input style={inputStyle} placeholder="Rabatt %" inputMode="numeric" value={code.percent} onChange={e => setDiscount(index, 'percent', e.target.value)} />
                 <button onClick={() => setField('discountCodes', form.discountCodes.filter((_, i) => i !== index))} style={{ border: '1px solid #fecaca', background: '#fef2f2', color: '#dc2626', borderRadius: '8px', padding: '0 12px', cursor: 'pointer' }}>X</button>

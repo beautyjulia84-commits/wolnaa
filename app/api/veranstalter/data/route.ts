@@ -1,3 +1,4 @@
+import { withEventSchedules } from '@/lib/event-schedules';
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { getAuthedVeranstalterId } from '@/lib/veranstalter-auth';
@@ -15,10 +16,10 @@ export async function GET(req: Request) {
 
   const { data: ev, error: eventsError } = await supabase
     .from('events')
-    .select('id,title,date')
+    .select('id,title,date,time,online_sale_ends_at')
     .eq('veranstalter_id', authedId)
     .order('date', { ascending: false })
-    .limit(5);
+    ;
 
   if (eventsError) {
     return NextResponse.json({ error: 'Events konnten nicht geladen werden.' }, { status: 500 });
@@ -43,7 +44,7 @@ export async function GET(req: Request) {
   });
 
   return NextResponse.json(
-    { veranstalter: v, events: eventsWithStats },
+    { veranstalter: v, events: await withEventSchedules(supabase, eventsWithStats) },
     { headers: { 'Cache-Control': 'no-store' } }
   );
 }

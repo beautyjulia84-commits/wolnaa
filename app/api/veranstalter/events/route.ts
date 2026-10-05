@@ -159,7 +159,7 @@ export async function DELETE(req: Request) {
 
   const { data: event, error: eventError } = await supabase
     .from('events')
-    .select('id, tickets_sold')
+    .select('id, title, tickets_sold')
     .eq('id', id)
     .eq('veranstalter_id', authedId)
     .single();
@@ -167,9 +167,14 @@ export async function DELETE(req: Request) {
   if (eventError || !event) {
     return NextResponse.json({ error: 'Event nicht gefunden oder kein Zugriff.' }, { status: 404 });
   }
-  if ((event.tickets_sold || 0) > 0) {
+  const [linked, legacy] = await Promise.all([
+    supabase.from('tickets').select('id', {count:'exact',head:true}).eq('event_id',id),
+    supabase.from('tickets').select('id', {count:'exact',head:true}).is('event_id',null).eq('event_title',event.title),
+  ]);
+  if (linked.error || legacy.error) return NextResponse.json({error:'Tickets konnten nicht geprüft werden. Event wurde nicht gelöscht.'},{status:503});
+  if ((event.tickets_sold || 0) > 0 || (linked.count || 0) > 0 || (legacy.count || 0) > 0) {
     return NextResponse.json(
-      { error: 'Events mit verkauften Tickets können nicht gelöscht werden.' },
+      { error: 'Events mit ausgestellten Tickets können nicht gelöscht werden. Die Ticket- und Kundendaten bleiben erhalten.' },
       { status: 409 }
     );
   }

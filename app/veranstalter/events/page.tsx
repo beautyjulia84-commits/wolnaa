@@ -1,114 +1,35 @@
 'use client';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import {eventTiming} from '@/lib/event-timing';
-import {useEventClock} from '@/lib/use-event-clock';
+import { eventTiming } from '@/lib/event-timing';
+import { useEventClock } from '@/lib/use-event-clock';
+import EventCard from '@/components/veranstalter/EventCard';
 
 export default function VeranstalterEvents() {
   const [events, setEvents] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [filter, setFilter] = useState<'alle'|'kommend'|'vergangen'>('alle');
-  const [deletingId, setDeletingId] = useState<string | null>(null);
-
+  const now = useEventClock();
   useEffect(() => {
-    const load = async () => {
+    let cancelled = false;
+    async function load() {
       try {
         const res = await fetch('/api/veranstalter/events', { cache: 'no-store' });
         const json = await res.json();
-
-        if (!res.ok) {
-          window.location.href = '/veranstalter/login';
-          return;
-        }
-
-        setEvents(json.events || []);
-      } catch (e) {
-        setError('Events konnten nicht geladen werden.');
-      } finally {
-        setLoading(false);
-      }
-    };
-    load();
-  }, []);
-
-  async function deleteEvent(event: any) {
-    if (!window.confirm(`„${event.title}“ wirklich löschen?`)) return;
-    setDeletingId(event.id);
-    setError('');
-    try {
-      const res = await fetch(`/api/veranstalter/events?id=${encodeURIComponent(event.id)}`, {
-        method: 'DELETE',
-      });
-      const json = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(json.error || 'Event konnte nicht gelöscht werden.');
-      setEvents(current => current.filter(item => item.id !== event.id));
-    } catch (error) {
-      setError(error instanceof Error ? error.message : 'Event konnte nicht gelöscht werden.');
-    } finally {
-      setDeletingId(null);
+        if (res.status === 401 || res.status === 403) { window.location.href = '/veranstalter/login'; return; }
+        if (!res.ok) throw new Error(json.error || 'Events konnten nicht geladen werden.');
+        if (!cancelled) setEvents(json.events || []);
+      } catch { if (!cancelled) setError('Events konnten nicht geladen werden. Bitte lade die Seite erneut.'); }
+      finally { if (!cancelled) setLoading(false); }
     }
-  }
-
-  const now = useEventClock();
-  const filtered = events.filter(e => {
-    if (filter==='kommend') return !eventTiming(e,now).ended;
-    if (filter==='vergangen') return eventTiming(e,now).ended;
-    return true;
-  });
-
-  if (loading) return <p style={{ color:'#666' }}>Laden...</p>;
-  if (error) return <p style={{ color:'#dc2626' }}>{error}</p>;
-
-  return (
-    <div>
-      <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'24px' }}>
-        <div>
-          <h1 style={{ margin:'0 0 4px', fontSize:'26px', fontWeight:'700', color:'#111' }}>Meine Events</h1>
-          <p style={{ margin:0, color:'#6b7280', fontSize:'15px' }}>{events.length} Events insgesamt</p>
-        </div>
-        <Link href="/veranstalter/events/neu" style={{ background:'#111827', color:'#fff', padding:'10px 20px', borderRadius:'8px', textDecoration:'none', fontSize:'14px', fontWeight:'500' }}>+ Neues Event</Link>
-      </div>
-
-      <div style={{ display:'flex', gap:'8px', marginBottom:'20px' }}>
-        {(['alle','kommend','vergangen'] as const).map(f => (
-          <button key={f} onClick={() => setFilter(f)} style={{ padding:'7px 16px', borderRadius:'20px', border:'1px solid', borderColor:filter===f?'#111827':'#e5e7eb', background:filter===f?'#111827':'#fff', color:filter===f?'#fff':'#6b7280', fontSize:'13px', fontWeight:'500', cursor:'pointer' }}>
-            {f.charAt(0).toUpperCase()+f.slice(1)}
-          </button>
-        ))}
-      </div>
-
-      {filtered.length === 0 ? (
-        <div style={{ background:'#fff', borderRadius:'12px', border:'1px solid #e5e7eb', padding:'48px', textAlign:'center' }}>
-          <p style={{ color:'#6b7280' }}>Keine Events gefunden.</p>
-        </div>
-      ) : (
-        <div style={{ display:'grid', gap:'12px' }}>
-          {filtered.map((e:any) => {
-
-            return (
-              <div key={e.id} style={{ background:'#fff', borderRadius:'12px', border:'1px solid #e5e7eb', padding:'20px 24px', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
-                <div style={{ flex:1 }}>
-                  <h3 style={{ margin:'0 0 6px', fontSize:'16px', fontWeight:'600', color:'#111' }}>{e.title}</h3>
-                  <p style={{ margin:0, color:'#6b7280', fontSize:'13px' }}>
-                    {new Date(e.date).toLocaleDateString('de-DE',{weekday:'short',day:'2-digit',month:'long',year:'numeric'})}
-                    {e.location && ` · ${e.location}`} · {now ? eventTiming(e,now).status : ''}
-                  </p>
-                </div>
-                <div style={{ display:'flex', alignItems:'center', gap:'10px', marginLeft:'24px' }}>
-                  <div style={{ textAlign:'center' }}>
-                    <p style={{ margin:0, fontSize:'20px', fontWeight:'700', color:'#111' }}>{e.tickets_sold||0}</p>
-                    <p style={{ margin:0, fontSize:'12px', color:'#9ca3af' }}>Tickets</p>
-                  </div>
-                  <Link href={`/veranstalter/events/${e.id}`} style={{ padding:'9px 14px', border:'1px solid #d1d5db', borderRadius:'8px', color:'#111827', textDecoration:'none', fontSize:'13px', fontWeight:'600', whiteSpace:'nowrap' }}>Bearbeiten</Link>
-                  <Link href={`/veranstalter/events/${e.id}/teilnehmer`} style={{ padding:'9px 14px', border:'1px solid #111827', borderRadius:'8px', background:'#111827', color:'#fff', textDecoration:'none', fontSize:'13px', fontWeight:'600', whiteSpace:'nowrap' }}>Tickets/Kunden</Link>
-                  <button onClick={() => deleteEvent(e)} disabled={deletingId === e.id} style={{ padding:'9px 14px', border:'1px solid #fecaca', borderRadius:'8px', background:'#fff', color:'#dc2626', fontSize:'13px', fontWeight:'600', whiteSpace:'nowrap', cursor:deletingId === e.id ? 'wait' : 'pointer', opacity:deletingId === e.id ? .6 : 1 }}>{deletingId === e.id ? 'Löschen…' : 'Löschen'}</button>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
-    </div>
-  );
+    void load(); return () => { cancelled = true; };
+  }, []);
+  const filtered = events.filter(e => filter === 'alle' || (filter === 'vergangen' ? eventTiming(e,now).ended : !eventTiming(e,now).ended));
+  return <div className="space-y-5 text-zinc-900">
+    <div className="flex flex-wrap items-center justify-between gap-3"><div><h1 className="text-2xl font-bold">Meine Events</h1><p className="text-sm text-zinc-600">{events.length} Events insgesamt</p></div><Link href="/veranstalter/events/neu" className="flex min-h-11 items-center rounded-lg bg-zinc-900 px-4 text-sm font-semibold text-white">+ Neues Event</Link></div>
+    <div className="flex flex-wrap gap-2">{(['alle','kommend','vergangen'] as const).map(f => <button key={f} type="button" aria-pressed={filter===f} onClick={() => setFilter(f)} className={`min-h-11 rounded-full border px-4 text-sm ${filter===f ? 'border-zinc-900 bg-zinc-900 text-white' : 'border-zinc-200 bg-white text-zinc-700'}`}>{f === 'alle' ? 'Alle' : f === 'kommend' ? 'Aktuell & kommend' : 'Vergangen'}</button>)}</div>
+    {error && <p role="alert" className="text-red-700">{error}</p>}
+    {loading ? <p role="status">Events werden geladen …</p> : !error && filtered.length === 0 ? <p className="rounded-xl border border-zinc-200 p-6">Keine Events gefunden.</p> : <div className="grid min-w-0 gap-4">{filtered.map(e => <EventCard key={e.id} event={e} onDeleted={id => setEvents(current => current.filter(e => e.id !== id))} />)}</div>}
+  </div>;
 }

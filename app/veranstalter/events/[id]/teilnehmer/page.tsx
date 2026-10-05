@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import EventPromoReport from '@/components/EventPromoReport';
 import { useParams } from 'next/navigation';
 
 export default function TeilnehmerPage() {
@@ -123,7 +124,7 @@ export default function TeilnehmerPage() {
         </p>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '14px', marginBottom: '22px' }}>
+      <div className="portal-stats" style={{ marginBottom:22 }}>
         {[
           { label: 'Verkaufte Tickets', value: paid },
           { label: 'Eingecheckt', value: checkedIn },
@@ -136,12 +137,13 @@ export default function TeilnehmerPage() {
         ))}
       </div>
 
+      <div className="mb-5"><EventPromoReport eventId={eventId} /></div>
       <div style={{ display: 'flex', gap: '10px', marginBottom: '16px' }}>
         <input
           value={search}
           onChange={e => setSearch(e.target.value)}
           placeholder="Name, E-Mail, Ticket-ID oder Ticketart suchen..."
-          style={{ flex: 1, padding: '11px 14px', border: '1px solid #d1d5db', borderRadius: '8px', fontSize: '14px' }}
+          style={{ flex: 1, minWidth: 0, padding: '11px 14px', border: '1px solid #d1d5db', borderRadius: '8px', fontSize: '14px' }}
         />
         <button onClick={exportCsv} style={{ background: '#111827', color: '#fff', border: 'none', borderRadius: '8px', padding: '0 16px', fontWeight: 600, cursor: 'pointer' }}>
           CSV
@@ -153,7 +155,7 @@ export default function TeilnehmerPage() {
           <div style={{ padding: '36px', textAlign: 'center', color: '#6b7280' }}>Noch keine Tickets für dieses Event.</div>
         ) : (
           <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <table className="portal-ticket-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
                 <tr style={{ background: '#f9fafb' }}>
                   {['Kunde', 'Ticket', 'Status', 'Betrag', 'Datum', ''].map(h => (
@@ -164,15 +166,15 @@ export default function TeilnehmerPage() {
               <tbody>
                 {filtered.map((t, i) => (
                   <tr key={t.id} style={{ borderTop: i === 0 ? 'none' : '1px solid #f3f4f6' }}>
-                    <td style={{ padding: '14px 16px' }}>
+                    <td data-label="Kunde" style={{ padding: '14px 16px' }}>
                       <p style={{ margin: 0, fontWeight: 600, color: '#111', fontSize: '14px' }}>{t.customer_name}</p>
                       <p style={{ margin: '3px 0 0', color: '#6b7280', fontSize: '12px' }}>{t.customer_email}</p>
                     </td>
-                    <td style={{ padding: '14px 16px', color: '#374151', fontSize: '13px' }}>
+                    <td data-label="Ticket" style={{ padding: '14px 16px', color: '#374151', fontSize: '13px' }}>
                       <p style={{ margin: 0 }}>{t.ticket_name || 'Ticket'}</p>
                       <p style={{ margin: '3px 0 0', color: '#9ca3af', fontSize: '11px' }}>{t.ticket_id}</p>
                     </td>
-                    <td style={{ padding: '14px 16px' }}>
+                    <td data-label="Status" style={{ padding: '14px 16px' }}>
                       <span style={{
                         display: 'inline-block',
                         padding: '4px 9px',
@@ -185,9 +187,9 @@ export default function TeilnehmerPage() {
                         {t.status === 'checked_in' ? 'Eingecheckt' : t.status === 'cancelled' ? 'Storniert' : 'Bezahlt'}
                       </span>
                     </td>
-                    <td style={{ padding: '14px 16px', color: '#111', fontWeight: 600, fontSize: '14px' }}>€{Number(t.amount || 0).toFixed(2)}</td>
-                    <td style={{ padding: '14px 16px', color: '#6b7280', fontSize: '12px' }}>{t.created_at ? new Date(t.created_at).toLocaleString('de-DE') : '-'}</td>
-                    <td style={{ padding: '14px 16px', textAlign: 'right' }}>
+                    <td data-label="Betrag" style={{ padding: '14px 16px', color: '#111', fontWeight: 600, fontSize: '14px' }}>€{Number(t.amount || 0).toFixed(2)}</td>
+                    <td data-label="Datum" style={{ padding: '14px 16px', color: '#6b7280', fontSize: '12px' }}>{t.created_at ? new Date(t.created_at).toLocaleString('de-DE') : '-'}</td>
+                    <td data-label="Aktion" style={{ padding: '14px 16px', textAlign: 'right' }}>
                       {t.status !== 'cancelled' && (
                         <button onClick={() => toggleCheckIn(t)} style={{ border: '1px solid #d1d5db', background: '#fff', borderRadius: '8px', padding: '7px 10px', cursor: 'pointer', fontSize: '12px' }}>
                           {t.status === 'checked_in' ? 'Zurücksetzen' : 'Einchecken'}

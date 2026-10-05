@@ -133,7 +133,7 @@ export default function Einstellungen() {
             { label:'E-Mail', value:veranstalter?.kontakt_email },
             { label:'Plattformgebühr (Wolnaa)', value:`${veranstalter?.platform_fee_percent}%` },
           ].map((item, i, arr) => (
-            <div key={item.label} style={{ display:'flex', justifyContent:'space-between', padding:'14px 0', borderBottom:i<arr.length-1?'1px solid #f3f4f6':'none' }}>
+            <div key={item.label} style={{ display:'flex', flexWrap:'wrap', gap:'8px', justifyContent:'space-between', padding:'14px 0', borderBottom:i<arr.length-1?'1px solid #f3f4f6':'none' }}>
               <span style={{ color:'#6b7280', fontSize:'14px' }}>{item.label}</span>
               <span style={{ fontWeight:'500', color:'#111', fontSize:'14px' }}>{item.value}</span>
             </div>
