@@ -1,8 +1,12 @@
 "use client";
+import {berlinLocal,berlinInstant,defaultEndLocal,eventTiming} from '@/lib/event-timing';
+import {useEventClock} from '@/lib/use-event-clock';
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import jsQR from "jsqr";
+
+function berlinInstantForDisplay(value:string) { try { return berlinInstant(value); } catch { return null; } }
 
 type Tab = "events" | "besucher" | "tickets" | "rechtliches" | "scanner" | "veranstalter" | "einstellungen";
 type LegalKey = "impressum" | "datenschutz" | "agb" | "teilnahme" | "widerruf";
@@ -12,7 +16,7 @@ type DiscountCode = { code: string; percent: string };
 
 type EventItem = {
   id?: string;
-  title: string; city: string; date: string; time: string; onlineSaleEndsAt: string;
+  title: string; city: string; date: string; time: string; onlineSaleEndsAt: string; eventEndsAt: string;
   location: string; address: string; imageUrl: string; price: string;
   description: string; tickets: TicketType[];
   lounges: boolean; loungeList: Lounge[]; discountCodes: DiscountCode[];
@@ -45,7 +49,7 @@ const LEGAL_LABELS: Record<LegalKey, string> = {
 };
 
 const EMPTY: EventItem = {
-  title: "", city: "", date: "", time: "", onlineSaleEndsAt: "", location: "", address: "",
+  title: "", city: "", date: "", time: "", onlineSaleEndsAt: "", eventEndsAt: "", location: "", address: "",
   imageUrl: "", price: "", description: "",
   tickets: [{ name: "Standard", price: "", quantity: "" }],
   lounges: false, loungeList: [], discountCodes: [],
@@ -59,7 +63,8 @@ function rowToEvent(r: any): EventItem {
     city: r.city ?? "",
     date: r.date ?? "",
     time: r.time ?? "",
-    onlineSaleEndsAt: r.online_sale_ends_at ? new Date(r.online_sale_ends_at).toISOString().slice(0, 16) : "",
+    onlineSaleEndsAt: r.online_sale_ends_at ? berlinLocal(r.online_sale_ends_at) : "",
+    eventEndsAt: r.event_ends_at ? berlinLocal(r.event_ends_at) : defaultEndLocal(r.date),
     location: r.location ?? "",
     address: r.address ?? "",
     imageUrl: r.image_url ?? "",
@@ -220,6 +225,7 @@ function VeranstalterEinladen({ adminPw }: { adminPw: string }) {
 }
 
 export default function AdminPage() {
+  const eventNow = useEventClock();
   const [authed, setAuthed] = useState(false);
   const [adminPw, setAdminPw] = useState("");
   const [tab, setTab] = useState<Tab>("besucher");
@@ -582,7 +588,7 @@ export default function AdminPage() {
                       <div className="flex-1 min-w-0">
                         <p className="font-semibold text-sm truncate">{e.title}</p>
                         <p className="text-zinc-600 text-xs">{e.city}{e.location ? ` · ${e.location}` : ""}</p>
-                        <p className="text-[#9b7435] text-xs">{e.date}{e.time ? ` · ${e.time}` : ""}</p>
+                        <p className="text-[#9b7435] text-xs">{e.date}{e.time ? ` · ${e.time}` : ""} · {eventNow > 0 ? eventTiming({date:e.date,time:e.time,event_ends_at:e.eventEndsAt ? berlinInstantForDisplay(e.eventEndsAt) : null},eventNow).status : ""}</p>
                       </div>
                     </div>
                     <div className="flex gap-2 mt-3 pt-3 border-t border-zinc-200">
@@ -892,8 +898,9 @@ export default function AdminPage() {
                       <input type="text" inputMode="numeric" value={ev.time} onChange={e => { let v = e.target.value.replace(/[^0-9:]/g, ""); if (v.length === 2 && !v.includes(":") && ev.time.length < 2) v += ":"; if (v.length <= 5) f("time", v); }} placeholder="22:00" maxLength={5} className={inp} />
                     </div>
                   </div>
+                  <div><label className={lbl}>Veranstaltungsende (deutsche Ortszeit)</label><input type="datetime-local" value={ev.eventEndsAt || defaultEndLocal(ev.date)} onChange={e => f("eventEndsAt", e.target.value)} className={inp} /><p className="text-zinc-600 text-xs mt-1.5">Ab diesem Zeitpunkt nicht mehr öffentlich sichtbar. Bei Nachtveranstaltungen den Folgetag wählen. Standard: Folgetag 05:00.</p></div>
                   <div>
-                    <label className={lbl}>Online-Verkauf endet</label>
+                    <label className={lbl}>Online-Verkauf endet (deutsche Ortszeit)</label>
                     <div className="grid grid-cols-2 gap-3">
                       <div>
                         <span className="block text-xs text-zinc-500 mb-1.5">Datum</span>
@@ -916,7 +923,7 @@ export default function AdminPage() {
                         />
                       </div>
                     </div>
-                    <p className="text-zinc-600 text-xs mt-1.5">Danach ist kein Online-Ticketkauf mehr möglich.</p>
+                    <p className="text-zinc-600 text-xs mt-1.5">Ab dann können keine neuen Bestellungen gestartet werden. Ohne Angabe gilt der Veranstaltungsbeginn. Bereits geöffnete Checkouts können noch bis zu 30 Minuten bezahlt werden.</p>
                   </div>
                 </div>
               </div>

@@ -1,3 +1,5 @@
+import {withEventSchedules} from '@/lib/event-schedules';
+import {eventTiming} from '@/lib/event-timing';
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { influencerPercent, combinedWheelPercent } from '@/lib/wheel-promotion';
@@ -38,7 +40,7 @@ export async function POST(req: Request) {
 
     const { data: event, error: eventError } = await supabase
       .from("events")
-      .select("id,title,tickets,lounge_list,discount_codes,online_sale_ends_at,stripe_account_id,veranstalter_id,veranstalter:veranstalter_id(platform_fee_percent)")
+      .select("id,title,date,time,tickets,lounge_list,discount_codes,online_sale_ends_at,stripe_account_id,veranstalter_id,veranstalter:veranstalter_id(platform_fee_percent)")
       .eq("id", eventId)
       .single();
 
@@ -46,7 +48,9 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Event nicht gefunden." }, { status: 404 });
     }
 
-    if (event.online_sale_ends_at && new Date(event.online_sale_ends_at).getTime() <= Date.now()) {
+    const [scheduledEvent] = await withEventSchedules(supabase,[event]);
+    const timing = eventTiming(scheduledEvent);
+    if (timing.salesClosed) {
       return NextResponse.json({ error: "Der Online-Verkauf für dieses Event ist beendet." }, { status: 400 });
     }
 
@@ -183,6 +187,12 @@ export async function POST(req: Request) {
       };
     }
 
+    // Recheck after inventory/discount lookups so requests crossing the deadline
+    // cannot create a fresh checkout. Existing checkouts get a short payment window.
+    if (eventTiming(scheduledEvent).salesClosed) {
+      return NextResponse.json({ error: "Der Online-Verkauf für diese Veranstaltung ist beendet." }, { status: 400 });
+    }
+    sessionConfig.expires_at = Math.ceil(Date.now() / 1000) + 30 * 60;
     const session = await stripe.checkout.sessions.create(sessionConfig);
 
     const { data: analyticsRow } = await supabase

@@ -1,3 +1,5 @@
+import { withEventSchedules, saveEventSchedule } from '@/lib/event-schedules';
+import { validateSchedule } from '@/lib/event-timing';
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { isAdminRequest } from "@/lib/admin-auth";
@@ -14,6 +16,7 @@ type AdminEvent = {
   date?: string;
   time?: string;
   onlineSaleEndsAt?: string;
+  eventEndsAt?: string;
   location?: string;
   address?: string;
   imageUrl?: string;
@@ -38,7 +41,9 @@ function eventToRow(event: AdminEvent) {
     city: event.city ?? "",
     date: event.date ?? "",
     time: event.time ?? "",
-    online_sale_ends_at: event.onlineSaleEndsAt ? new Date(event.onlineSaleEndsAt).toISOString() : null,
+    // Keep the legacy column in its original wall-time encoding. The canonical
+    // Berlin instant is stored with the schedule; retries cannot double-shift it.
+    online_sale_ends_at: event.onlineSaleEndsAt ? event.onlineSaleEndsAt + ':00.000Z' : null,
     location: event.location ?? "",
     address: event.address ?? "",
     image_url: event.imageUrl ?? "",
@@ -69,7 +74,7 @@ export async function GET(req: NextRequest) {
   }
 
   return NextResponse.json(
-    { events: data ?? [] },
+    { events: await withEventSchedules(supabase, data ?? []) },
     { headers: { "Cache-Control": "no-store" } }
   );
 }
@@ -84,6 +89,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Eventname fehlt." }, { status: 400 });
   }
 
+  let schedule;
+  try { schedule = validateSchedule(event); } catch (e) { return NextResponse.json({error:(e as Error).message},{status:400}); }
   const { data, error } = await supabase
     .from("events")
     .insert(eventToRow(event))
@@ -94,6 +101,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
+  try { await saveEventSchedule(supabase,data.id,schedule); } catch(e) { return NextResponse.json({error:(e as Error).message},{status:500}); }
   return NextResponse.json({ success: true, id: data?.id });
 }
 
@@ -110,6 +118,8 @@ export async function PUT(req: NextRequest) {
     return NextResponse.json({ error: "Eventname fehlt." }, { status: 400 });
   }
 
+  let schedule;
+  try { schedule = validateSchedule(event); } catch (e) { return NextResponse.json({error:(e as Error).message},{status:400}); }
   const { data, error } = await supabase
     .from("events")
     .update(eventToRow(event))
@@ -125,5 +135,6 @@ export async function PUT(req: NextRequest) {
     return NextResponse.json({ error: "Event nicht gefunden oder kein Admin-Event." }, { status: 404 });
   }
 
+  try { await saveEventSchedule(supabase,event.id,schedule); } catch(e) { return NextResponse.json({error:(e as Error).message},{status:500}); }
   return NextResponse.json({ success: true });
 }

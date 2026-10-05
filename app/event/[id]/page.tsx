@@ -2,20 +2,17 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { createClient } from "@supabase/supabase-js";
+import {eventTiming} from '@/lib/event-timing';
+import {useEventClock} from '@/lib/use-event-clock';
 import DiscountWheel from '@/components/DiscountWheel';
 import { influencerPercent, combinedWheelPercent } from '@/lib/wheel-promotion';
-
-const sb = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
 
 type TicketType = { name: string; price: string; quantity: string };
 type Lounge = { name: string; persons: string; price: string; type?: string };
 type DiscountCode = { code: string; percent: string };
 type Availability = { activeIndex: number; remaining: number | null; soldOut: boolean };
 type EventItem = {
+  event_ends_at?: string | null; online_sale_ends_at?: string | null;
   id: string; title: string; city: string; date: string; time: string;
   location: string; address: string;
   image_url?: string; imageUrl?: string;
@@ -76,6 +73,7 @@ function formatMoney(value: number) {
 
 export default function EventPage() {
   const params = useParams();
+  const now = useEventClock();
   const id = params?.id as string;
   const [event, setEvent] = useState<EventItem | null>(null);
   const [notFound, setNotFound] = useState(false);
@@ -100,11 +98,9 @@ export default function EventPage() {
 
   async function loadEvent() {
     try {
-      const { data } = await sb
-        .from("events")
-        .select("*, veranstalter:veranstalter_id(firmenname,kontakt_email)")
-        .eq("slug", id)
-        .single();
+      const result = await fetch(`/api/events?slug=${encodeURIComponent(id)}`, {cache:'no-store'});
+      if (!result.ok) throw new Error('Event konnte nicht geladen werden');
+      const data = (await result.json()).events?.[0];
       if (data) {
         setEvent(data);
         const response = await fetch(`/api/events/${data.id}/availability`, { cache: "no-store" });
@@ -130,6 +126,8 @@ export default function EventPage() {
   );
 
   const n = normalize(event);
+  const timing = eventTiming(event, now);
+  const salesClosed = !now || timing.salesClosed;
   const activeTicketIndex = availability?.activeIndex ?? -1;
   const activeTicket = activeTicketIndex >= 0 ? n.tickets[activeTicketIndex] : null;
   const totalTickets = Object.values(ticketQtys).reduce((a, b) => a + b, 0);
@@ -167,6 +165,7 @@ export default function EventPage() {
   }
 
   async function submitOrder() {
+    if (eventTiming(event!).salesClosed) { setCheckoutError("Der Online-Verkauf ist beendet."); return; }
     if (!validate()) return;
     setLoading(true); setCheckoutError("");
     try {
@@ -214,22 +213,23 @@ export default function EventPage() {
           </div>
         </div>
         {event.description && <div className="max-w-2xl border-t border-white/10 pt-6"><p className="text-zinc-400 text-sm leading-7 whitespace-pre-wrap">{event.description}</p></div>}
-        {event.id === 'd3a2c95d-893d-4ee4-8645-b28ec7f61063' && <DiscountWheel eventId={event.id} onReward={setWheelPercent} />}
+        {!salesClosed && event.id === 'd3a2c95d-893d-4ee4-8645-b28ec7f61063' && <DiscountWheel eventId={event.id} onReward={setWheelPercent} />}
       </div>
 
-      {step === "info" && (
+      {salesClosed && <p role="status" className="mx-auto max-w-3xl p-6 text-center text-[#d6b36a]">{timing.ended ? "Diese Veranstaltung ist beendet." : "Der Online-Ticketverkauf ist beendet."}</p>}
+      {(step === "info" || salesClosed) && (
         <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-white/10 bg-black/80 p-5 backdrop-blur-xl">
           <div className="max-w-2xl mx-auto flex items-center justify-between">
             <div>
-              <p className="text-xs text-zinc-500 uppercase tracking-widest">Ab</p>
-              <p className="text-2xl font-bold text-[#d6b36a]">{!availability ? "Wird geladen…" : activeTicket ? formatMoney(toMoney(activeTicket.price)) : "Ausverkauft"}</p>{activeTicket && <p className="mt-1 text-xs text-zinc-500">inkl. 19% MwSt.</p>}
+              {!salesClosed && <p className="text-xs text-zinc-500 uppercase tracking-widest">Ab</p>}
+              <p className="text-2xl font-bold text-[#d6b36a]">{salesClosed ? "Online-Verkauf beendet" : !availability ? "Wird geladen…" : activeTicket ? formatMoney(toMoney(activeTicket.price)) : "Ausverkauft"}</p>{!salesClosed && activeTicket && <p className="mt-1 text-xs text-zinc-500">inkl. 19% MwSt.</p>}
             </div>
-            <button onClick={() => setStep("tickets")} disabled={!availability || (!activeTicket && !n.hasLounges)} className="bg-[#d6b36a] text-black font-bold px-8 py-4 rounded-md text-base hover:bg-[#ead08d] transition-colors uppercase tracking-[0.12em] disabled:cursor-not-allowed disabled:bg-zinc-800 disabled:text-zinc-500">{!availability ? "Bitte warten" : activeTicket || n.hasLounges ? "Tickets kaufen →" : "Ausverkauft"}</button>
+            <button onClick={() => setStep("tickets")} disabled={salesClosed || !availability || (!activeTicket && !n.hasLounges)} className="bg-[#d6b36a] text-black font-bold px-8 py-4 rounded-md text-base hover:bg-[#ead08d] transition-colors uppercase tracking-[0.12em] disabled:cursor-not-allowed disabled:bg-zinc-800 disabled:text-zinc-500">{salesClosed ? "Online-Verkauf beendet" : !availability ? "Bitte warten" : activeTicket || n.hasLounges ? "Tickets kaufen →" : "Ausverkauft"}</button>
           </div>
         </div>
       )}
 
-      {step === "tickets" && (
+      {!salesClosed && step === "tickets" && (
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-end justify-center" onClick={() => setStep("info")}>
           <div className="w-full max-w-2xl bg-black border-t border-white/10 rounded-t-xl max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
             <div className="sticky top-0 bg-black border-b border-white/10 px-6 pt-6 pb-4 flex items-center justify-between">
@@ -314,7 +314,7 @@ export default function EventPage() {
         </div>
       )}
 
-      {step === "checkout" && (
+      {!salesClosed && step === "checkout" && (
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-end justify-center" onClick={() => setStep("tickets")}>
           <div className="w-full max-w-2xl bg-black border-t border-white/10 rounded-t-xl" onClick={e => e.stopPropagation()}>
             <div className="px-6 pt-6 pb-4 border-b border-white/10 flex items-center justify-between">

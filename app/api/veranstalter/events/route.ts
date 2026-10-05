@@ -1,3 +1,5 @@
+import { withEventSchedules, saveEventSchedule } from '@/lib/event-schedules';
+import { validateSchedule } from '@/lib/event-timing';
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { getAuthedVeranstalterId } from '@/lib/veranstalter-auth';
@@ -15,7 +17,9 @@ function eventToRow(event: any, veranstalter: any) {
     city: event.city || '',
     date: event.date,
     time: event.time || '',
-    online_sale_ends_at: event.onlineSaleEndsAt ? new Date(event.onlineSaleEndsAt).toISOString() : null,
+    // Keep the legacy column in its original wall-time encoding. The canonical
+    // Berlin instant is stored with the schedule; retries cannot double-shift it.
+    online_sale_ends_at: event.onlineSaleEndsAt ? event.onlineSaleEndsAt + ':00.000Z' : null,
     location: event.location || '',
     address: event.address || '',
     image_url: event.imageUrl || '',
@@ -67,7 +71,7 @@ export async function GET(req: Request) {
       .single();
 
     if (error || !data) return NextResponse.json({ error: 'Event nicht gefunden.' }, { status: 404 });
-    return NextResponse.json({ event: data });
+    return NextResponse.json({ event: (await withEventSchedules(supabase, [data]))[0] });
   }
 
   const { data, error } = await supabase
@@ -78,7 +82,7 @@ export async function GET(req: Request) {
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   return NextResponse.json(
-    { events: data || [] },
+    { events: await withEventSchedules(supabase, data || []) },
     { headers: { 'Cache-Control': 'no-store' } }
   );
 }
@@ -96,10 +100,12 @@ export async function POST(req: Request) {
     const veranstalter = await getVeranstalter(supabase, authedId);
     if (!veranstalter) return NextResponse.json({ error: 'Kein Zugriff.' }, { status: 403 });
 
+    const schedule = validateSchedule(event);
     const row = eventToRow(event, veranstalter);
     const { data, error } = await supabase.from('events').insert(row).select('id').single();
 
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    await saveEventSchedule(supabase,data.id,schedule);
     return NextResponse.json({ success: true, id: data.id });
   } catch (err: any) {
     return NextResponse.json({ error: err?.message || 'Event konnte nicht gespeichert werden.' }, { status: 500 });
@@ -120,16 +126,19 @@ export async function PUT(req: Request) {
     const veranstalter = await getVeranstalter(supabase, authedId);
     if (!veranstalter) return NextResponse.json({ error: 'Kein Zugriff.' }, { status: 403 });
 
+    const schedule = validateSchedule(event);
     const row = eventToRow(event, veranstalter);
     delete (row as any).slug;
 
-    const { error } = await supabase
+    const { data: updated, error } = await supabase
       .from('events')
       .update(row)
       .eq('id', event.id)
-      .eq('veranstalter_id', authedId);
+      .eq('veranstalter_id', authedId).select('id').maybeSingle();
 
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    if (!updated) return NextResponse.json({error:'Event nicht gefunden oder kein Zugriff.'},{status:404});
+    await saveEventSchedule(supabase,event.id,schedule);
     return NextResponse.json({ success: true });
   } catch (err: any) {
     return NextResponse.json({ error: err?.message || 'Event konnte nicht gespeichert werden.' }, { status: 500 });

@@ -1,4 +1,6 @@
 "use client";
+import {eventTiming} from '@/lib/event-timing';
+import {useEventClock} from '@/lib/use-event-clock';
 
 import Image from "next/image";
 import { useEffect, useState, useCallback, type FormEvent } from "react";
@@ -166,8 +168,10 @@ type EventItem = {
   location: string; address: string; image_url: string; price: string;
   description: string; tickets: any[];
   lounges: boolean; lounge_list: any[]; discount_codes: any[];
+  event_ends_at?: string | null; online_sale_ends_at?: string | null;
   active_ticket_price?: string | number | null;
   sold_out?: boolean;
+  sales_closed?: boolean;
 };
 
 function createEventLink(event: EventItem): string {
@@ -225,7 +229,7 @@ function EventCard({ event, lang }: { event: EventItem; lang: Lang }) {
         <p className="float-text text-zinc-400 mt-2 text-sm">{event.city}{event.location && ` · ${event.location}`}</p>
         <div className="mt-5 flex items-center justify-between">
           <div>
-            <p className="float-text text-[#d6b36a] font-bold text-lg">{event.sold_out ? t.soldOut : `${t.from} ${getStartingPrice(event)} €`}</p>
+            <p className="float-text text-[#d6b36a] font-bold text-lg">{event.sales_closed ? (lang === "de" ? "Online-Verkauf beendet" : "Онлайн-продажа завершена") : event.sold_out ? t.soldOut : `${t.from} ${getStartingPrice(event)} €`}</p>
             <p className="mt-1 text-[11px] text-zinc-500">{t.vatIncluded}</p>
           </div>
           {event.lounges && event.lounge_list?.length > 0 && (
@@ -291,7 +295,7 @@ function FeaturedEvent({ event, lang, first = false }: { event: EventItem; lang:
 
         <div className="mt-8 flex flex-wrap items-center gap-4">
           <span>
-            <span className="block text-lg font-bold text-[#d6b36a]">{event.sold_out ? t.soldOut : `${t.from} ${getStartingPrice(event)} €`}</span>
+            <span className="block text-lg font-bold text-[#d6b36a]">{event.sales_closed ? (lang === "de" ? "Online-Verkauf beendet" : "Онлайн-продажа завершена") : event.sold_out ? t.soldOut : `${t.from} ${getStartingPrice(event)} €`}</span>
             <span className="mt-1 block text-[11px] text-zinc-500">{t.vatIncluded}</span>
           </span>
         </div>
@@ -469,7 +473,10 @@ function ContactModal({ onClose, lang }: { onClose: () => void; lang: Lang }) {
 
 export default function Home() {
   const [events, setEvents] = useState<EventItem[]>([]);
+  const eventNow = useEventClock();
+  const visibleEvents = events.filter(event => eventNow > 0 && !eventTiming(event,eventNow).ended).map(event => ({...event, sales_closed:eventTiming(event,eventNow).salesClosed}));
   const [eventsLoading, setEventsLoading] = useState(true);
+  const [eventsError, setEventsError] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [showLegal, setShowLegal] = useState<LegalType>(null);
   const [legalContent, setLegalContent] = useState<Record<string, string>>({});
@@ -534,19 +541,11 @@ export default function Home() {
 
   async function loadEvents() {
     setEventsLoading(true);
+    setEventsError(false);
     try {
-      const { data, error } = await sb
-        .from("events")
-        .select("*")
-        .order("created_at", { ascending: true });
-
-      if (error) {
-        console.error("Events laden Fehler:", error);
-        setEvents([]);
-        return;
-      }
-
-      const rows = (data ?? []).map((row: any) => row.data ?? row);
+      const response = await fetch('/api/events', {cache:'no-store'});
+      if (!response.ok) throw new Error('Events nicht verfügbar');
+      const {events: rows} = await response.json();
       const enriched = await Promise.all(rows.map(async (event: EventItem) => {
         try {
           const response = await fetch(`/api/events/${event.id}/availability`, { cache: "no-store" });
@@ -562,6 +561,8 @@ export default function Home() {
         }
       }));
       setEvents(enriched);
+    } catch {
+      setEventsError(true);
     } finally {
       setEventsLoading(false);
     }
@@ -800,7 +801,7 @@ export default function Home() {
         <h2 className="mb-10 text-4xl font-semibold md:text-5xl">{t.upcomingTitle}</h2>
 
         <div className="md:hidden">
-          {mounted && events.map((event,index) => <FeaturedEvent key={event.id} event={event} lang={lang} first={index === 0} />)}
+          {mounted && visibleEvents.map((event,index) => <FeaturedEvent key={event.id} event={event} lang={lang} first={index === 0} />)}
         </div>
 
         <div className="grid gap-8 md:grid-cols-3">
@@ -809,10 +810,11 @@ export default function Home() {
               <div className="h-7 w-7 animate-spin rounded-full border-2 border-[#d6b36a]/25 border-t-[#d6b36a]" aria-label="Events werden geladen" />
             </div>
           )}
-          {mounted && !eventsLoading && events.length === 0 && <EmptyState lang={lang} />}
+          {mounted && eventsError && <p role="alert">Veranstaltungen konnten nicht geladen werden. Bitte lade die Seite erneut.</p>}
+          {mounted && !eventsLoading && !eventsError && visibleEvents.length === 0 && <EmptyState lang={lang} />}
         </div>
         <div className="hidden grid-cols-2 items-stretch gap-8 md:grid">
-          {mounted && events.map(event => <EventCard key={event.id} event={event} lang={lang} />)}
+          {mounted && visibleEvents.map(event => <EventCard key={event.id} event={event} lang={lang} />)}
         </div>
       </section>
 

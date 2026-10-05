@@ -1,3 +1,5 @@
+import {withEventSchedules} from '@/lib/event-schedules';
+import {eventTiming} from '@/lib/event-timing';
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 import { recordAnalytics } from '@/lib/analytics';
@@ -11,8 +13,10 @@ export async function POST(req: Request) {
   const { eventId } = await req.json();
   if (eventId !== WHEEL_EVENT_ID) return NextResponse.json({ error: 'Diese Aktion gilt nur für Nürnberg.' }, { status: 400 });
   if (readReward(req)) return NextResponse.json({ error: 'In diesem Browser wurde bereits gedreht.' }, { status: 409 });
-  const { data: event } = await supabase.from('events').select('date,online_sale_ends_at').eq('id', WHEEL_EVENT_ID).single();
-  if (!event || event.date < new Date().toISOString().slice(0, 10) || (event.online_sale_ends_at && new Date(event.online_sale_ends_at).getTime() <= Date.now())) {
+  const { data: event } = await supabase.from('events').select('id,date,time,online_sale_ends_at').eq('id', WHEEL_EVENT_ID).single();
+  let scheduled;
+  try { if(event) [scheduled] = await withEventSchedules(supabase,[event]); } catch { return NextResponse.json({error:'Zeitplan nicht verfügbar.'},{status:503}); }
+  if (!scheduled || eventTiming(scheduled).salesClosed) {
     return NextResponse.json({ error: 'Die Aktion ist beendet.' }, { status: 400 });
   }
   let spinNumber: number;

@@ -1,6 +1,8 @@
 'use client';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import {eventTiming} from '@/lib/event-timing';
+import {useEventClock} from '@/lib/use-event-clock';
 
 export default function VeranstalterEvents() {
   const [events, setEvents] = useState<any[]>([]);
@@ -48,10 +50,10 @@ export default function VeranstalterEvents() {
     }
   }
 
-  const now = new Date();
+  const now = useEventClock();
   const filtered = events.filter(e => {
-    if (filter==='kommend') return new Date(e.date) >= now;
-    if (filter==='vergangen') return new Date(e.date) < now;
+    if (filter==='kommend') return !eventTiming(e,now).ended;
+    if (filter==='vergangen') return eventTiming(e,now).ended;
     return true;
   });
 
@@ -83,14 +85,14 @@ export default function VeranstalterEvents() {
       ) : (
         <div style={{ display:'grid', gap:'12px' }}>
           {filtered.map((e:any) => {
-            const isPast = new Date(e.date) < now;
+
             return (
               <div key={e.id} style={{ background:'#fff', borderRadius:'12px', border:'1px solid #e5e7eb', padding:'20px 24px', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
                 <div style={{ flex:1 }}>
                   <h3 style={{ margin:'0 0 6px', fontSize:'16px', fontWeight:'600', color:'#111' }}>{e.title}</h3>
                   <p style={{ margin:0, color:'#6b7280', fontSize:'13px' }}>
                     {new Date(e.date).toLocaleDateString('de-DE',{weekday:'short',day:'2-digit',month:'long',year:'numeric'})}
-                    {e.location && ` · ${e.location}`} · {isPast ? 'Abgeschlossen' : 'Kommend'}
+                    {e.location && ` · ${e.location}`} · {now ? eventTiming(e,now).status : ''}
                   </p>
                 </div>
                 <div style={{ display:'flex', alignItems:'center', gap:'10px', marginLeft:'24px' }}>

@@ -1,4 +1,5 @@
 'use client';
+import {berlinLocal,defaultEndLocal} from '@/lib/event-timing';
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -13,7 +14,7 @@ type EventFormState = {
   city: string;
   date: string;
   time: string;
-  onlineSaleEndsAt: string;
+  onlineSaleEndsAt: string; eventEndsAt: string;
   location: string;
   address: string;
   imageUrl: string;
@@ -29,7 +30,7 @@ const emptyEvent: EventFormState = {
   city: '',
   date: '',
   time: '',
-  onlineSaleEndsAt: '',
+  onlineSaleEndsAt: '', eventEndsAt: '',
   location: '',
   address: '',
   imageUrl: '',
@@ -70,7 +71,8 @@ function rowToForm(row: any): EventFormState {
     city: row.city || '',
     date: row.date || '',
     time: row.time || '',
-    onlineSaleEndsAt: row.online_sale_ends_at ? new Date(row.online_sale_ends_at).toISOString().slice(0, 16) : '',
+    onlineSaleEndsAt: row.online_sale_ends_at ? berlinLocal(row.online_sale_ends_at) : '',
+    eventEndsAt: row.event_ends_at ? berlinLocal(row.event_ends_at) : defaultEndLocal(row.date),
     location: row.location || '',
     address: row.address || '',
     imageUrl: row.image_url || '',
@@ -223,8 +225,9 @@ export default function VeranstalterEventForm({ eventId }: { eventId?: string })
               <div><label style={labelStyle}>Datum *</label><input type="date" style={inputStyle} value={form.date} onChange={e => setField('date', e.target.value)} /></div>
               <div><label style={labelStyle}>Uhrzeit</label><input style={inputStyle} placeholder="22:00" value={form.time} onChange={e => setField('time', e.target.value.replace(/[^0-9:]/g, '').slice(0, 5))} /></div>
             </div>
+            <div><label style={labelStyle}>Veranstaltungsende (deutsche Ortszeit)</label><input type="datetime-local" style={inputStyle} value={form.eventEndsAt || defaultEndLocal(form.date)} onChange={e => setField('eventEndsAt', e.target.value)} /><p style={{color:'#6b7280',fontSize:'12px'}}>Ab dann nicht mehr öffentlich sichtbar. Bei Nachtveranstaltungen den Folgetag wählen. Standard: Folgetag 05:00.</p></div>
             <div>
-              <label style={labelStyle}>Online-Verkauf endet</label>
+              <label style={labelStyle}>Online-Verkauf endet (deutsche Ortszeit)</label>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                 <div>
                   <span style={{ display: 'block', color: '#6b7280', fontSize: '12px', marginBottom: '5px' }}>Datum</span>
@@ -247,7 +250,7 @@ export default function VeranstalterEventForm({ eventId }: { eventId?: string })
                   />
                 </div>
               </div>
-              <p style={{ color: '#6b7280', fontSize: '12px', margin: '7px 0 0' }}>Danach ist kein Online-Ticketkauf mehr möglich.</p>
+              <p style={{ color: '#6b7280', fontSize: '12px', margin: '7px 0 0' }}>Ab dann können keine neuen Bestellungen gestartet werden. Ohne Angabe gilt der Veranstaltungsbeginn. Bereits geöffnete Checkouts können noch bis zu 30 Minuten bezahlt werden.</p>
             </div>
           </div>
         </section>
