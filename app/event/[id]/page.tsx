@@ -185,20 +185,21 @@ export default function EventPage() {
 
   return (
     <div className="min-h-screen bg-black text-white">
-      <div className="relative h-[40vh] min-h-[300px] overflow-hidden md:h-[48vh] md:min-h-[360px]">
+      <div className="relative h-[68svh] min-h-[440px] max-h-[820px] overflow-hidden md:h-[72svh] md:min-h-[520px]">
         {n.imageUrl ? <img src={n.imageUrl} alt={event.title} className="w-full h-full object-cover" /> : <div className="w-full h-full bg-gradient-to-br from-zinc-900 to-black" />}
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/45 to-black/15" />
+        <div className="absolute inset-x-0 top-0 z-10 mx-auto max-w-3xl px-5 pt-5 md:pt-8">
+          <Link href="/" className="inline-flex min-h-11 items-center rounded-md border border-white/25 bg-black/65 px-4 py-3 text-sm text-white backdrop-blur-sm transition-colors hover:border-[#d6b36a] hover:text-[#d6b36a] focus-visible:outline-2 focus-visible:outline-[#d6b36a]">← Zurück</Link>
+        </div>
+        <div className="absolute inset-x-0 bottom-0 z-10 mx-auto max-w-3xl px-5 pb-4">
+          <EventCountdown event={event} overlay />
+        </div>
       </div>
 
-      <div className="max-w-3xl mx-auto px-5 -mt-14 relative z-10 pb-40 md:-mt-20">
-        <Link href="/" className="mb-8 inline-flex items-center text-xs font-bold uppercase tracking-[0.18em] text-white/70 transition-colors hover:text-[#d6b36a]">
-          ← Zurück
-        </Link>
-
+      <div className="max-w-3xl mx-auto px-5 pt-5 relative z-10 pb-40 md:pt-8">
         <div className="mb-8">
           <p className="mb-3 text-xs font-bold uppercase tracking-[0.28em] text-[#d6b36a]">WOLNAA EVENT</p>
           <h1 className="text-3xl font-semibold leading-tight mb-5 md:text-5xl">{event.title}</h1>
-          <EventCountdown event={event} />
           <div className="grid gap-5 text-sm text-zinc-300 sm:grid-cols-2">
             <div><p className="mb-2 flex items-center gap-2 text-zinc-400"><EventIcon kind="calendar" />Beginn</p><p>{formatDate(event.date)}{event.time ? ` · ${event.time} Uhr` : ''}</p></div>
             {Number.isFinite(timing.ends) && <div><p className="mb-2 flex items-center gap-2 text-zinc-400"><EventIcon kind="clock" />Ende</p><p>{new Intl.DateTimeFormat('de-DE', {timeZone:'Europe/Berlin',day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'}).format(new Date(timing.ends))} Uhr</p></div>}

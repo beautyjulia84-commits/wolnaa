@@ -277,11 +277,12 @@ function FeaturedEvent({ event, lang, first = false }: { event: EventItem; lang:
           {event.title}
         </h3>
 
-        <p className="float-text mt-5 text-sm leading-relaxed text-zinc-400 md:text-base">
-          {formatDate(event.date, lang)}{event.time && ` · ${event.time}`}
-          {event.city && ` · ${event.city}`}
-          {event.location && ` · ${event.location}`}
-        </p>
+        <div className="mt-5 space-y-3 text-sm leading-relaxed text-zinc-300 md:text-base">
+          <p className="flex items-start gap-3"><EventIcon kind="calendar" /><span>{formatDate(event.date, lang)}</span></p>
+          {event.time && <p className="flex items-center gap-3"><EventIcon kind="clock" /><span>{event.time} {lang === 'de' ? 'Uhr' : ''}</span></p>}
+          <p className="flex items-start gap-3"><EventIcon kind="pin" /><span>{event.city}{event.location && ` · ${event.location}`}{event.address && <span className="block text-zinc-400">{event.address}</span>}</span></p>
+        </div>
+        <EventCountdown event={event} lang={lang} compact />
 
         <div className="mt-8 flex flex-wrap items-center gap-4">
           <span>
