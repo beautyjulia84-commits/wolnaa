@@ -367,8 +367,11 @@ function CookieBanner({ lang }: { lang: Lang }) {
 
   return (
     <>
-    <button type="button" aria-expanded={visible} aria-controls="cookie-settings-panel" onClick={() => setVisible(open => !open)} className="fixed bottom-6 left-0 z-[9999] min-h-11 rounded-r-lg border border-l-0 border-white/20 bg-zinc-950 px-3 text-xs text-zinc-200 shadow-lg hover:text-[#d6b36a] focus-visible:outline-2 focus-visible:outline-[#d6b36a]">
-      Cookies {visible ? '‹' : '›'}
+    <button type="button" aria-label={lang === 'de' ? 'Cookie-Einstellungen öffnen oder schließen' : 'Открыть или закрыть настройки cookie'} aria-expanded={visible} aria-controls="cookie-settings-panel" onClick={() => setVisible(open => !open)} className="group fixed bottom-6 left-0 z-[9999] flex h-11 items-center rounded-r-lg border border-l-0 border-white/20 bg-zinc-950 text-xs text-zinc-200 shadow-lg hover:text-[#d6b36a] focus-visible:outline-2 focus-visible:outline-[#d6b36a]">
+      <span className="grid grid-cols-[0fr] transition-[grid-template-columns] duration-200 group-hover:grid-cols-[1fr] group-focus-visible:grid-cols-[1fr] motion-reduce:transition-none">
+        <span className="overflow-hidden"><span className="block whitespace-nowrap pl-3">Cookies</span></span>
+      </span>
+      <span aria-hidden="true" className="flex h-11 w-11 shrink-0 items-center justify-center text-lg">{visible ? '‹' : '›'}</span>
     </button>
     {visible && <div id="cookie-settings-panel" role="region" aria-label={lang === 'de' ? 'Cookie-Einstellungen' : 'Настройки cookie'} onKeyDown={event => { if (event.key === 'Escape') setVisible(false); }} style={{
       position: 'fixed', bottom: 80, left: 12,
