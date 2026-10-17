@@ -1,4 +1,6 @@
 "use client";
+import EventCountdown from "@/components/EventCountdown";
+import EventIcon from "@/components/EventIcon";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -28,16 +30,6 @@ type EventItem = {
 function slugify(t: string) {
   return t.toLowerCase().replace(/\s+/g, "-").replace(/[^\w-]+/g, "");
 }
-function calcCountdown(d: string) {
-  if (!d) return null;
-  const diff = new Date(d + "T00:00:00").getTime() - new Date().getTime();
-  const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
-  if (days < 0) return null;
-  if (days === 0) return "Heute!";
-  if (days === 1) return "Morgen!";
-  return `Noch ${days} Tage`;
-}
-
 function formatDate(d: string) {
   if (!d) return "";
   try { return new Date(d + "T00:00:00").toLocaleDateString("de-DE", { weekday: "long", day: "numeric", month: "long", year: "numeric" }); }
@@ -206,10 +198,11 @@ export default function EventPage() {
         <div className="mb-8">
           <p className="mb-3 text-xs font-bold uppercase tracking-[0.28em] text-[#d6b36a]">WOLNAA EVENT</p>
           <h1 className="text-3xl font-semibold leading-tight mb-5 md:text-5xl">{event.title}</h1>
-          <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-zinc-300">
-            {event.date && <p>{formatDate(event.date)}{event.time ? ` · ${event.time} Uhr` : ""}{calcCountdown(event.date) && <span className="ml-3 text-xs font-semibold text-[#d6b36a]">{calcCountdown(event.date)}</span>}</p>}
-            {event.city && <p>{event.city}{event.location ? ` · ${event.location}` : ""}</p>}
-            {event.address && <a href={`https://maps.google.com/?q=${encodeURIComponent(event.address)}`} target="_blank" rel="noopener noreferrer" className="text-zinc-400 transition-colors hover:text-[#d6b36a]">Route anzeigen →</a>}
+          <EventCountdown event={event} />
+          <div className="grid gap-5 text-sm text-zinc-300 sm:grid-cols-2">
+            <div><p className="mb-2 flex items-center gap-2 text-zinc-400"><EventIcon kind="calendar" />Beginn</p><p>{formatDate(event.date)}{event.time ? ` · ${event.time} Uhr` : ''}</p></div>
+            {Number.isFinite(timing.ends) && <div><p className="mb-2 flex items-center gap-2 text-zinc-400"><EventIcon kind="clock" />Ende</p><p>{new Intl.DateTimeFormat('de-DE', {timeZone:'Europe/Berlin',day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'}).format(new Date(timing.ends))} Uhr</p></div>}
+            <div className="border-t border-white/10 pt-5 sm:col-span-2"><p className="mb-2 flex items-center gap-2 text-zinc-400"><EventIcon kind="pin" />Veranstaltungsort</p><p>{event.city}{event.location ? ` · ${event.location}` : ''}</p>{event.address && <><p className="mt-1">{event.address}</p><a href={`https://maps.google.com/?q=${encodeURIComponent(event.address)}`} target="_blank" rel="noopener noreferrer" className="mt-3 inline-block text-[#d6b36a] underline underline-offset-4">Location &amp; Anreise</a></>}</div>
           </div>
         </div>
         {event.description && <div className="max-w-2xl border-t border-white/10 pt-6"><p className="text-zinc-400 text-sm leading-7 whitespace-pre-wrap">{event.description}</p></div>}

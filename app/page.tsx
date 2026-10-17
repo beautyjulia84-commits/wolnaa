@@ -1,4 +1,6 @@
 "use client";
+import EventCountdown from "@/components/EventCountdown";
+import EventIcon from "@/components/EventIcon";
 import {eventTiming} from '@/lib/event-timing';
 import {useEventClock} from '@/lib/use-event-clock';
 
@@ -178,17 +180,6 @@ function createEventLink(event: EventItem): string {
   return `/event/${(event as any).slug || event.title.toLowerCase().replace(/\s+/g, "-").replace(/[^\w-]+/g, "")}`;
 }
 
-function calcCountdown(d: string, lang: Lang = 'de') {
-  if (!d) return null;
-  const diff = new Date(d + "T00:00:00").getTime() - new Date().getTime();
-  const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
-  if (days < 0) return null;
-  const t = I18N[lang];
-  if (days === 0) return t.today;
-  if (days === 1) return t.tomorrow;
-  return t.daysLeft.replace('{days}', String(days));
-}
-
 function formatDate(d: string, lang: Lang = 'de') {
   if (!d) return "";
   try {
@@ -221,12 +212,11 @@ function EventCard({ event, lang }: { event: EventItem; lang: Lang }) {
         )}
       </div>
       <div className="p-6">
-        <div className="flex items-center justify-between">
-          <p className="float-text text-[#d6b36a] text-sm font-medium tracking-wide">{formatDate(event.date, lang)}{event.time && ` · ${event.time}`}</p>
-          {calcCountdown(event.date, lang) && <span className="bg-[#d6b36a] text-black text-xs font-bold px-2 py-0.5 rounded-md whitespace-nowrap">{calcCountdown(event.date, lang)}</span>}
-        </div>
+        <p className="flex items-start gap-2 text-sm text-zinc-300"><EventIcon kind="calendar" /><span>{formatDate(event.date, lang)}</span></p>
+        {event.time && <p className="mt-2 flex items-center gap-2 text-sm text-zinc-300"><EventIcon kind="clock" /><span>{event.time} {lang === 'de' ? 'Uhr' : ''}</span></p>}
         <h3 className="float-text text-2xl font-bold mt-3 leading-tight">{event.title}</h3>
-        <p className="float-text text-zinc-400 mt-2 text-sm">{event.city}{event.location && ` · ${event.location}`}</p>
+        <p className="mt-3 flex items-start gap-2 text-sm text-zinc-400"><EventIcon kind="pin" /><span>{event.city}{event.location && ` · ${event.location}`}{event.address && <span className="mt-1 block">{event.address}</span>}</span></p>
+        <EventCountdown event={event} lang={lang} compact />
         <div className="mt-5 flex items-center justify-between">
           <div>
             <p className="float-text text-[#d6b36a] font-bold text-lg">{event.sales_closed ? (lang === "de" ? "Online-Verkauf beendet" : "Онлайн-продажа завершена") : event.sold_out ? t.soldOut : `${t.from} ${getStartingPrice(event)} €`}</p>
