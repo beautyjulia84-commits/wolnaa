@@ -4,6 +4,7 @@ import {eventTiming} from '@/lib/event-timing';
 import {useEventClock} from '@/lib/use-event-clock';
 
 import Image from "next/image";
+import Link from "next/link";
 import { useEffect, useState, useCallback, type FormEvent } from "react";
 import { createClient } from "@supabase/supabase-js";
 import PurchaseActivity from "@/components/PurchaseActivity";
@@ -202,7 +203,7 @@ function EventCard({ event, lang }: { event: EventItem; lang: Lang }) {
     setTimeout(() => setTapped(false), 600);
   }
   return (
-    <a href={createEventLink(event)} onTouchStart={handleTouch} data-tapped={tapped} className="event-card motion-card group block overflow-hidden rounded-md border bg-zinc-950/70">
+    <Link prefetch={true} href={createEventLink(event)} onTouchStart={handleTouch} data-tapped={tapped} className="event-card motion-card group block overflow-hidden rounded-md border bg-zinc-950/70">
       <div className="relative h-56 flex items-center justify-center bg-[radial-gradient(circle_at_top,#2b1b00_0%,#111_38%,#000_100%)] overflow-hidden">
         {event.image_url ? (
           <img src={event.image_url} alt={event.title} className="w-full h-56 object-cover transition-transform duration-700 group-hover:scale-[1.02]" loading="lazy" decoding="async" />
@@ -225,7 +226,7 @@ function EventCard({ event, lang }: { event: EventItem; lang: Lang }) {
           )}
         </div>
       </div>
-    </a>
+    </Link>
   );
 }
 
@@ -256,7 +257,7 @@ function EmptyState({ lang }: { lang: Lang }) {
 function FeaturedEvent({ event, lang, first = false }: { event: EventItem; lang: Lang; first?: boolean }) {
   const t = I18N[lang];
   return (
-    <a href={createEventLink(event)} className="event-card motion-card group mb-8 grid overflow-hidden rounded-md border bg-zinc-950/70 md:grid-cols-[1.15fr_0.85fr]">
+    <Link prefetch={true} href={createEventLink(event)} className="event-card motion-card group mb-8 grid overflow-hidden rounded-md border bg-zinc-950/70 md:grid-cols-[1.15fr_0.85fr]">
       <div className="relative min-h-[280px] overflow-hidden bg-zinc-950 md:min-h-[420px]">
         {event.image_url ? (
           <img src={event.image_url} alt={event.title} className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy" decoding="async" />
@@ -288,7 +289,7 @@ function FeaturedEvent({ event, lang, first = false }: { event: EventItem; lang:
           </span>
         </div>
       </div>
-    </a>
+    </Link>
   );
 }
 

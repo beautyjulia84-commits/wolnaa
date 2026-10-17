@@ -11,7 +11,7 @@ import { influencerPercent, combinedWheelPercent } from '@/lib/wheel-promotion';
 type TicketType = { name: string; price: string; quantity: string };
 type Lounge = { name: string; persons: string; price: string; type?: string };
 type DiscountCode = { code: string; percent: string };
-type Availability = { activeIndex: number; remaining: number | null; soldOut: boolean };
+type Availability = { activeIndex: number; remaining: number | null; soldOut: boolean; salesClosed?: boolean };
 export type EventItem = {
   event_ends_at?: string | null; online_sale_ends_at?: string | null;
   id: string; title: string; city: string; date: string; time: string;
@@ -100,7 +100,7 @@ export default function EventDetails({ event, initialNow }: { event: EventItem; 
 
   const n = normalize(event);
   const timing = eventTiming(event, now);
-  const salesClosed = !now || timing.salesClosed;
+  const salesClosed = !now || timing.salesClosed || availability?.salesClosed === true;
   const activeTicketIndex = availability?.activeIndex ?? -1;
   const activeTicket = activeTicketIndex >= 0 ? n.tickets[activeTicketIndex] : null;
   const totalTickets = Object.values(ticketQtys).reduce((a, b) => a + b, 0);
