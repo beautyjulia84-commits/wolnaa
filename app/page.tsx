@@ -936,9 +936,9 @@ export default function Home() {
         </div>
         <p className="text-zinc-500 text-sm mb-3">© {new Date().getFullYear()} WOLNAA</p>
         <button className="text-xs text-zinc-400 underline" onClick={() => window.dispatchEvent(new Event('wolnaa-open-cookie-settings'))}>Cookie-Einstellungen</button>
-        <div className="mt-6 flex flex-col items-center px-4">
-          <p className="text-sm text-zinc-400">Webseite und Ticketsystem von</p>
-          <Image src="/starteventz-logo.jpg" alt="StartEventz" width={1280} height={640} sizes="240px" className="h-auto w-60 max-w-full" />
+        <div className="mt-6 flex items-center justify-center gap-1 px-3">
+          <p className="whitespace-nowrap text-xs text-zinc-400 sm:text-sm">Webseite und Ticketsystem von</p>
+          <Image src="/starteventz-logo.jpg" alt="StartEventz" width={1280} height={640} sizes="(min-width: 640px) 112px, 96px" className="h-auto w-24 shrink-0 sm:w-28" />
         </div>
       </footer>
 
