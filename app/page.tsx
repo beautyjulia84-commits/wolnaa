@@ -365,18 +365,21 @@ function CookieBanner({ lang }: { lang: Lang }) {
     if (wasAll) window.location.reload();
   }
 
-  if (!visible) return null;
-
   return (
-    <div style={{
-      position: 'fixed', bottom: 24, left: '50%', transform: 'translateX(-50%)',
-      width: '90%', maxWidth: 560, zIndex: 9999,
+    <>
+    <button type="button" aria-expanded={visible} aria-controls="cookie-settings-panel" onClick={() => setVisible(open => !open)} className="fixed bottom-6 left-0 z-[9999] min-h-11 rounded-r-lg border border-l-0 border-white/20 bg-zinc-950 px-3 text-xs text-zinc-200 shadow-lg hover:text-[#d6b36a] focus-visible:outline-2 focus-visible:outline-[#d6b36a]">
+      Cookies {visible ? '‹' : '›'}
+    </button>
+    {visible && <div id="cookie-settings-panel" role="region" aria-label={lang === 'de' ? 'Cookie-Einstellungen' : 'Настройки cookie'} onKeyDown={event => { if (event.key === 'Escape') setVisible(false); }} style={{
+      position: 'fixed', bottom: 80, left: 12,
+      width: 'calc(100% - 24px)', maxWidth: 420, maxHeight: 'calc(100dvh - 104px)', overflowY: 'auto', zIndex: 9999,
       background: '#111', border: '1px solid #333',
       borderRadius: 20, padding: '20px 24px',
       boxShadow: '0 8px 40px rgba(0,0,0,0.6)',
       display: 'flex', flexDirection: 'column', gap: 14,
     }}>
       <div>
+        <button type="button" onClick={() => setVisible(false)} aria-label={lang === 'de' ? 'Cookie-Einstellungen einklappen' : 'Свернуть настройки cookie'} className="float-right -mr-2 -mt-2 flex h-11 w-11 items-center justify-center rounded text-zinc-300 hover:text-white">✕</button>
         <p style={{ color: '#fff', fontWeight: 700, fontSize: 15, marginBottom: 6 }}>🍪 {t.cookieTitle}</p>
         <p style={{ color: '#a1a1aa', fontSize: 13, lineHeight: 1.6 }}>
           {lang === 'de' ? 'Notwendige Funktionen bleiben aktiv. Mit „Alle akzeptieren“ erlaubst du zusätzlich TikTok-Werbetracking und ein Sitzungscookie zur Zuordnung der Ticketkäufe zu ihrer Herkunft. Das Glücksrad-Aktionscookie erfordert eine separate Einwilligung am Rad.' : 'Необходимые функции остаются активными. «Принять все» разрешает рекламное отслеживание TikTok и cookie сеанса для определения источника покупки билетов. Для cookie колеса скидок требуется отдельное согласие.'}{' '}
@@ -395,7 +398,8 @@ function CookieBanner({ lang }: { lang: Lang }) {
           fontWeight: 600, fontSize: 14, cursor: 'pointer',
         }}>{t.necessaryOnly}</button>
       </div>
-    </div>
+    </div>}
+    </>
   );
 }
 
@@ -934,8 +938,6 @@ export default function Home() {
             <button key={key!} onClick={() => setShowLegal(key)} className="hover:text-[#d6b36a] active:text-[#d6b36a] transition-colors underline-offset-4 hover:underline active:underline">{label}</button>
           ))}
         </div>
-        <p className="text-zinc-500 text-sm mb-3">© {new Date().getFullYear()} WOLNAA</p>
-        <button className="text-xs text-zinc-400 underline" onClick={() => window.dispatchEvent(new Event('wolnaa-open-cookie-settings'))}>Cookie-Einstellungen</button>
         <div className="mt-6 flex items-center justify-center gap-1 px-3">
           <p className="whitespace-nowrap text-xs text-zinc-400 sm:text-sm">Webseite und Ticketsystem von</p>
           <Image src="/starteventz-logo.jpg" alt="StartEventz" width={1280} height={640} sizes="(min-width: 640px) 112px, 96px" className="h-auto w-24 shrink-0 sm:w-28" />
