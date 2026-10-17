@@ -256,8 +256,8 @@ function EmptyState({ lang }: { lang: Lang }) {
 function FeaturedEvent({ event, lang, first = false }: { event: EventItem; lang: Lang; first?: boolean }) {
   const t = I18N[lang];
   return (
-    <a href={createEventLink(event)} className="event-card motion-card group mb-12 grid overflow-hidden rounded-md border bg-zinc-950/70 md:grid-cols-[1.15fr_0.85fr]">
-      <div className="relative min-h-[320px] overflow-hidden bg-zinc-950 md:min-h-[420px]">
+    <a href={createEventLink(event)} className="event-card motion-card group mb-8 grid overflow-hidden rounded-md border bg-zinc-950/70 md:grid-cols-[1.15fr_0.85fr]">
+      <div className="relative min-h-[280px] overflow-hidden bg-zinc-950 md:min-h-[420px]">
         {event.image_url ? (
           <img src={event.image_url} alt={event.title} className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy" decoding="async" />
         ) : (
@@ -266,22 +266,22 @@ function FeaturedEvent({ event, lang, first = false }: { event: EventItem; lang:
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/25 to-transparent" />
       </div>
 
-      <div className="flex min-h-[280px] flex-col justify-center p-7 md:p-10">
-        <p className="mb-4 text-xs font-bold uppercase tracking-[0.28em] text-[#d6b36a]">
+      <div className="relative z-10 -mt-6 flex flex-col px-5 pb-5 pt-0 md:mt-0 md:justify-center md:p-10">
+        <p className="mb-2 text-xs font-bold uppercase tracking-[0.28em] text-[#d6b36a]">
           {first ? t.nextEvent : t.upcoming}
         </p>
 
-        <h3 className="float-text text-3xl font-semibold leading-tight md:text-5xl">
+        <h3 className="float-text text-2xl font-semibold leading-tight md:text-5xl">
           {event.title}
         </h3>
 
-        <div className="mt-5 space-y-3 text-sm leading-relaxed text-zinc-300 md:text-base">
+        <div className="mt-3 space-y-2 text-sm leading-snug text-zinc-300 md:text-base">
           <p className="flex items-start gap-3"><EventIcon kind="calendar" /><span>{formatDate(event.date, lang)}</span></p>
           {event.time && <p className="flex items-center gap-3"><EventIcon kind="clock" /><span>{event.time} {lang === 'de' ? 'Uhr' : ''}</span></p>}
           <p className="flex items-start gap-3"><EventIcon kind="pin" /><span>{event.city}{event.location && ` · ${event.location}`}{event.address && <span className="block text-zinc-400">{event.address}</span>}</span></p>
         </div>
 
-        <div className="mt-8 flex flex-wrap items-center gap-4">
+        <div className="mt-4 flex flex-wrap items-center gap-4">
           <span>
             <span className="block text-lg font-bold text-[#d6b36a]">{event.sales_closed ? (lang === "de" ? "Online-Verkauf beendet" : "Онлайн-продажа завершена") : event.sold_out ? t.soldOut : `${t.from} ${getStartingPrice(event)} €`}</span>
             <span className="mt-1 block text-[11px] text-zinc-500">{t.vatIncluded}</span>
