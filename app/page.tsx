@@ -1,5 +1,4 @@
 "use client";
-import EventCountdown from "@/components/EventCountdown";
 import EventIcon from "@/components/EventIcon";
 import {eventTiming} from '@/lib/event-timing';
 import {useEventClock} from '@/lib/use-event-clock';
@@ -216,7 +215,6 @@ function EventCard({ event, lang }: { event: EventItem; lang: Lang }) {
         {event.time && <p className="mt-2 flex items-center gap-2 text-sm text-zinc-300"><EventIcon kind="clock" /><span>{event.time} {lang === 'de' ? 'Uhr' : ''}</span></p>}
         <h3 className="float-text text-2xl font-bold mt-3 leading-tight">{event.title}</h3>
         <p className="mt-3 flex items-start gap-2 text-sm text-zinc-400"><EventIcon kind="pin" /><span>{event.city}{event.location && ` · ${event.location}`}{event.address && <span className="mt-1 block">{event.address}</span>}</span></p>
-        <EventCountdown event={event} lang={lang} compact />
         <div className="mt-5 flex items-center justify-between">
           <div>
             <p className="float-text text-[#d6b36a] font-bold text-lg">{event.sales_closed ? (lang === "de" ? "Online-Verkauf beendet" : "Онлайн-продажа завершена") : event.sold_out ? t.soldOut : `${t.from} ${getStartingPrice(event)} €`}</p>
@@ -282,7 +280,6 @@ function FeaturedEvent({ event, lang, first = false }: { event: EventItem; lang:
           {event.time && <p className="flex items-center gap-3"><EventIcon kind="clock" /><span>{event.time} {lang === 'de' ? 'Uhr' : ''}</span></p>}
           <p className="flex items-start gap-3"><EventIcon kind="pin" /><span>{event.city}{event.location && ` · ${event.location}`}{event.address && <span className="block text-zinc-400">{event.address}</span>}</span></p>
         </div>
-        <EventCountdown event={event} lang={lang} compact />
 
         <div className="mt-8 flex flex-wrap items-center gap-4">
           <span>
