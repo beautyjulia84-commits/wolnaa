@@ -29,7 +29,7 @@ body {
   --wolnaa-gold: #e8cb7e;
   --wolnaa-surface: #16171c;
   --wolnaa-metal: linear-gradient(112deg,#92702b,#d4ad53 17%,#fff1ae 32%,#d9b65d 46%,#b98d38 56%,#f5df8c 75%,#fff4bb 84%,#b28a38);
-  --wolnaa-halo: #d3aa4938;
+  --wolnaa-halo: #d3aa4910;
 }
 :is(.wolnaa-page,.wolnaa-event,.wolnaa-info) :is(button,a)[class*="bg-[#d6b36a]"]:not(:disabled),
 .wolnaa-gold-button {
@@ -37,7 +37,7 @@ body {
   background-image: var(--wolnaa-metal);
   color: #241b09;
   border-color: #e8cb7e;
-  box-shadow: inset 0 1px 1px #fff3be, inset 0 -2px 3px #74521d, 0 0 16px var(--wolnaa-halo);
+  box-shadow: inset 0 1px 1px #fff3be, inset 0 -2px 3px #74521d, 0 0 5px var(--wolnaa-halo);
   text-shadow: 0 1px 0 #ffffff30;
 }
 :is(.wolnaa-page,.wolnaa-event,.wolnaa-info) [class*="text-[#d6b36a]"] {
@@ -84,7 +84,7 @@ body {
   .wolnaa-mobile-nav [aria-current="page"] .wolnaa-nav-icon::before {
     content:""; position:absolute; width:48px; height:48px; border-radius:50%;
     background-image:radial-gradient(ellipse at 32% 12%,#ffffff70,transparent 46%),var(--wolnaa-metal);
-    box-shadow:inset 0 2px 2px #fff3be,inset 0 -3px 5px #74521d,0 0 24px var(--wolnaa-halo);
+    box-shadow:inset 0 2px 2px #fff3be,inset 0 -3px 5px #74521d,0 0 8px var(--wolnaa-halo);
   }
   .wolnaa-mobile-nav [aria-current="page"] svg { filter:none; }
   .wolnaa-purchase-bar { bottom:0; padding:12px 16px calc(12px + env(safe-area-inset-bottom)); background:rgba(20,20,19,.76); }
@@ -116,7 +116,7 @@ body {
 .wolnaa-customer-card .wolnaa-account-field,.wolnaa-customer-select select { width:100%; height:54px; padding:0 15px; background:#191a20; border:1px solid #62625a; border-radius:12px; color:#f6f6f4; font-size:16px; margin:0 0 24px; }
 .wolnaa-customer-card .wolnaa-account-field::placeholder { color:#898980; }
 .wolnaa-customer-card :is(input,select,button,a):focus-visible { outline:2px solid #e8cb7e; outline-offset:3px; }
-.wolnaa-customer-card .wolnaa-customer-primary { width:100%; border-radius:12px; min-height:50px; margin:0; background-image:var(--wolnaa-metal); box-shadow:inset 0 1px 1px #fff3be,inset 0 -2px 3px #74521d,0 0 16px var(--wolnaa-halo); }
+.wolnaa-customer-card .wolnaa-customer-primary { width:100%; border-radius:12px; min-height:50px; margin:0; background-image:var(--wolnaa-metal); box-shadow:inset 0 1px 1px #fff3be,inset 0 -2px 3px #74521d,0 0 5px var(--wolnaa-halo); }
 .wolnaa-customer-card .wolnaa-customer-note { font-size:12px; line-height:1.6; color:#aaa99f; margin:16px 0 0; min-height:38px; }
 .wolnaa-customer-card .wolnaa-customer-kicker { font-size:14px; color:#c7c7bf; margin:0 0 10px; }
 .wolnaa-customer-select { position:relative; }
@@ -158,7 +158,7 @@ body {
 .wolnaa-customer-card .wolnaa-customer-kicker,.wolnaa-customer-help > span,.wolnaa-customer-select > span { color:var(--wolnaa-gold); }
 .wolnaa-customer-card :is(input,select):focus { border-color:var(--wolnaa-gold); box-shadow:0 0 12px #d3aa4920; }
 .wolnaa-customer-header img { filter:sepia(1) saturate(1.8) brightness(.95); }
-.cookie-toggle.enabled { background-image:var(--wolnaa-metal); box-shadow:0 0 12px var(--wolnaa-halo); }
+.cookie-toggle.enabled { background-image:var(--wolnaa-metal); box-shadow:0 0 4px var(--wolnaa-halo); }
 .wolnaa-info a.wolnaa-gold-button { border-radius:12px; }
 
 .frosted-event-content::before { content:""; position:absolute; inset:-40px; z-index:-1; pointer-events:none; background-image:var(--event-poster); background-size:cover; background-position:center; filter:blur(32px) saturate(.55); opacity:.22; }
@@ -172,3 +172,13 @@ body {
   .wolnaa-hero .wolnaa-hero-content { width:100%; max-width:540px; padding-top:0; }
   .wolnaa-hero-actions { width:100%; }
 }
+
+/* Compact button corners, consistent throughout the public ticket shop. */
+.wolnaa-page :is(button,a.inline-flex),
+.wolnaa-hero-actions a,
+.wolnaa-event button,
+.wolnaa-info .wolnaa-account-button,
+.wolnaa-info a.wolnaa-gold-button,
+.wolnaa-customer-card .wolnaa-customer-primary,
+.wolnaa-page .wolnaa-gold-button,
+.cookie-actions button { border-radius:6px; }
