@@ -23,3 +23,75 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* StartEventz gold material, with restrained light on Wolnaa's dark surfaces. */
+:root {
+  --wolnaa-gold: #e8cb7e;
+  --wolnaa-metal: linear-gradient(112deg,#92702b,#d4ad53 17%,#fff1ae 32%,#d9b65d 46%,#b98d38 56%,#f5df8c 75%,#fff4bb 84%,#b28a38);
+  --wolnaa-halo: #d3aa4938;
+}
+:is(.wolnaa-page,.wolnaa-event,.wolnaa-info) :is(button,a)[class*="bg-[#d6b36a]"]:not(:disabled),
+.wolnaa-gold-button {
+  background-color: #d4ad53;
+  background-image: var(--wolnaa-metal);
+  color: #241b09;
+  border-color: #e8cb7e;
+  box-shadow: inset 0 1px 1px #fff3be, inset 0 -2px 3px #74521d, 0 0 16px var(--wolnaa-halo);
+  text-shadow: 0 1px 0 #ffffff30;
+}
+:is(.wolnaa-page,.wolnaa-event,.wolnaa-info) [class*="text-[#d6b36a]"] {
+  color: var(--wolnaa-gold);
+  text-shadow: 0 0 10px #d3aa4926;
+}
+:is(.wolnaa-page,.wolnaa-event,.wolnaa-info) svg[class*="text-[#d6b36a]"] {
+  filter: drop-shadow(0 0 4px var(--wolnaa-halo));
+}
+.wolnaa-mobile-nav { display: none; }
+.wolnaa-info { min-height: 100svh; background:#080808; color:#f5f5f5; padding:40px 22px 64px; }
+.wolnaa-info-inner { max-width:680px; margin:auto; }
+.wolnaa-info h1 { font-size:clamp(30px,6vw,44px); line-height:1.12; margin:40px 0 24px; font-weight:650; }
+.wolnaa-info p { color:#d4d4d4; line-height:1.7; margin:16px 0; }
+.wolnaa-info h2 { font-size:22px; margin:28px 0 12px; }
+.wolnaa-info a { color:var(--wolnaa-gold); }
+.wolnaa-info a.wolnaa-gold-button { display:inline-flex; align-items:center; justify-content:center; min-height:48px; padding:12px 22px; margin:12px 0; border-radius:6px; color:#241b09; font-weight:600; }
+.wolnaa-mobile-nav a:focus-visible,.wolnaa-info a:focus-visible { outline:2px solid #fff3be; outline-offset:5px; }
+@media (hover:hover) {
+  .wolnaa-gold-button:hover { filter:brightness(1.07); }
+}
+@media (max-width:767px) {
+  body:has(.wolnaa-mobile-nav) { background:#080808; }
+  .wolnaa-page,.wolnaa-info { padding-bottom:calc(110px + env(safe-area-inset-bottom)); }
+  .wolnaa-event { padding-bottom:calc(100px + env(safe-area-inset-bottom)); }
+  .wolnaa-mobile-nav {
+    position:fixed; inset:auto 0 0; z-index:45; display:grid;
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    padding:9px 10px calc(10px + env(safe-area-inset-bottom));
+    background:linear-gradient(110deg,rgba(100,82,39,.22),rgba(25,25,24,.72) 35%,rgba(25,25,24,.72));
+    backdrop-filter:blur(20px) saturate(125%); -webkit-backdrop-filter:blur(20px) saturate(125%);
+    border-top:1px solid #e8cb7e26;
+    box-shadow:0 -8px 28px #0003;
+  }
+  .wolnaa-mobile-nav a {
+    display:flex; flex-direction:column; align-items:center; justify-content:flex-end;
+    position:relative; gap:7px; min-height:54px; color:var(--wolnaa-gold);
+    font-size:11px; line-height:1.35; text-decoration:none; white-space:nowrap;
+  }
+  .wolnaa-nav-icon { display:grid; place-items:center; width:32px; height:32px; position:relative; transition:transform .25s ease; }
+  .wolnaa-nav-icon svg { position:relative; z-index:1; filter:drop-shadow(0 0 4px var(--wolnaa-halo)); }
+  .wolnaa-mobile-nav [aria-current="page"] { font-weight:650; }
+  .wolnaa-mobile-nav [aria-current="page"] .wolnaa-nav-icon { transform:translateY(-20px); color:#241b09; }
+  .wolnaa-mobile-nav [aria-current="page"] .wolnaa-nav-icon::before {
+    content:""; position:absolute; width:56px; height:56px; border-radius:50%;
+    background-image:radial-gradient(ellipse at 32% 12%,#ffffff70,transparent 46%),var(--wolnaa-metal);
+    box-shadow:inset 0 2px 2px #fff3be,inset 0 -3px 5px #74521d,0 0 24px var(--wolnaa-halo);
+  }
+  .wolnaa-mobile-nav [aria-current="page"] svg { filter:none; }
+  .wolnaa-purchase-bar { bottom:calc(92px + env(safe-area-inset-bottom)); padding:12px 16px; background:rgba(20,20,19,.76); }
+  .wolnaa-purchase-bar > div { gap:12px; }
+  .wolnaa-purchase-bar button { padding:12px 16px; font-size:13px; min-height:48px; letter-spacing:.06em; }
+  .wolnaa-purchase-bar p.text-2xl { font-size:20px; }
+  .wolnaa-page button[aria-controls="cookie-settings-panel"] { bottom:calc(100px + env(safe-area-inset-bottom)); }
+  .wolnaa-page #cookie-settings-panel { bottom:calc(152px + env(safe-area-inset-bottom)) !important; max-height:calc(100dvh - 176px) !important; }
+  body:has([aria-modal="true"]) .wolnaa-mobile-nav { display:none; }
+}
+@media (prefers-reduced-motion:reduce) { .wolnaa-nav-icon { transition:none; } }

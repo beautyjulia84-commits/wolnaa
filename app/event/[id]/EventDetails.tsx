@@ -165,7 +165,7 @@ export default function EventDetails({ event, initialNow }: { event: EventItem; 
   const canCheckout = acceptedLegal && isAdult && hasSelection;
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="wolnaa-event min-h-screen bg-black text-white">
       <div className="relative h-[68svh] min-h-[440px] max-h-[820px] overflow-hidden md:h-[72svh] md:min-h-[520px]">
         {n.imageUrl ? <img src={n.imageUrl} fetchPriority="high" decoding="async" alt={event.title} className="w-full h-full object-cover" /> : <div className="w-full h-full bg-gradient-to-br from-zinc-900 to-black" />}
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/45 to-black/15" />
@@ -193,7 +193,7 @@ export default function EventDetails({ event, initialNow }: { event: EventItem; 
 
       {salesClosed && <p role="status" className="mx-auto max-w-3xl p-6 text-center text-[#d6b36a]">{timing.ended ? "Diese Veranstaltung ist beendet." : "Der Online-Ticketverkauf ist beendet."}</p>}
       {(step === "info" || salesClosed) && (
-        <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-white/10 bg-black/80 p-5 backdrop-blur-xl">
+        <div className="wolnaa-purchase-bar fixed bottom-0 left-0 right-0 z-50 border-t border-white/10 bg-black/80 p-5 backdrop-blur-xl">
           {availabilityError && !salesClosed && <p role="alert" className="mx-auto mb-3 max-w-2xl text-sm text-amber-200">Ticketverfügbarkeit konnte nicht geladen werden. <button className="underline" onClick={() => setAvailabilityAttempt(value => value + 1)}>Erneut versuchen</button></p>}
           <div className="max-w-2xl mx-auto flex items-center justify-between">
             <div>
@@ -206,7 +206,7 @@ export default function EventDetails({ event, initialNow }: { event: EventItem; 
       )}
 
       {!salesClosed && step === "tickets" && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-end justify-center" onClick={() => setStep("info")}>
+        <div role="dialog" aria-modal="true" aria-label="Ticketbestellung" className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-end justify-center" onClick={() => setStep("info")}>
           <div className="w-full max-w-2xl bg-black border-t border-white/10 rounded-t-xl max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
             <div className="sticky top-0 bg-black border-b border-white/10 px-6 pt-6 pb-4 flex items-center justify-between">
               <div><h2 className="text-lg font-bold">Tickets auswählen</h2><p className="text-zinc-500 text-sm mt-0.5">{event.title}</p></div>
@@ -291,7 +291,7 @@ export default function EventDetails({ event, initialNow }: { event: EventItem; 
       )}
 
       {!salesClosed && step === "checkout" && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-end justify-center" onClick={() => setStep("tickets")}>
+        <div role="dialog" aria-modal="true" aria-label="Ticketbestellung" className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-end justify-center" onClick={() => setStep("tickets")}>
           <div className="w-full max-w-2xl bg-black border-t border-white/10 rounded-t-xl" onClick={e => e.stopPropagation()}>
             <div className="px-6 pt-6 pb-4 border-b border-white/10 flex items-center justify-between">
               <div><h2 className="text-lg font-bold">Bestellung abschließen</h2><p className="text-zinc-500 text-sm mt-0.5">{totalTickets} Ticket{totalTickets !== 1 ? "s" : ""} · <span className="text-[#d6b36a] font-bold">{formatMoney(total)}</span></p><p className="mt-1 text-[11px] text-zinc-500">inkl. 19% MwSt.</p></div>

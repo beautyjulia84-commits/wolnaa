@@ -4,6 +4,7 @@ import ConsentGate from '@/components/ConsentGate';
 import AnalyticsTracker from "@/components/AnalyticsTracker";
 import { Bebas_Neue, DM_Sans } from "next/font/google";
 import "./globals.css";
+import MobileNavigation from "@/components/MobileNavigation";
 
 // ─── Fonts ────────────────────────────────────────────────────────────────────
 
@@ -116,6 +117,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col text-white">
         <AnalyticsTracker />
         {children}
+        <MobileNavigation />
       </body>
     </html>
   );
