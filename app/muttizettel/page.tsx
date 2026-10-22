@@ -50,5 +50,6 @@ export default function MuttizettelPage() {
         <Link className="wolnaa-gold-button" href={`/event/${event.slug || event.id}`}>Zum Event</Link>
       </section>}
     <div className="wolnaa-customer-help"><span>Gut zu wissen</span><p>Ein Muttizettel ersetzt weder dein Ticket noch die Ausweis- und Begleitpersonenprüfung am Einlass. Es gelten die Regeln des Veranstalters.</p></div>
+    <div className="wolnaa-security-note"><svg width="20" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V6a4 4 0 0 1 8 0v4"/></svg><p>Die Verbindung zu Wolnaa ist über HTTPS verschlüsselt. Auf dieser Seite werden keine persönlichen Angaben oder Unterschriften erfasst.</p></div>
   </CustomerPageShell>;
 }
