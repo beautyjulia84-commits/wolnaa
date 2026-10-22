@@ -171,7 +171,7 @@ export default function EventDetails({ event, initialNow }: { event: EventItem; 
         {n.imageUrl ? <img src={n.imageUrl} fetchPriority="high" decoding="async" alt={event.title} className="w-full h-full object-cover" /> : <div className="w-full h-full bg-gradient-to-br from-zinc-900 to-black" />}
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/45 to-black/15" />
         <div className="absolute inset-x-0 top-0 z-10 mx-auto max-w-3xl px-5 pt-5 md:pt-8">
-          <Link href="/" className="inline-flex min-h-11 items-center rounded-md border border-white/25 bg-black/65 px-4 py-3 text-sm text-white backdrop-blur-sm transition-colors hover:border-[#d6b36a] hover:text-[#d6b36a] focus-visible:outline-2 focus-visible:outline-[#d6b36a]">← Zurück</Link>
+          <Link href="/" className="inline-flex min-h-11 items-center rounded-md border border-white/25 bg-black/65 px-4 py-3 text-sm text-white backdrop-blur-sm transition-colors hover:border-[#00e5eb] hover:text-[#00e5eb] focus-visible:outline-2 focus-visible:outline-[#00e5eb]">← Zurück</Link>
         </div>
         <div className="absolute inset-x-0 bottom-0 z-10 mx-auto max-w-3xl px-5 pb-4">
           <EventCountdown event={event} overlay />
@@ -180,29 +180,29 @@ export default function EventDetails({ event, initialNow }: { event: EventItem; 
 
       <div className="max-w-3xl mx-auto px-5 pt-5 relative z-10 pb-40 md:pt-8">
         <div className="mb-8">
-          <p className="mb-3 text-xs font-bold uppercase tracking-[0.28em] text-[#d6b36a]">WOLNAA EVENT</p>
+          <p className="mb-3 text-xs font-bold uppercase tracking-[0.28em] text-[#00e5eb]">WOLNAA EVENT</p>
           <h1 className="text-3xl font-semibold leading-tight mb-5 md:text-5xl">{event.title}</h1>
           <div className="grid gap-5 text-sm text-zinc-300 sm:grid-cols-2">
-            <div><p className="mb-2 text-zinc-400">Eintritt</p><p>Ab {event.min_age === 16 ? 16 : 18} Jahren</p>{event.min_age === 16 && <Link href={`/muttizettel?event=${event.id}`} className="text-[#d6b36a] underline">Muttizettel für dieses Event</Link>}</div>
+            <div><p className="mb-2 text-zinc-400">Eintritt</p><p>Ab {event.min_age === 16 ? 16 : 18} Jahren</p>{event.min_age === 16 && <Link href={`/muttizettel?event=${event.id}`} className="text-[#00e5eb] underline">Muttizettel für dieses Event</Link>}</div>
             <div><p className="mb-2 flex items-center gap-2 text-zinc-400"><EventIcon kind="calendar" />Beginn</p><p>{formatDate(event.date)}{event.time ? ` · ${event.time} Uhr` : ''}</p></div>
             {Number.isFinite(timing.ends) && <div><p className="mb-2 flex items-center gap-2 text-zinc-400"><EventIcon kind="clock" />Ende</p><p>{new Intl.DateTimeFormat('de-DE', {timeZone:'Europe/Berlin',day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'}).format(new Date(timing.ends))} Uhr</p></div>}
-            <div className="border-t border-white/10 pt-5 sm:col-span-2"><p className="mb-2 flex items-center gap-2 text-zinc-400"><EventIcon kind="pin" />Veranstaltungsort</p><p>{event.city}{event.location ? ` · ${event.location}` : ''}</p>{event.address && <><p className="mt-1">{event.address}</p><a href={`https://maps.google.com/?q=${encodeURIComponent(event.address)}`} target="_blank" rel="noopener noreferrer" className="mt-3 inline-block text-[#d6b36a] underline underline-offset-4">Location &amp; Anreise</a></>}</div>
+            <div className="border-t border-white/10 pt-5 sm:col-span-2"><p className="mb-2 flex items-center gap-2 text-zinc-400"><EventIcon kind="pin" />Veranstaltungsort</p><p>{event.city}{event.location ? ` · ${event.location}` : ''}</p>{event.address && <><p className="mt-1">{event.address}</p><a href={`https://maps.google.com/?q=${encodeURIComponent(event.address)}`} target="_blank" rel="noopener noreferrer" className="mt-3 inline-block text-[#00e5eb] underline underline-offset-4">Location &amp; Anreise</a></>}</div>
           </div>
         </div>
         {event.description && <div className="max-w-2xl border-t border-white/10 pt-6"><p className="text-zinc-400 text-sm leading-7 whitespace-pre-wrap">{event.description}</p></div>}
         {!salesClosed && event.id === 'd3a2c95d-893d-4ee4-8645-b28ec7f61063' && <DiscountWheel eventId={event.id} onReward={setWheelPercent} />}
       </div>
 
-      {salesClosed && <p role="status" className="mx-auto max-w-3xl p-6 text-center text-[#d6b36a]">{timing.ended ? "Diese Veranstaltung ist beendet." : "Der Online-Ticketverkauf ist beendet."}</p>}
+      {salesClosed && <p role="status" className="mx-auto max-w-3xl p-6 text-center text-[#00e5eb]">{timing.ended ? "Diese Veranstaltung ist beendet." : "Der Online-Ticketverkauf ist beendet."}</p>}
       {(step === "info" || salesClosed) && (
         <div className="wolnaa-purchase-bar fixed bottom-0 left-0 right-0 z-50 border-t border-white/10 bg-black/80 p-5 backdrop-blur-xl">
           {availabilityError && !salesClosed && <p role="alert" className="mx-auto mb-3 max-w-2xl text-sm text-amber-200">Ticketverfügbarkeit konnte nicht geladen werden. <button className="underline" onClick={() => setAvailabilityAttempt(value => value + 1)}>Erneut versuchen</button></p>}
           <div className="max-w-2xl mx-auto flex items-center justify-between">
             <div>
               {!salesClosed && <p className="text-xs text-zinc-500 uppercase tracking-widest">Ab</p>}
-              <p className="text-2xl font-bold text-[#d6b36a]">{salesClosed ? "Online-Verkauf beendet" : !availability ? "Wird geladen…" : activeTicket ? formatMoney(toMoney(activeTicket.price)) : "Ausverkauft"}</p>{!salesClosed && activeTicket && <p className="mt-1 text-xs text-zinc-500">inkl. 19% MwSt.</p>}
+              <p className="text-2xl font-bold text-[#00e5eb]">{salesClosed ? "Online-Verkauf beendet" : !availability ? "Wird geladen…" : activeTicket ? formatMoney(toMoney(activeTicket.price)) : "Ausverkauft"}</p>{!salesClosed && activeTicket && <p className="mt-1 text-xs text-zinc-500">inkl. 19% MwSt.</p>}
             </div>
-            <button onClick={() => setStep("tickets")} disabled={salesClosed || !availability || (!activeTicket && !n.hasLounges)} className="bg-[#d6b36a] text-black font-bold px-8 py-4 rounded-md text-base hover:bg-[#ead08d] transition-colors uppercase tracking-[0.12em] disabled:cursor-not-allowed disabled:bg-zinc-800 disabled:text-zinc-500">{salesClosed ? "Online-Verkauf beendet" : !availability ? "Bitte warten" : activeTicket || n.hasLounges ? "Tickets kaufen →" : "Ausverkauft"}</button>
+            <button onClick={() => setStep("tickets")} disabled={salesClosed || !availability || (!activeTicket && !n.hasLounges)} className="bg-[#00e5eb] text-black font-bold px-8 py-4 rounded-md text-base hover:bg-[#6fffff] transition-colors uppercase tracking-[0.12em] disabled:cursor-not-allowed disabled:bg-zinc-800 disabled:text-zinc-500">{salesClosed ? "Online-Verkauf beendet" : !availability ? "Bitte warten" : activeTicket || n.hasLounges ? "Tickets kaufen →" : "Ausverkauft"}</button>
           </div>
         </div>
       )}
@@ -217,11 +217,11 @@ export default function EventDetails({ event, initialNow }: { event: EventItem; 
             <div className="px-6 py-5 space-y-3">
               {activeTicket && (
                 <div className="flex items-center justify-between bg-black/35 border border-white/10 rounded-md px-5 py-4">
-                  <div><p className="font-bold text-base">{activeTicket.name || "Ticket"}</p><p className="text-[#d6b36a] font-bold mt-0.5">{formatMoney(toMoney(activeTicket.price))}</p><p className="mt-1 text-[11px] text-zinc-500">inkl. 19% MwSt.{availability?.remaining !== null && availability?.remaining !== undefined ? ` · Noch ${availability.remaining} verfügbar` : ""}</p></div>
+                  <div><p className="font-bold text-base">{activeTicket.name || "Ticket"}</p><p className="text-[#00e5eb] font-bold mt-0.5">{formatMoney(toMoney(activeTicket.price))}</p><p className="mt-1 text-[11px] text-zinc-500">inkl. 19% MwSt.{availability?.remaining !== null && availability?.remaining !== undefined ? ` · Noch ${availability.remaining} verfügbar` : ""}</p></div>
                   <div className="flex items-center gap-2">
-                    <button onClick={() => setTicketQtys(p => ({ ...p, [activeTicketIndex]: Math.max(0, (p[activeTicketIndex] ?? 0) - 1) }))} className="w-9 h-9 rounded-md border border-zinc-700 flex items-center justify-center font-bold hover:border-[#d6b36a] hover:text-[#d6b36a] transition-colors text-lg">−</button>
+                    <button onClick={() => setTicketQtys(p => ({ ...p, [activeTicketIndex]: Math.max(0, (p[activeTicketIndex] ?? 0) - 1) }))} className="w-9 h-9 rounded-md border border-zinc-700 flex items-center justify-center font-bold hover:border-[#00e5eb] hover:text-[#00e5eb] transition-colors text-lg">−</button>
                     <span className="w-6 text-center font-bold">{ticketQtys[activeTicketIndex] ?? 0}</span>
-                    <button onClick={() => setTicketQtys(p => ({ ...p, [activeTicketIndex]: Math.min(availability?.remaining ?? Number.POSITIVE_INFINITY, (p[activeTicketIndex] ?? 0) + 1) }))} className="w-9 h-9 rounded-md bg-[#d6b36a] text-black flex items-center justify-center font-bold hover:bg-[#ead08d] transition-colors text-lg">+</button>
+                    <button onClick={() => setTicketQtys(p => ({ ...p, [activeTicketIndex]: Math.min(availability?.remaining ?? Number.POSITIVE_INFINITY, (p[activeTicketIndex] ?? 0) + 1) }))} className="w-9 h-9 rounded-md bg-[#00e5eb] text-black flex items-center justify-center font-bold hover:bg-[#6fffff] transition-colors text-lg">+</button>
                   </div>
                 </div>
               )}
@@ -230,20 +230,20 @@ export default function EventDetails({ event, initialNow }: { event: EventItem; 
                 <>
                   <p className="text-xs font-bold text-zinc-500 uppercase tracking-widest pt-2">Lounge</p>
                   {n.loungeList.map((lounge, i) => (
-                    <button key={i} onClick={() => setSelectedLounge(selectedLounge === i ? null : i)} className={`w-full flex items-center justify-between rounded-md border px-5 py-4 text-left transition-all ${selectedLounge === i ? "border-[#d6b36a] bg-[#d6b36a]/10" : "border-white/10 bg-zinc-950"}`}>
+                    <button key={i} onClick={() => setSelectedLounge(selectedLounge === i ? null : i)} className={`w-full flex items-center justify-between rounded-md border px-5 py-4 text-left transition-all ${selectedLounge === i ? "border-[#00e5eb] bg-[#00e5eb]/10" : "border-white/10 bg-zinc-950"}`}>
                       <div><p className="font-bold">{lounge.name}</p><p className="text-zinc-500 text-xs mt-0.5">bis {lounge.persons} Personen</p></div>
-                      <div className="flex items-center gap-3"><span className="text-[#d6b36a] font-bold">{formatMoney(toMoney(lounge.price))}</span><div className={`w-6 h-6 rounded-md border-2 flex items-center justify-center ${selectedLounge === i ? "bg-[#d6b36a] border-[#d6b36a]" : "border-zinc-600"}`}>{selectedLounge === i && <span className="text-black text-xs font-bold">✓</span>}</div></div>
+                      <div className="flex items-center gap-3"><span className="text-[#00e5eb] font-bold">{formatMoney(toMoney(lounge.price))}</span><div className={`w-6 h-6 rounded-md border-2 flex items-center justify-center ${selectedLounge === i ? "bg-[#00e5eb] border-[#00e5eb]" : "border-zinc-600"}`}>{selectedLounge === i && <span className="text-black text-xs font-bold">✓</span>}</div></div>
                     </button>
                   ))}
                 </>
               )}
-              {wheelPercent > 0 && <p className="text-sm text-[#d6b36a]">Dein Glücksrad-Rabatt: {wheelPercent} % auf Tickets – automatisch angewendet.</p>}
+              {wheelPercent > 0 && <p className="text-sm text-[#00e5eb]">Dein Glücksrad-Rabatt: {wheelPercent} % auf Tickets – automatisch angewendet.</p>}
               {hasSelection && (
                 <div className="bg-black/35 border border-white/10 rounded-md px-5 py-4">
                   <p className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-3">Rabattcode</p>
                   <div className="flex gap-2">
-                    <input type="text" value={discountInput} onChange={e => { setDiscountInput(e.target.value.toUpperCase()); setDiscountError(""); setDiscountSuccess(false); setAppliedDiscount(null); }} onKeyDown={e => e.key === "Enter" && applyDiscount()} placeholder="Code eingeben" className="flex-1 bg-zinc-900 border border-zinc-700 focus:border-[#d6b36a] rounded-md px-4 py-3 text-white placeholder:text-zinc-600 outline-none text-sm font-mono uppercase transition-colors" />
-                    <button onClick={applyDiscount} className="bg-[#d6b36a] text-black font-bold px-5 py-3 rounded-md text-sm hover:bg-[#ead08d] transition-colors shrink-0">Einlösen</button>
+                    <input type="text" value={discountInput} onChange={e => { setDiscountInput(e.target.value.toUpperCase()); setDiscountError(""); setDiscountSuccess(false); setAppliedDiscount(null); }} onKeyDown={e => e.key === "Enter" && applyDiscount()} placeholder="Code eingeben" className="flex-1 bg-zinc-900 border border-zinc-700 focus:border-[#00e5eb] rounded-md px-4 py-3 text-white placeholder:text-zinc-600 outline-none text-sm font-mono uppercase transition-colors" />
+                    <button onClick={applyDiscount} className="bg-[#00e5eb] text-black font-bold px-5 py-3 rounded-md text-sm hover:bg-[#6fffff] transition-colors shrink-0">Einlösen</button>
                   </div>
                   {discountSuccess && appliedDiscount && <p className="text-green-400 text-xs mt-2">✓ {toDiscountPercent(appliedDiscount.percent)}{wheelPercent ? ' zusätzliche Prozentpunkte auf Tickets' : '% Rabatt wird angewendet'}</p>}
                   {discountError && <p className="text-red-400 text-xs mt-2">{discountError}</p>}
@@ -258,19 +258,19 @@ export default function EventDetails({ event, initialNow }: { event: EventItem; 
                   </p>
                 </div>
                 <label className="flex items-start gap-3 cursor-pointer" onClick={() => setIsAdult(!isAdult)}>
-                  <div className={`mt-0.5 w-5 h-5 rounded-md border-2 shrink-0 flex items-center justify-center transition-all ${isAdult ? "bg-[#d6b36a] border-[#d6b36a]" : "border-zinc-600"}`}>{isAdult && <span className="text-black text-[10px] font-bold">✓</span>}</div>
+                  <div className={`mt-0.5 w-5 h-5 rounded-md border-2 shrink-0 flex items-center justify-center transition-all ${isAdult ? "bg-[#00e5eb] border-[#00e5eb]" : "border-zinc-600"}`}>{isAdult && <span className="text-black text-[10px] font-bold">✓</span>}</div>
                   <span className="text-zinc-400 text-sm leading-relaxed">Ich bin mindestens <span className="text-white font-semibold">{event.min_age === 16 ? 16 : 18} Jahre alt</span>.</span>
                 </label>
                 <label className="flex items-start gap-3 cursor-pointer" onClick={() => setAcceptedLegal(!acceptedLegal)}>
-                  <div className={`mt-0.5 w-5 h-5 rounded-md border-2 shrink-0 flex items-center justify-center transition-all ${acceptedLegal ? "bg-[#d6b36a] border-[#d6b36a]" : "border-zinc-600"}`}>{acceptedLegal && <span className="text-black text-[10px] font-bold">✓</span>}</div>
-                  <span className="text-zinc-400 text-sm leading-relaxed">Ich akzeptiere die <Link href="/agb" target="_blank" className="text-[#d6b36a] underline underline-offset-2">AGB</Link>, die <Link href="/datenschutz" target="_blank" className="text-[#d6b36a] underline underline-offset-2">Datenschutzerklärung</Link> und die Hinweise zum jeweiligen Veranstalter.</span>
+                  <div className={`mt-0.5 w-5 h-5 rounded-md border-2 shrink-0 flex items-center justify-center transition-all ${acceptedLegal ? "bg-[#00e5eb] border-[#00e5eb]" : "border-zinc-600"}`}>{acceptedLegal && <span className="text-black text-[10px] font-bold">✓</span>}</div>
+                  <span className="text-zinc-400 text-sm leading-relaxed">Ich akzeptiere die <Link href="/agb" target="_blank" className="text-[#00e5eb] underline underline-offset-2">AGB</Link>, die <Link href="/datenschutz" target="_blank" className="text-[#00e5eb] underline underline-offset-2">Datenschutzerklärung</Link> und die Hinweise zum jeweiligen Veranstalter.</span>
                 </label>
               </div>
             </div>
             <div className="sticky bottom-0 bg-black border-t border-white/10 px-6 py-5">
               {hasSelection && (
                 <div className="flex items-center justify-between mb-4">
-                  <div><p className="text-zinc-500 text-xs">Gesamt</p>{(wheelPercent > 0 || appliedDiscount) && <p className="text-green-400 text-xs">− {wheelPercent ? combinedWheelPercent(wheelPercent, influencerPercent(event.id, appliedDiscount?.code)) : toDiscountPercent(appliedDiscount?.percent)}% Rabatt{wheelPercent ? ' auf Tickets' : ''}</p>}<p className="text-2xl font-bold text-[#d6b36a]">{formatMoney(total)}</p><p className="mt-1 text-[11px] text-zinc-500">inkl. 19% MwSt.</p></div>
+                  <div><p className="text-zinc-500 text-xs">Gesamt</p>{(wheelPercent > 0 || appliedDiscount) && <p className="text-green-400 text-xs">− {wheelPercent ? combinedWheelPercent(wheelPercent, influencerPercent(event.id, appliedDiscount?.code)) : toDiscountPercent(appliedDiscount?.percent)}% Rabatt{wheelPercent ? ' auf Tickets' : ''}</p>}<p className="text-2xl font-bold text-[#00e5eb]">{formatMoney(total)}</p><p className="mt-1 text-[11px] text-zinc-500">inkl. 19% MwSt.</p></div>
                   <p className="text-zinc-600 text-xs">{totalTickets} Ticket{totalTickets !== 1 ? "s" : ""}</p>
                 </div>
               )}
@@ -283,7 +283,7 @@ export default function EventDetails({ event, initialNow }: { event: EventItem; 
                     });
                   }
                   setStep("checkout");
-                }} disabled={!canCheckout} className={`w-full py-4 rounded-md font-bold text-base transition-all ${canCheckout ? "bg-[#d6b36a] text-black hover:bg-[#ead08d]" : "bg-zinc-900 text-zinc-600 cursor-not-allowed"}`}>
+                }} disabled={!canCheckout} className={`w-full py-4 rounded-md font-bold text-base transition-all ${canCheckout ? "bg-[#00e5eb] text-black hover:bg-[#6fffff]" : "bg-zinc-900 text-zinc-600 cursor-not-allowed"}`}>
                 {!hasSelection ? "Ticket auswählen" : !isAdult || !acceptedLegal ? "Bitte Bedingungen akzeptieren" : `Weiter · ${formatMoney(total)}`}
               </button>
               <p className="text-center text-zinc-600 text-xs mt-3">🔒 Sichere Zahlung über Stripe</p>
@@ -296,7 +296,7 @@ export default function EventDetails({ event, initialNow }: { event: EventItem; 
         <div role="dialog" aria-modal="true" aria-label="Ticketbestellung" className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-end justify-center" onClick={() => setStep("tickets")}>
           <div className="w-full max-w-2xl bg-black border-t border-white/10 rounded-t-xl" onClick={e => e.stopPropagation()}>
             <div className="px-6 pt-6 pb-4 border-b border-white/10 flex items-center justify-between">
-              <div><h2 className="text-lg font-bold">Bestellung abschließen</h2><p className="text-zinc-500 text-sm mt-0.5">{totalTickets} Ticket{totalTickets !== 1 ? "s" : ""} · <span className="text-[#d6b36a] font-bold">{formatMoney(total)}</span></p><p className="mt-1 text-[11px] text-zinc-500">inkl. 19% MwSt.</p></div>
+              <div><h2 className="text-lg font-bold">Bestellung abschließen</h2><p className="text-zinc-500 text-sm mt-0.5">{totalTickets} Ticket{totalTickets !== 1 ? "s" : ""} · <span className="text-[#00e5eb] font-bold">{formatMoney(total)}</span></p><p className="mt-1 text-[11px] text-zinc-500">inkl. 19% MwSt.</p></div>
               <button onClick={() => setStep("tickets")} className="w-9 h-9 rounded-md border border-zinc-700 flex items-center justify-center text-zinc-400 hover:text-white">✕</button>
             </div>
             <div className="px-6 py-5 space-y-4">
@@ -309,12 +309,12 @@ export default function EventDetails({ event, initialNow }: { event: EventItem; 
               </div>
               <div>
                 <label className="block text-xs font-bold text-zinc-400 mb-2 uppercase tracking-widest">Vollständiger Name</label>
-                <input value={customerName} onChange={e => { setCustomerName(e.target.value); setFormErrors(p => ({ ...p, name: "" })); }} placeholder="Max Mustermann" className={`w-full rounded-md border bg-zinc-950 px-4 py-3 text-white placeholder:text-zinc-600 outline-none text-sm transition-colors ${formErrors.name ? "border-red-500" : "border-zinc-700 focus:border-[#d6b36a]"}`} />
+                <input value={customerName} onChange={e => { setCustomerName(e.target.value); setFormErrors(p => ({ ...p, name: "" })); }} placeholder="Max Mustermann" className={`w-full rounded-md border bg-zinc-950 px-4 py-3 text-white placeholder:text-zinc-600 outline-none text-sm transition-colors ${formErrors.name ? "border-red-500" : "border-zinc-700 focus:border-[#00e5eb]"}`} />
                 {formErrors.name && <p className="text-red-400 text-xs mt-1">{formErrors.name}</p>}
               </div>
               <div>
                 <label className="block text-xs font-bold text-zinc-400 mb-2 uppercase tracking-widest">E-Mail-Adresse</label>
-                <input type="email" value={customerEmail} onChange={e => { setCustomerEmail(e.target.value); setFormErrors(p => ({ ...p, email: "" })); }} placeholder="max@example.de" className={`w-full rounded-md border bg-zinc-950 px-4 py-3 text-white placeholder:text-zinc-600 outline-none text-sm transition-colors ${formErrors.email ? "border-red-500" : "border-zinc-700 focus:border-[#d6b36a]"}`} />
+                <input type="email" value={customerEmail} onChange={e => { setCustomerEmail(e.target.value); setFormErrors(p => ({ ...p, email: "" })); }} placeholder="max@example.de" className={`w-full rounded-md border bg-zinc-950 px-4 py-3 text-white placeholder:text-zinc-600 outline-none text-sm transition-colors ${formErrors.email ? "border-red-500" : "border-zinc-700 focus:border-[#00e5eb]"}`} />
                 {formErrors.email && <p className="text-red-400 text-xs mt-1">{formErrors.email}</p>}
               </div>
               <p className="text-zinc-600 text-xs">Das Ticket wird nach Zahlung an diese E-Mail gesendet.</p>
@@ -322,7 +322,7 @@ export default function EventDetails({ event, initialNow }: { event: EventItem; 
             </div>
             <div className="px-6 pb-6 flex gap-3">
               <button onClick={() => setStep("tickets")} className="flex-1 rounded-md border border-zinc-700 py-4 text-sm font-semibold text-zinc-400 hover:text-white transition-colors">← Zurück</button>
-              <button onClick={submitOrder} disabled={loading} className="flex-1 rounded-md bg-[#d6b36a] text-black font-bold py-4 text-sm hover:bg-[#ead08d] transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
+              <button onClick={submitOrder} disabled={loading} className="flex-1 rounded-md bg-[#00e5eb] text-black font-bold py-4 text-sm hover:bg-[#6fffff] transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
                 {loading ? <><div className="w-4 h-4 border-2 border-black border-t-transparent rounded-md animate-spin" />Laden...</> : "Mit Stripe bezahlen →"}
               </button>
             </div>

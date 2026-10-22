@@ -42,7 +42,7 @@ export default function MuttizettelPage() {
       {state === "loading" ? "Verfügbarkeit wird geprüft …" : state === "error" ? "Events konnten nicht geladen werden." : !eligible.length ? "Aktuell ist keine Veranstaltung ab 16 freigeschaltet." : "Wähle das Event, das du besuchen möchtest."}
     </div>
     {state === "error" && <button className="wolnaa-account-button" onClick={() => setRetry(value => value + 1)}>Erneut versuchen</button>}
-      {event && <section style={{marginTop:24,padding:20,border:"1px solid #d6b36a55",borderRadius:16}}>
+      {event && <section style={{marginTop:24,padding:20,border:"1px solid #00e5eb55",borderRadius:16}}>
         <h2>{event.title}</h2>
         <p>{event.city} · {new Date(event.date + "T12:00:00").toLocaleDateString("de-DE")} {event.time && `· ${event.time} Uhr`} · Eintritt ab 16</p>
         <p>Du bist 16 oder 17? Stimme die benötigte Erziehungsbeauftragung und die Begleitung vorab mit dem Veranstalter ab. Die Auswahl hier stellt noch keinen Muttizettel aus.</p>

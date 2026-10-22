@@ -25,15 +25,16 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
     event = (await loadEventInfo(id)) || undefined;
   } catch {
     return <main className="min-h-screen bg-black text-white flex flex-col items-center justify-center gap-4 px-5 text-center">
-      <h1 className="text-2xl text-[#d6b36a]">Event gerade nicht erreichbar</h1>
+      <h1 className="text-2xl text-[#00e5eb]">Event gerade nicht erreichbar</h1>
       <p>Bitte versuche es noch einmal.</p>
-      <a href={`/event/${encodeURIComponent(id)}`} className="text-[#d6b36a] underline">Erneut laden</a>
+      <a href={`/event/${encodeURIComponent(id)}`} className="text-[#00e5eb] underline">Erneut laden</a>
       <Link href="/">Zur Startseite</Link>
     </main>;
   }
   if (!event) return <main className="min-h-screen bg-black text-white flex flex-col items-center justify-center gap-4">
-    <h1 className="text-2xl text-[#d6b36a]">Event nicht gefunden</h1>
+    <h1 className="text-2xl text-[#00e5eb]">Event nicht gefunden</h1>
     <Link href="/">← Zur Startseite</Link>
   </main>;
   return <EventDetails key={event.id} event={event} initialNow={Date.now()} />;
 }
+
