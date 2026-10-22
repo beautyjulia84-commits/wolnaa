@@ -32,10 +32,10 @@ export default function MuttizettelPage() {
     <p>Wähle deine Veranstaltung. Hier erscheinen ausschließlich aktuelle Wolnaa-Events mit Eintritt ab 16 Jahren.</p>
     {state === "loading" && <p role="status">Veranstaltungen werden geladen …</p>}
     {state === "error" && <div role="alert"><p>Die Veranstaltungen konnten nicht geladen werden.</p><button onClick={() => setRetry(value => value + 1)}>Erneut versuchen</button></div>}
-    {state === "ready" && (eligible.length ? <>
+    {state === "ready" && <>
       <label htmlFor="mutti-event" style={{display:"block",marginBottom:12}}>Veranstaltung auswählen</label>
-      <select id="mutti-event" value={event?.id || ""} onChange={e => setSelected(e.target.value)} style={{width:"100%",padding:14,border:"1px solid #d6b36a",borderRadius:12,background:"#171717",color:"#fff",fontSize:16}}>
-        <option value="">Bitte ein Event auswählen</option>
+      <select id="mutti-event" disabled={!eligible.length} value={event?.id || ""} onChange={e => setSelected(e.target.value)} style={{width:"100%",padding:14,border:"1px solid #d6b36a",borderRadius:12,background:"#171717",color:"#fff",fontSize:16}}>
+        <option value="">{eligible.length ? "Veranstaltung auswählen" : "Keine Veranstaltung ab 16 verfügbar"}</option>
         {eligible.map(item => <option key={item.id} value={item.id}>{item.title} · {new Date(item.date + "T12:00:00").toLocaleDateString("de-DE")}</option>)}
       </select>
       {event && <section style={{marginTop:24,padding:20,border:"1px solid #d6b36a55",borderRadius:16}}>
@@ -45,7 +45,8 @@ export default function MuttizettelPage() {
         <p><a href={`mailto:${event.veranstalter?.kontakt_email || "kontakt@wolnaa.de"}?subject=${encodeURIComponent("Muttizettel: " + event.title)}`}>Muttizettel beim Veranstalter anfragen</a></p>
         <Link className="wolnaa-gold-button" href={`/event/${event.slug || event.id}`}>Zum Event</Link>
       </section>}
-    </> : <p>Aktuell ist kein Event ab 16 Jahren freigeschaltet. Sobald ein Veranstalter ein passendes Event speichert, erscheint es hier.</p>)}
+    {!eligible.length && <p>Aktuell findet keine freigeschaltete Veranstaltung ab 16 statt.</p>}
+    </>}
     <p>Ein Muttizettel ersetzt kein Ticket. Beachte die Einlassbedingungen des jeweiligen Veranstalters.</p>
   </div></main>;
 }

@@ -1,0 +1,18 @@
+import assert from 'node:assert/strict';
+import {createCustomerSession,customerSessionEmail,customerDigest,safeEqual,escapeEmailPattern,sameOrigin} from '../lib/customer-access.ts';
+process.env.SUPABASE_SERVICE_ROLE_KEY='test-only-secret';
+const now=Date.now();
+const session=createCustomerSession('buyer@example.com',now);
+assert.equal(customerSessionEmail(session,now),'buyer@example.com');
+assert.equal(customerSessionEmail(session,now+3600000),null);
+assert.equal(customerSessionEmail(session+'x',now),null);
+assert.equal(customerSessionEmail(session.replace(session.split('.')[0],Buffer.from(JSON.stringify({email:'other@example.com',expires:now+3600000})).toString('base64url')),now),null);
+assert.equal(customerSessionEmail(undefined,now),null);
+assert.equal(safeEqual(customerDigest('one:123456'),customerDigest('two:123456')),false);
+assert.equal(escapeEmailPattern('a_b%z@example.com'),'a\\_b\\%z@example.com');
+assert.equal(sameOrigin(new Request('https://www.wolnaa.de/api/customer/access',{headers:{origin:'https://evil.example'}})),false);
+assert.equal(sameOrigin(new Request('https://www.wolnaa.de/api/customer/access',{headers:{origin:'https://www.wolnaa.de'}})),true);
+delete process.env.SUPABASE_SERVICE_ROLE_KEY;
+assert.equal(customerSessionEmail(session,now),null);
+assert.throws(()=>createCustomerSession('buyer@example.com',now));
+console.log('Customer access: signed identity, expiry, tampering, wildcard and origin checks passed');

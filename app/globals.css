@@ -65,28 +65,28 @@ body {
   .wolnaa-mobile-nav {
     position:fixed; inset:auto 0 0; z-index:45; display:grid;
     grid-template-columns:repeat(4,minmax(0,1fr));
-    padding:9px 10px calc(10px + env(safe-area-inset-bottom));
-    background:linear-gradient(110deg,rgba(100,82,39,.22),rgba(25,25,24,.72) 35%,rgba(25,25,24,.72));
+    padding:6px 10px calc(6px + env(safe-area-inset-bottom));
+    background:rgba(8,8,8,.86);
     backdrop-filter:blur(20px) saturate(125%); -webkit-backdrop-filter:blur(20px) saturate(125%);
     border-top:1px solid #e8cb7e26;
     box-shadow:0 -8px 28px #0003;
   }
   .wolnaa-mobile-nav a {
     display:flex; flex-direction:column; align-items:center; justify-content:flex-end;
-    position:relative; gap:7px; min-height:54px; color:var(--wolnaa-gold);
+    position:relative; gap:3px; min-height:48px; color:var(--wolnaa-gold);
     font-size:11px; line-height:1.35; text-decoration:none; white-space:nowrap;
   }
   .wolnaa-nav-icon { display:grid; place-items:center; width:32px; height:32px; position:relative; transition:transform .25s ease; }
   .wolnaa-nav-icon svg { position:relative; z-index:1; filter:drop-shadow(0 0 4px var(--wolnaa-halo)); }
   .wolnaa-mobile-nav [aria-current="page"] { font-weight:650; }
-  .wolnaa-mobile-nav [aria-current="page"] .wolnaa-nav-icon { transform:translateY(-20px); color:#241b09; }
+  .wolnaa-mobile-nav [aria-current="page"] .wolnaa-nav-icon { transform:translateY(-14px); color:#241b09; }
   .wolnaa-mobile-nav [aria-current="page"] .wolnaa-nav-icon::before {
-    content:""; position:absolute; width:56px; height:56px; border-radius:50%;
+    content:""; position:absolute; width:48px; height:48px; border-radius:50%;
     background-image:radial-gradient(ellipse at 32% 12%,#ffffff70,transparent 46%),var(--wolnaa-metal);
     box-shadow:inset 0 2px 2px #fff3be,inset 0 -3px 5px #74521d,0 0 24px var(--wolnaa-halo);
   }
   .wolnaa-mobile-nav [aria-current="page"] svg { filter:none; }
-  .wolnaa-purchase-bar { bottom:calc(104px + env(safe-area-inset-bottom)); padding:12px 16px; background:rgba(20,20,19,.76); }
+  .wolnaa-purchase-bar { bottom:calc(61px + env(safe-area-inset-bottom)); padding:12px 16px; background:rgba(20,20,19,.76); }
   .wolnaa-purchase-bar > div { gap:12px; }
   .wolnaa-purchase-bar button { padding:12px 16px; font-size:13px; min-height:48px; letter-spacing:.06em; }
   .wolnaa-purchase-bar p.text-2xl { font-size:20px; }
@@ -95,3 +95,12 @@ body {
   body:has([aria-modal="true"]) .wolnaa-mobile-nav { display:none; }
 }
 @media (prefers-reduced-motion:reduce) { .wolnaa-nav-icon { transition:none; } }
+
+@media (max-width:767px) {
+  .wolnaa-nav-flat [aria-current="page"] .wolnaa-nav-icon { transform:none; color:var(--wolnaa-gold); }
+  .wolnaa-nav-flat [aria-current="page"] .wolnaa-nav-icon::before { content:none; }
+}
+.wolnaa-account-field { display:block; width:100%; padding:14px; margin:8px 0 18px; background:#171717; border:1px solid #666; border-radius:10px; color:white; font-size:16px; }
+.wolnaa-account-button { min-height:48px; padding:12px 20px; border-radius:8px; font-weight:600; cursor:pointer; }
+.wolnaa-account-button:disabled { opacity:.5; cursor:wait; }
+.wolnaa-ticket-card { margin:16px 0; padding:18px; border:1px solid #d6b36a44; border-radius:14px; background:#141414; }
