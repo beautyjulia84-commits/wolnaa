@@ -861,7 +861,7 @@ export default function Home() {
         <div className="flex flex-wrap items-center justify-center gap-4 text-sm text-zinc-400 mb-4">
           <button onClick={() => window.dispatchEvent(new Event("wolnaa-open-cookie-settings"))}>Cookie-Einstellungen</button>
           {legalLinks.map(([key, label]) => (
-            <button key={key!} onClick={() => setShowLegal(key)} className="hover:text-[#d6b36a] active:text-[#d6b36a] transition-colors underline-offset-4 hover:underline active:underline">{label}</button>
+            <button key={key!} onClick={() => setShowLegal(key)} className="text-white hover:text-white active:text-white transition-colors underline-offset-4 hover:underline active:underline">{label}</button>
           ))}
         </div>
         <div className="mt-6 flex items-center justify-center gap-1 px-3">

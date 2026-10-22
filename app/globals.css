@@ -154,7 +154,7 @@ body {
 .cookie-actions button:last-child { grid-column:1/-1; color:#e8cb7e; border-color:#e8cb7e70; }
 
 /* Shared gold accents across the shop, consent controls and ticket account. */
-.wolnaa-page footer :is(button,a),.wolnaa-customer-footer a { color:#f5f5f5; text-shadow:0 0 10px #d3aa4926; }
+.wolnaa-page footer :is(button,a),.wolnaa-customer-footer a { color:#fff; text-shadow:none; }
 .wolnaa-customer-card .wolnaa-customer-kicker,.wolnaa-customer-help > span,.wolnaa-customer-select > span { color:var(--wolnaa-gold); }
 .wolnaa-customer-card :is(input,select):focus { border-color:var(--wolnaa-gold); box-shadow:0 0 12px #d3aa4920; }
 .wolnaa-customer-header img { filter:sepia(1) saturate(1.8) brightness(.95); }
