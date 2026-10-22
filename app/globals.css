@@ -131,7 +131,7 @@ body {
 @media(max-width:360px) { .wolnaa-customer-page { padding-left:14px; padding-right:14px; } .wolnaa-customer-card { padding:24px 20px; } .wolnaa-customer-card h1 { font-size:29px; } .wolnaa-customer-header { gap:12px; } }
 .wolnaa-page .event-card.frosted-event-card { border-radius:20px; border-color:#ffffff24; box-shadow:none; background-color:#08080a; background-size:cover; background-position:center; }
 .wolnaa-page .event-card.frosted-event-card:hover { transform:translateY(-3px); border-color:#ffffff40; box-shadow:0 15px 40px #0005; }
-.frosted-event-content { border-radius:20px; background:linear-gradient(125deg,rgba(12,12,15,.72),rgba(12,12,15,.82)); backdrop-filter:blur(32px) saturate(65%); -webkit-backdrop-filter:blur(32px) saturate(65%); border-top:1px solid #ffffff24; }
+.frosted-event-content { border-radius:20px; isolation:isolate; overflow:hidden; background:rgba(12,12,15,.78); backdrop-filter:blur(32px); -webkit-backdrop-filter:blur(32px); border-top:1px solid #ffffff24; }
 .wolnaa-cookie-dialog { width:calc(100% - 24px); max-width:520px; max-height:calc(100dvh - 32px); margin:auto; padding:24px; border:1px solid #ffffff24; border-radius:22px; background:#16171c; color:#f5f5f5; overflow:auto; box-shadow:0 25px 80px #0008; }
 .wolnaa-cookie-dialog::backdrop { background:#000b; backdrop-filter:blur(7px); }
 .cookie-dialog-heading { display:flex; justify-content:space-between; gap:8px; align-items:center; margin-bottom:18px; }
@@ -159,3 +159,5 @@ body {
 .wolnaa-customer-header img { filter:sepia(1) saturate(1.8) brightness(.95); }
 .cookie-toggle.enabled { background-image:var(--wolnaa-metal); box-shadow:0 0 12px var(--wolnaa-halo); }
 .wolnaa-info a.wolnaa-gold-button { border-radius:12px; }
+
+.frosted-event-content::before { content:""; position:absolute; inset:-40px; z-index:-1; pointer-events:none; background-image:var(--event-poster); background-size:cover; background-position:center; filter:blur(32px) saturate(.55); opacity:.22; }
