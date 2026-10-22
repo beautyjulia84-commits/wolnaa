@@ -14,7 +14,7 @@ type EventFormState = {
   city: string;
   date: string;
   time: string;
-  onlineSaleEndsAt: string; eventEndsAt: string;
+  onlineSaleEndsAt: string; eventEndsAt: string; minAge: 16 | 18;
   location: string;
   address: string;
   imageUrl: string;
@@ -30,7 +30,7 @@ const emptyEvent: EventFormState = {
   city: '',
   date: '',
   time: '',
-  onlineSaleEndsAt: '', eventEndsAt: '',
+  onlineSaleEndsAt: '', eventEndsAt: '', minAge: 18,
   location: '',
   address: '',
   imageUrl: '',
@@ -72,6 +72,7 @@ function rowToForm(row: any): EventFormState {
     date: row.date || '',
     time: row.time || '',
     onlineSaleEndsAt: row.online_sale_ends_at ? berlinLocal(row.online_sale_ends_at) : '',
+    minAge: row.min_age === 16 ? 16 : 18,
     eventEndsAt: row.event_ends_at ? berlinLocal(row.event_ends_at) : defaultEndLocal(row.date),
     location: row.location || '',
     address: row.address || '',
@@ -225,6 +226,7 @@ export default function VeranstalterEventForm({ eventId }: { eventId?: string })
               <div><label style={labelStyle}>Datum *</label><input type="date" style={inputStyle} value={form.date} onChange={e => setField('date', e.target.value)} /></div>
               <div><label style={labelStyle}>Uhrzeit</label><input style={inputStyle} placeholder="22:00" value={form.time} onChange={e => setField('time', e.target.value.replace(/[^0-9:]/g, '').slice(0, 5))} /></div>
             </div>
+            <div><label style={labelStyle} htmlFor="event-min-age">Eintrittsalter</label><select id="event-min-age" style={inputStyle} value={form.minAge} onChange={e => setField("minAge", Number(e.target.value) as 16 | 18)}><option value={18}>Ab 18 Jahren</option><option value={16}>Ab 16 Jahren – Muttizettel</option></select><p style={{color:"#9ca3af",fontSize:12}}>Events ab 16 erscheinen in der Muttizettel-Auswahl.</p></div>
             <div><label style={labelStyle}>Veranstaltungsende (deutsche Ortszeit)</label><input type="datetime-local" style={inputStyle} value={form.eventEndsAt || defaultEndLocal(form.date)} onChange={e => setField('eventEndsAt', e.target.value)} /><p style={{color:'#6b7280',fontSize:'12px'}}>Ab dann nicht mehr öffentlich sichtbar. Bei Nachtveranstaltungen den Folgetag wählen. Standard: Folgetag 05:00.</p></div>
             <div>
               <label style={labelStyle}>Online-Verkauf endet (deutsche Ortszeit)</label>

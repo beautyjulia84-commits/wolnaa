@@ -17,7 +17,7 @@ type DiscountCode = { code: string; percent: string };
 
 type EventItem = {
   id?: string;
-  title: string; city: string; date: string; time: string; onlineSaleEndsAt: string; eventEndsAt: string;
+  title: string; city: string; date: string; time: string; onlineSaleEndsAt: string; eventEndsAt: string; minAge: 16 | 18;
   location: string; address: string; imageUrl: string; price: string;
   description: string; tickets: TicketType[];
   lounges: boolean; loungeList: Lounge[]; discountCodes: DiscountCode[];
@@ -50,7 +50,7 @@ const LEGAL_LABELS: Record<LegalKey, string> = {
 };
 
 const EMPTY: EventItem = {
-  title: "", city: "", date: "", time: "", onlineSaleEndsAt: "", eventEndsAt: "", location: "", address: "",
+  title: "", city: "", date: "", time: "", onlineSaleEndsAt: "", eventEndsAt: "", minAge: 18, location: "", address: "",
   imageUrl: "", price: "", description: "",
   tickets: [{ name: "Standard", price: "", quantity: "" }],
   lounges: false, loungeList: [], discountCodes: [],
@@ -65,6 +65,7 @@ function rowToEvent(r: any): EventItem {
     date: r.date ?? "",
     time: r.time ?? "",
     onlineSaleEndsAt: r.online_sale_ends_at ? berlinLocal(r.online_sale_ends_at) : "",
+    minAge: r.min_age === 16 ? 16 : 18,
     eventEndsAt: r.event_ends_at ? berlinLocal(r.event_ends_at) : defaultEndLocal(r.date),
     location: r.location ?? "",
     address: r.address ?? "",
@@ -905,6 +906,7 @@ export default function AdminPage() {
                       <input type="text" inputMode="numeric" value={ev.time} onChange={e => { let v = e.target.value.replace(/[^0-9:]/g, ""); if (v.length === 2 && !v.includes(":") && ev.time.length < 2) v += ":"; if (v.length <= 5) f("time", v); }} placeholder="22:00" maxLength={5} className={inp} />
                     </div>
                   </div>
+                  <div><label className={lbl} htmlFor="event-min-age">Eintrittsalter</label><select id="event-min-age" value={ev.minAge} onChange={e => f("minAge", Number(e.target.value) as 16 | 18)} className={inp}><option value={18}>Ab 18 Jahren</option><option value={16}>Ab 16 Jahren – Muttizettel</option></select><p className="text-zinc-500 text-xs mt-1.5">Events ab 16 erscheinen in der Muttizettel-Auswahl.</p></div>
                   <div><label className={lbl}>Veranstaltungsende (deutsche Ortszeit)</label><input type="datetime-local" value={ev.eventEndsAt || defaultEndLocal(ev.date)} onChange={e => f("eventEndsAt", e.target.value)} className={inp} /><p className="text-zinc-600 text-xs mt-1.5">Ab diesem Zeitpunkt nicht mehr öffentlich sichtbar. Bei Nachtveranstaltungen den Folgetag wählen. Standard: Folgetag 05:00.</p></div>
                   <div>
                     <label className={lbl}>Online-Verkauf endet (deutsche Ortszeit)</label>

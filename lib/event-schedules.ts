@@ -15,7 +15,7 @@ export async function withEventSchedules<T extends { id:string; online_sale_ends
       try { salesEnd = berlinInstant(new Date(salesEnd).toISOString().slice(0,16)); }
       catch { throw new Error('Gespeichertes Verkaufsende ist ungültig. Bitte Event bearbeiten.'); }
     }
-    return { ...event, online_sale_ends_at: saved ? saved.salesEndAt : salesEnd, event_ends_at: saved?.endAt || null };
+    return { ...event, min_age: saved?.minAge === 16 ? 16 : 18, online_sale_ends_at: saved ? saved.salesEndAt : salesEnd, event_ends_at: saved?.endAt || null };
   });
 }
 export async function saveEventSchedule(db:SupabaseClient,id:string,schedule:ReturnType<typeof validateSchedule>) {

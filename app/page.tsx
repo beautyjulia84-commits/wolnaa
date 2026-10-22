@@ -83,7 +83,7 @@ const I18N = {
     sendMessage: "Nachricht senden",
     momentsAlts: ["Wolnaa Partynacht auf der Tanzfläche", "Gast bei einem Wolnaa Event", "Wolnaa Eventmoment an der Bar", "Volle Tanzfläche bei Wolnaa"],
     faq: [
-      { q: "Wie alt muss ich sein?", a: "Unsere Events sind ausschließlich für Personen ab 18 Jahren. Ein gültiger Ausweis wird beim Einlass kontrolliert." },
+      { q: "Wie alt muss ich sein?", a: "Je nach Veranstaltung gilt Eintritt ab 16 oder 18 Jahren. Die Altersgrenze steht auf der Eventseite. Für Events ab 16 findest du den Bereich Muttizettel im Menü. Ein gültiger Ausweis wird beim Einlass kontrolliert." },
       { q: "Wie erhalte ich mein Ticket?", a: "Nach erfolgreicher Zahlung erhältst du dein Ticket mit QR-Code sofort per E-Mail." },
       { q: "Gibt es Lounges?", a: "Bei ausgewählten Events bieten wir exklusive VIP Lounges an. Die Verfügbarkeit siehst du direkt auf der Event-Seite." },
       { q: "Wo kann ich parken?", a: "Parkmöglichkeiten findest du in der Nähe des Veranstaltungsortes. Die genaue Adresse ist auf der Event-Seite verlinkt." },
@@ -153,7 +153,7 @@ const I18N = {
     sendMessage: "Отправить сообщение",
     momentsAlts: ["Вечеринка Wolnaa на танцполе", "Гость события Wolnaa", "Момент события Wolnaa у бара", "Полный танцпол Wolnaa"],
     faq: [
-      { q: "С какого возраста можно прийти?", a: "Наши события только для гостей от 18 лет. На входе проверяется действительный документ." },
+      { q: "С какого возраста можно прийти?", a: "В зависимости от мероприятия вход с 16 или 18 лет. Возраст указан на странице события. Для событий 16+ раздел Muttizettel находится в меню. На входе проверяется действительный документ." },
       { q: "Как я получу билет?", a: "После успешной оплаты билет с QR-кодом сразу приходит на e-mail." },
       { q: "Есть ли lounge?", a: "На выбранных событиях доступны эксклюзивные VIP lounge. Доступность указана на странице события." },
       { q: "Где можно припарковаться?", a: "Парковки находятся рядом с локацией. Точный адрес указан на странице события." },

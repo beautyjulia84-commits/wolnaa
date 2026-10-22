@@ -13,6 +13,7 @@ type Lounge = { name: string; persons: string; price: string; type?: string };
 type DiscountCode = { code: string; percent: string };
 type Availability = { activeIndex: number; remaining: number | null; soldOut: boolean; salesClosed?: boolean };
 export type EventItem = {
+  min_age?: number;
   event_ends_at?: string | null; online_sale_ends_at?: string | null;
   id: string; title: string; city: string; date: string; time: string;
   location: string; address: string;
@@ -182,6 +183,7 @@ export default function EventDetails({ event, initialNow }: { event: EventItem; 
           <p className="mb-3 text-xs font-bold uppercase tracking-[0.28em] text-[#d6b36a]">WOLNAA EVENT</p>
           <h1 className="text-3xl font-semibold leading-tight mb-5 md:text-5xl">{event.title}</h1>
           <div className="grid gap-5 text-sm text-zinc-300 sm:grid-cols-2">
+            <div><p className="mb-2 text-zinc-400">Eintritt</p><p>Ab {event.min_age === 16 ? 16 : 18} Jahren</p>{event.min_age === 16 && <Link href={`/muttizettel?event=${event.id}`} className="text-[#d6b36a] underline">Muttizettel für dieses Event</Link>}</div>
             <div><p className="mb-2 flex items-center gap-2 text-zinc-400"><EventIcon kind="calendar" />Beginn</p><p>{formatDate(event.date)}{event.time ? ` · ${event.time} Uhr` : ''}</p></div>
             {Number.isFinite(timing.ends) && <div><p className="mb-2 flex items-center gap-2 text-zinc-400"><EventIcon kind="clock" />Ende</p><p>{new Intl.DateTimeFormat('de-DE', {timeZone:'Europe/Berlin',day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'}).format(new Date(timing.ends))} Uhr</p></div>}
             <div className="border-t border-white/10 pt-5 sm:col-span-2"><p className="mb-2 flex items-center gap-2 text-zinc-400"><EventIcon kind="pin" />Veranstaltungsort</p><p>{event.city}{event.location ? ` · ${event.location}` : ''}</p>{event.address && <><p className="mt-1">{event.address}</p><a href={`https://maps.google.com/?q=${encodeURIComponent(event.address)}`} target="_blank" rel="noopener noreferrer" className="mt-3 inline-block text-[#d6b36a] underline underline-offset-4">Location &amp; Anreise</a></>}</div>
@@ -257,7 +259,7 @@ export default function EventDetails({ event, initialNow }: { event: EventItem; 
                 </div>
                 <label className="flex items-start gap-3 cursor-pointer" onClick={() => setIsAdult(!isAdult)}>
                   <div className={`mt-0.5 w-5 h-5 rounded-md border-2 shrink-0 flex items-center justify-center transition-all ${isAdult ? "bg-[#d6b36a] border-[#d6b36a]" : "border-zinc-600"}`}>{isAdult && <span className="text-black text-[10px] font-bold">✓</span>}</div>
-                  <span className="text-zinc-400 text-sm leading-relaxed">Ich bin mindestens <span className="text-white font-semibold">18 Jahre alt</span>.</span>
+                  <span className="text-zinc-400 text-sm leading-relaxed">Ich bin mindestens <span className="text-white font-semibold">{event.min_age === 16 ? 16 : 18} Jahre alt</span>.</span>
                 </label>
                 <label className="flex items-start gap-3 cursor-pointer" onClick={() => setAcceptedLegal(!acceptedLegal)}>
                   <div className={`mt-0.5 w-5 h-5 rounded-md border-2 shrink-0 flex items-center justify-center transition-all ${acceptedLegal ? "bg-[#d6b36a] border-[#d6b36a]" : "border-zinc-600"}`}>{acceptedLegal && <span className="text-black text-[10px] font-bold">✓</span>}</div>
@@ -330,3 +332,4 @@ export default function EventDetails({ event, initialNow }: { event: EventItem; 
     </div>
   );
 }
+

@@ -30,11 +30,18 @@ export function eventTiming(event: TimedEvent, now = Date.now()) {
   return { starts, ends, salesEnd, ended, salesClosed: ended || !Number.isFinite(salesEnd) || now >= salesEnd,
     status: ended ? 'Abgeschlossen' : Number.isFinite(starts) && now >= starts ? 'Läuft' : 'Kommend' };
 }
-export function validateSchedule(event: { date?:string; time?:string; onlineSaleEndsAt?:string; eventEndsAt?:string }) {
+export function validateSchedule(event: { date?:string; time?:string; onlineSaleEndsAt?:string; eventEndsAt?:string; minAge?:number }) {
   const starts = berlinInstant(`${event.date}T${event.time || '00:00'}`);
   const endAt = berlinInstant(event.eventEndsAt || defaultEndLocal(event.date || ''));
   const salesEndAt = event.onlineSaleEndsAt ? berlinInstant(event.onlineSaleEndsAt) : null;
   if (endAt <= starts) throw new Error('Das Veranstaltungsende muss nach dem Beginn liegen. Für Nachtveranstaltungen bitte den Folgetag wählen.');
   if (salesEndAt && salesEndAt > endAt) throw new Error('Der Online-Verkauf muss spätestens zum Veranstaltungsende schließen.');
-  return { version: 1, endAt, salesEndAt };
+  const minAge = event.minAge ?? 18;
+  if (minAge !== 16 && minAge !== 18) throw new Error('Bitte Eintritt ab 16 oder 18 Jahren auswählen.');
+  return { version: 1, endAt, salesEndAt, minAge };
+}
+
+/** Only explicitly enabled, current events belong in the Muttizettel picker. */
+export function allowsMuttizettel(event: TimedEvent & { min_age?: number; description?: string }, now = Date.now()) {
+  return event.min_age === 16 && !eventTiming(event, now).ended && !/^\s*ABGESAGT/i.test(event.description || '');
 }
