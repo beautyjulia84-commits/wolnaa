@@ -34,7 +34,7 @@ export default function MobileNavigation() {
     window.addEventListener("resize", update);
     return () => { window.removeEventListener("scroll", update); window.removeEventListener("resize", update); };
   }, [pathname]);
-  if (!(pathname === "/" || pathname?.startsWith("/event/") || pathname === "/muttizettel" || pathname === "/mein-bereich")) return null;
+  if (!(pathname === "/" || pathname === "/muttizettel" || pathname === "/mein-bereich")) return null;
   const active = pathname === "/muttizettel" ? 2 : pathname === "/mein-bereich" ? 3 : pathname?.startsWith("/event/") || eventsVisible ? 1 : 0;
   return <nav className={`wolnaa-mobile-nav${pathname?.startsWith("/event/") ? " wolnaa-nav-flat" : ""}`} aria-label="Mobile Hauptnavigation">
     {items.map((item, index) => <Link key={item.href} href={item.href} aria-current={index === active ? "page" : undefined}>

@@ -8,6 +8,6 @@ export default function CustomerPageShell({children}:{children:ReactNode}) {
       <Link href="/#events">Zum Ticketshop <span aria-hidden="true">↗</span></Link>
     </header>
     <div className="wolnaa-customer-card">{children}</div>
-    <footer className="wolnaa-customer-footer"><a href="mailto:kontakt@wolnaa.de">Hilfe & Kontakt</a><Link href="/veranstalter/login">Veranstalter-Login</Link></footer>
+    <footer className="wolnaa-customer-footer"><a href="mailto:kontakt@wolnaa.de">Hilfe & Kontakt</a><Link href="/?cookies=1">Cookie-Einstellungen</Link></footer>
   </main>;
 }

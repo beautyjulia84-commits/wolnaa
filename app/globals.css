@@ -68,7 +68,7 @@ body {
     padding:6px 10px calc(6px + env(safe-area-inset-bottom));
     background:rgba(8,8,8,.86);
     backdrop-filter:blur(20px) saturate(125%); -webkit-backdrop-filter:blur(20px) saturate(125%);
-    border-top:1px solid #e8cb7e26;
+    border-top:0;
     box-shadow:0 -8px 28px #0003;
   }
   .wolnaa-mobile-nav a {
@@ -86,12 +86,10 @@ body {
     box-shadow:inset 0 2px 2px #fff3be,inset 0 -3px 5px #74521d,0 0 24px var(--wolnaa-halo);
   }
   .wolnaa-mobile-nav [aria-current="page"] svg { filter:none; }
-  .wolnaa-purchase-bar { bottom:calc(61px + env(safe-area-inset-bottom)); padding:12px 16px; background:rgba(20,20,19,.76); }
+  .wolnaa-purchase-bar { bottom:0; padding:12px 16px calc(12px + env(safe-area-inset-bottom)); background:rgba(20,20,19,.76); }
   .wolnaa-purchase-bar > div { gap:12px; }
   .wolnaa-purchase-bar button { padding:12px 16px; font-size:13px; min-height:48px; letter-spacing:.06em; }
   .wolnaa-purchase-bar p.text-2xl { font-size:20px; }
-  .wolnaa-page button[aria-controls="cookie-settings-panel"] { bottom:calc(100px + env(safe-area-inset-bottom)); }
-  .wolnaa-page #cookie-settings-panel { bottom:calc(152px + env(safe-area-inset-bottom)) !important; max-height:calc(100dvh - 176px) !important; }
   body:has([aria-modal="true"]) .wolnaa-mobile-nav { display:none; }
 }
 @media (prefers-reduced-motion:reduce) { .wolnaa-nav-icon { transition:none; } }
@@ -131,3 +129,25 @@ body {
 .wolnaa-customer-footer a { color:#aaa99f; padding:10px 0; }
 @media(min-width:768px) { .wolnaa-customer-header { min-height:120px; } .wolnaa-customer-card { padding:36px; } }
 @media(max-width:360px) { .wolnaa-customer-page { padding-left:14px; padding-right:14px; } .wolnaa-customer-card { padding:24px 20px; } .wolnaa-customer-card h1 { font-size:29px; } .wolnaa-customer-header { gap:12px; } }
+.wolnaa-page .event-card.frosted-event-card { border-radius:20px; border-color:#ffffff24; box-shadow:none; background:#151519; }
+.wolnaa-page .event-card.frosted-event-card:hover { transform:translateY(-3px); border-color:#ffffff40; box-shadow:0 15px 40px #0005; }
+.frosted-event-content { border-radius:20px; background:linear-gradient(120deg,#222229db,#151519ed 58%,#343436c9); backdrop-filter:blur(24px); -webkit-backdrop-filter:blur(24px); border-top:1px solid #ffffff24; }
+.wolnaa-cookie-dialog { width:calc(100% - 24px); max-width:520px; max-height:calc(100dvh - 32px); margin:auto; padding:24px; border:1px solid #ffffff24; border-radius:22px; background:#16171c; color:#f5f5f5; overflow:auto; box-shadow:0 25px 80px #0008; }
+.wolnaa-cookie-dialog::backdrop { background:#000b; backdrop-filter:blur(7px); }
+.cookie-dialog-heading { display:flex; justify-content:space-between; gap:8px; align-items:center; margin-bottom:18px; }
+.cookie-dialog-heading h2 { font-size:23px; font-weight:750; letter-spacing:-.6px; line-height:1.2; }
+.cookie-dialog-heading button { min-width:36px; min-height:44px; font-size:30px; color:#aaa; }
+.wolnaa-cookie-dialog > p { color:#b7b7bf; font-size:14px; line-height:1.65; margin-bottom:22px; }
+.wolnaa-cookie-dialog a { color:#e8cb7e; text-decoration:underline; }
+.cookie-option { position:relative; display:flex; align-items:flex-start; gap:15px; padding:18px; border:1px solid #ffffff12; border-radius:16px; background:#ffffff02; margin-top:12px; }
+.cookie-option strong { font-size:16px; }
+.cookie-option p { color:#aaaab4; font-size:13px; line-height:1.6; margin-top:7px; }
+.cookie-option input { position:absolute; width:44px; height:28px; opacity:0; cursor:pointer; }
+.cookie-option input:focus-visible + span { outline:2px solid white; outline-offset:4px; }
+.cookie-toggle { display:block; width:42px; height:25px; border-radius:999px; flex-shrink:0; background:#555660; margin-top:2px; }
+.cookie-toggle::after { content:''; display:block; width:19px; height:19px; margin:3px; border-radius:50%; background:#17171c; transition:transform .15s; }
+.cookie-toggle.enabled { background:#dfc282; }
+.cookie-toggle.enabled::after { transform:translateX(17px); }
+.cookie-actions { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:24px; }
+.cookie-actions button { min-height:48px; padding:12px 8px; border-radius:12px; border:1px solid #ffffff20; font-size:13px; font-weight:650; }
+.cookie-actions button:last-child { grid-column:1/-1; color:#e8cb7e; border-color:#e8cb7e70; }

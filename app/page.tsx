@@ -1,4 +1,5 @@
 "use client";
+import CookieBanner from "@/components/CookieBanner";
 import EventIcon from "@/components/EventIcon";
 import {eventTiming} from '@/lib/event-timing';
 import {useEventClock} from '@/lib/use-event-clock';
@@ -257,20 +258,17 @@ function EmptyState({ lang }: { lang: Lang }) {
 function FeaturedEvent({ event, lang, first = false }: { event: EventItem; lang: Lang; first?: boolean }) {
   const t = I18N[lang];
   return (
-    <Link prefetch={true} href={createEventLink(event)} className="event-card motion-card group mb-8 grid overflow-hidden rounded-md border bg-zinc-950/70 md:grid-cols-[1.15fr_0.85fr]">
+    <Link prefetch={true} href={createEventLink(event)} className="event-card frosted-event-card group mb-8 grid overflow-hidden border md:grid-cols-[1.15fr_0.85fr]">
       <div className="relative min-h-[280px] overflow-hidden bg-zinc-950 md:min-h-[420px]">
         {event.image_url ? (
           <img src={event.image_url} alt={event.title} className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy" decoding="async" />
         ) : (
           <Image src="/wolnaa-logo.png" alt="WOLNAA" width={360} height={140} className="absolute left-1/2 top-1/2 h-auto w-56 -translate-x-1/2 -translate-y-1/2 object-contain opacity-80" />
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/25 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
       </div>
 
-      <div className="relative z-10 -mt-6 flex flex-col px-5 pb-5 pt-0 md:mt-0 md:justify-center md:p-10">
-        <p className="mb-2 text-xs font-bold uppercase tracking-[0.28em] text-[#d6b36a]">
-          {first ? t.nextEvent : t.upcoming}
-        </p>
+      <div className="frosted-event-content relative z-10 -mt-5 flex flex-col p-5 md:mt-0 md:justify-center md:p-8">
 
         <h3 className="float-text text-2xl font-semibold leading-tight md:text-5xl">
           {event.title}
@@ -282,11 +280,12 @@ function FeaturedEvent({ event, lang, first = false }: { event: EventItem; lang:
           <p className="flex items-start gap-3"><EventIcon kind="pin" /><span>{event.city}{event.location && ` · ${event.location}`}{event.address && <span className="block text-zinc-400">{event.address}</span>}</span></p>
         </div>
 
-        <div className="mt-4 flex flex-wrap items-center gap-4">
+        <div className="mt-5 flex items-center justify-between gap-3 border-t border-white/10 pt-5">
           <span>
             <span className="block text-lg font-bold text-[#d6b36a]">{event.sales_closed ? (lang === "de" ? "Online-Verkauf beendet" : "Онлайн-продажа завершена") : event.sold_out ? t.soldOut : `${t.from} ${getStartingPrice(event)} €`}</span>
             <span className="mt-1 block text-[11px] text-zinc-500">{t.vatIncluded}</span>
           </span>
+          <span className="wolnaa-gold-button rounded-xl px-4 py-3 text-sm font-semibold">{lang === 'de' ? 'Event ansehen' : 'Подробнее'} <span aria-hidden="true">→</span></span>
         </div>
       </div>
     </Link>
@@ -328,72 +327,6 @@ function LegalModal({ type, content, onClose, lang }: { type: LegalType; content
 }
 
 
-function CookieBanner({ lang }: { lang: Lang }) {
-  const t = I18N[lang];
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    const consent = localStorage.getItem('wolnaa-cookie-consent');
-    if (!consent) setVisible(true);
-    const open = () => setVisible(true);
-    window.addEventListener('wolnaa-open-cookie-settings', open);
-    return () => window.removeEventListener('wolnaa-open-cookie-settings', open);
-  }, []);
-
-  function accept() {
-    localStorage.setItem('wolnaa-cookie-consent', 'all');
-    window.dispatchEvent(new Event('wolnaa-consent-change'));
-    setVisible(false);
-  }
-
-  function decline() {
-    const wasAll = localStorage.getItem('wolnaa-cookie-consent') === 'all';
-    localStorage.setItem('wolnaa-cookie-consent', 'necessary');
-    window.dispatchEvent(new Event('wolnaa-consent-change'));
-    setVisible(false);
-    if (wasAll) window.location.reload();
-  }
-
-  return (
-    <>
-    <button type="button" aria-label={lang === 'de' ? 'Cookie-Einstellungen öffnen oder schließen' : 'Открыть или закрыть настройки cookie'} aria-expanded={visible} aria-controls="cookie-settings-panel" onClick={() => setVisible(open => !open)} className="group fixed bottom-6 left-0 z-[9999] flex h-11 items-center rounded-r-lg border border-l-0 border-white/20 bg-zinc-950 text-xs text-zinc-200 shadow-lg hover:text-[#d6b36a] focus-visible:outline-2 focus-visible:outline-[#d6b36a]">
-      <span className="grid grid-cols-[0fr] transition-[grid-template-columns] duration-200 group-hover:grid-cols-[1fr] group-focus-visible:grid-cols-[1fr] motion-reduce:transition-none">
-        <span className="overflow-hidden"><span className="block whitespace-nowrap pl-3">Cookies</span></span>
-      </span>
-      <span aria-hidden="true" className="flex h-11 w-11 shrink-0 items-center justify-center text-lg">{visible ? '‹' : '›'}</span>
-    </button>
-    {visible && <div id="cookie-settings-panel" role="region" aria-label={lang === 'de' ? 'Cookie-Einstellungen' : 'Настройки cookie'} onKeyDown={event => { if (event.key === 'Escape') setVisible(false); }} style={{
-      position: 'fixed', bottom: 80, left: 12,
-      width: 'calc(100% - 24px)', maxWidth: 420, maxHeight: 'calc(100dvh - 104px)', overflowY: 'auto', zIndex: 9999,
-      background: '#111', border: '1px solid #333',
-      borderRadius: 20, padding: '20px 24px',
-      boxShadow: '0 8px 40px rgba(0,0,0,0.6)',
-      display: 'flex', flexDirection: 'column', gap: 14,
-    }}>
-      <div>
-        <button type="button" onClick={() => setVisible(false)} aria-label={lang === 'de' ? 'Cookie-Einstellungen einklappen' : 'Свернуть настройки cookie'} className="float-right -mr-2 -mt-2 flex h-11 w-11 items-center justify-center rounded text-zinc-300 hover:text-white">✕</button>
-        <p style={{ color: '#fff', fontWeight: 700, fontSize: 15, marginBottom: 6 }}>🍪 {t.cookieTitle}</p>
-        <p style={{ color: '#a1a1aa', fontSize: 13, lineHeight: 1.6 }}>
-          {lang === 'de' ? 'Notwendige Funktionen bleiben aktiv. Mit „Alle akzeptieren“ erlaubst du zusätzlich TikTok-Werbetracking und ein Sitzungscookie zur Zuordnung der Ticketkäufe zu ihrer Herkunft. Das Glücksrad-Aktionscookie erfordert eine separate Einwilligung am Rad.' : 'Необходимые функции остаются активными. «Принять все» разрешает рекламное отслеживание TikTok и cookie сеанса для определения источника покупки билетов. Для cookie колеса скидок требуется отдельное согласие.'}{' '}
-          <a href="/datenschutz" style={{ color: '#d6b36a', fontSize: 13 }}>{t.legalPrivacy}</a>
-        </p>
-      </div>
-      <div style={{ display: 'flex', gap: 10 }}>
-        <button onClick={accept} style={{
-          flex: 1, background: '#d6b36a', color: '#000',
-          border: 'none', borderRadius: 12, padding: '10px 16px',
-          fontWeight: 700, fontSize: 14, cursor: 'pointer',
-        }}>{t.acceptAll}</button>
-        <button onClick={decline} style={{
-          flex: 1, background: '#d6b36a', color: '#000',
-          border: '1px solid #333', borderRadius: 12, padding: '10px 16px',
-          fontWeight: 600, fontSize: 14, cursor: 'pointer',
-        }}>{t.necessaryOnly}</button>
-      </div>
-    </div>}
-    </>
-  );
-}
 
 function ContactModal({ onClose, lang }: { onClose: () => void; lang: Lang }) {
   const t = I18N[lang];
@@ -926,6 +859,7 @@ export default function Home() {
 
       <footer className="border-t border-white/10 pt-8 pb-6 text-center">
         <div className="flex flex-wrap items-center justify-center gap-4 text-sm text-zinc-400 mb-4">
+          <button onClick={() => window.dispatchEvent(new Event("wolnaa-open-cookie-settings"))}>Cookie-Einstellungen</button>
           {legalLinks.map(([key, label]) => (
             <button key={key!} onClick={() => setShowLegal(key)} className="hover:text-[#d6b36a] active:text-[#d6b36a] transition-colors underline-offset-4 hover:underline active:underline">{label}</button>
           ))}
