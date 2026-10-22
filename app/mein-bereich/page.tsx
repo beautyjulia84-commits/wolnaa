@@ -1,5 +1,5 @@
 "use client";
-import Link from 'next/link';
+import CustomerPageShell from '@/components/CustomerPageShell';
 import {useEffect,useState,type FormEvent} from 'react';
 type Ticket={ticket_id:string;event_title:string;ticket_name:string;status:string};
 export default function MeinBereich() {
@@ -41,9 +41,9 @@ export default function MeinBereich() {
     } catch {setError('Abmelden fehlgeschlagen. Bitte erneut versuchen.');}
     finally {setBusy(false);}
   }
-  return <main className="wolnaa-info"><div className="wolnaa-info-inner">
-    <Link href="/">← Zurück zu Wolnaa</Link><h1>Mein Bereich</h1>
-    {loading ? <p role="status">Ticketbereich wird geladen …</p> : account ? <>
+  return <CustomerPageShell>
+    {account ? <>
+      <h1>Deine Tickets.</h1>
       <p>Angemeldet als <strong style={{overflowWrap:'anywhere'}}>{account}</strong></p>
       <button className="wolnaa-account-button" disabled={busy} onClick={logout}>Abmelden</button>
       <h2>Deine Tickets</h2>
@@ -53,19 +53,19 @@ export default function MeinBereich() {
         {ticket.status==='paid' ? <a className="wolnaa-gold-button" href={`/api/customer/tickets?download=${encodeURIComponent(ticket.ticket_id)}`}>Ticket als PDF herunterladen</a> : <p>{ticket.status==='checked_in'?'Bereits am Einlass verwendet':ticket.status==='cancelled'?'Storniert':ticket.status==='refunded'?'Erstattet':'Kein Download verfügbar'}</p>}
       </article>)}
     </> : <>
-      <h2>Anmelden und Tickets herunterladen</h2>
-      <p>Nutze die E-Mail-Adresse deiner Ticketbestellung. Du erhältst einen Anmeldecode – ein Passwort ist nicht nötig.</p>
+      <h1>Deine Tickets.<br />Dein Bereich.</h1>
+      <p className="wolnaa-customer-intro">Melde dich mit der E-Mail-Adresse deines Ticketkaufs an.</p>
       <form onSubmit={submit}>
-        {!sent ? <><label htmlFor="customer-email">E-Mail-Adresse der Bestellung</label><input id="customer-email" className="wolnaa-account-field" type="email" autoComplete="email" maxLength={254} value={email} onChange={e=>setEmail(e.target.value)} required /></> : <>
+        {!sent ? <><label htmlFor="customer-email">E-Mail-Adresse</label><input id="customer-email" className="wolnaa-account-field" placeholder="name@beispiel.de" type="email" autoComplete="email" maxLength={254} value={email} onChange={e=>setEmail(e.target.value)} required /></> : <>
           <p role="status">Der Code wurde an {email} gesendet. Prüfe auch deinen Spam-Ordner. Er ist zehn Minuten gültig.</p>
           <label htmlFor="customer-code">Sechsstelliger Anmeldecode</label><input id="customer-code" className="wolnaa-account-field" inputMode="numeric" autoComplete="one-time-code" pattern="[0-9]{6}" maxLength={6} value={code} onChange={e=>setCode(e.target.value.replace(/\D/g,''))} required />
         </>}
-        <button className="wolnaa-gold-button wolnaa-account-button" disabled={busy}>{busy?'Bitte warten …':sent?'Anmelden':'Code per E-Mail erhalten'}</button>
+        <button className="wolnaa-gold-button wolnaa-account-button wolnaa-customer-primary" disabled={busy || loading}>{busy?'Bitte warten …':sent?'Anmelden':'Anmeldecode erhalten'}</button>
         {sent && <button type="button" className="wolnaa-account-button" disabled={busy} onClick={()=>{setSent(false);setCode('');setError('');}}>Andere Adresse / neuer Code</button>}
+      <p className="wolnaa-customer-note">{loading ? "Anmeldung wird geprüft …" : "Ohne Passwort. Dein persönlicher Code kommt per E-Mail."}</p>
       </form>
     </>}
     {error && <p role="alert" style={{color:'#fca5a5'}}>{error}</p>}
-    <p>Fragen zu deinen Tickets? <a href="mailto:kontakt@wolnaa.de">kontakt@wolnaa.de</a></p>
-    <h2>Für Veranstalter</h2><Link href="/veranstalter/login">Zum Veranstalter-Login →</Link>
-  </div></main>;
+    <div className="wolnaa-customer-help"><span>Tickets immer dabei</span><p>Nach der Anmeldung kannst du deine Tickets als PDF herunterladen.</p></div>
+  </CustomerPageShell>;
 }

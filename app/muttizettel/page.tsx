@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import CustomerPageShell from "@/components/CustomerPageShell";
 import { useEffect, useState } from "react";
 import { allowsMuttizettel } from "@/lib/event-timing";
 import { useEventClock } from "@/lib/use-event-clock";
@@ -26,18 +27,21 @@ export default function MuttizettelPage() {
   }, [retry]);
   const eligible = events.filter(event => allowsMuttizettel(event, now));
   const event = eligible.find(event => event.id === selected);
-  return <main className="wolnaa-info"><div className="wolnaa-info-inner">
-    <Link href="/">← Zurück zu Wolnaa</Link>
-    <h1>Muttizettel</h1>
-    <p>Wähle deine Veranstaltung. Hier erscheinen ausschließlich aktuelle Wolnaa-Events mit Eintritt ab 16 Jahren.</p>
-    {state === "loading" && <p role="status">Veranstaltungen werden geladen …</p>}
-    {state === "error" && <div role="alert"><p>Die Veranstaltungen konnten nicht geladen werden.</p><button onClick={() => setRetry(value => value + 1)}>Erneut versuchen</button></div>}
-    {state === "ready" && <>
-      <label htmlFor="mutti-event" style={{display:"block",marginBottom:12}}>Veranstaltung auswählen</label>
-      <select id="mutti-event" disabled={!eligible.length} value={event?.id || ""} onChange={e => setSelected(e.target.value)} style={{width:"100%",padding:14,border:"1px solid #d6b36a",borderRadius:12,background:"#171717",color:"#fff",fontSize:16}}>
-        <option value="">{eligible.length ? "Veranstaltung auswählen" : "Keine Veranstaltung ab 16 verfügbar"}</option>
+  return <CustomerPageShell>
+    <p className="wolnaa-customer-kicker">Muttizettel</p>
+    <h1>Gemeinsam<br />zum Event.</h1>
+    <p className="wolnaa-customer-intro">Für 16- und 17-Jährige bei freigeschalteten Wolnaa-Veranstaltungen.</p>
+    <label htmlFor="mutti-event">Veranstaltung auswählen</label>
+    <div className="wolnaa-customer-select">
+      <select id="mutti-event" disabled={state !== "ready" || !eligible.length} aria-busy={state === "loading"} aria-describedby="mutti-status" value={event?.id || ""} onChange={e => setSelected(e.target.value)}>
+        <option value="">{state !== "ready" || eligible.length ? "Veranstaltung auswählen" : "Keine Events ab 16 verfügbar"}</option>
         {eligible.map(item => <option key={item.id} value={item.id}>{item.title} · {new Date(item.date + "T12:00:00").toLocaleDateString("de-DE")}</option>)}
-      </select>
+      </select><span aria-hidden="true">⌄</span>
+    </div>
+    <div id="mutti-status" className="wolnaa-customer-status" role="status">
+      {state === "loading" ? "Verfügbarkeit wird geprüft …" : state === "error" ? "Events konnten nicht geladen werden." : !eligible.length ? "Aktuell ist keine Veranstaltung ab 16 freigeschaltet." : "Wähle das Event, das du besuchen möchtest."}
+    </div>
+    {state === "error" && <button className="wolnaa-account-button" onClick={() => setRetry(value => value + 1)}>Erneut versuchen</button>}
       {event && <section style={{marginTop:24,padding:20,border:"1px solid #d6b36a55",borderRadius:16}}>
         <h2>{event.title}</h2>
         <p>{event.city} · {new Date(event.date + "T12:00:00").toLocaleDateString("de-DE")} {event.time && `· ${event.time} Uhr`} · Eintritt ab 16</p>
@@ -45,8 +49,6 @@ export default function MuttizettelPage() {
         <p><a href={`mailto:${event.veranstalter?.kontakt_email || "kontakt@wolnaa.de"}?subject=${encodeURIComponent("Muttizettel: " + event.title)}`}>Muttizettel beim Veranstalter anfragen</a></p>
         <Link className="wolnaa-gold-button" href={`/event/${event.slug || event.id}`}>Zum Event</Link>
       </section>}
-    {!eligible.length && <p>Aktuell findet keine freigeschaltete Veranstaltung ab 16 statt.</p>}
-    </>}
-    <p>Ein Muttizettel ersetzt kein Ticket. Beachte die Einlassbedingungen des jeweiligen Veranstalters.</p>
-  </div></main>;
+    <div className="wolnaa-customer-help"><span>Gut zu wissen</span><p>Ein Muttizettel ersetzt weder dein Ticket noch die Ausweis- und Begleitpersonenprüfung am Einlass. Es gelten die Regeln des Veranstalters.</p></div>
+  </CustomerPageShell>;
 }
