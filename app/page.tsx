@@ -867,7 +867,7 @@ export default function Home() {
         </div>
         <div className="mt-6 flex items-center justify-center gap-1 px-3">
           <p className="whitespace-nowrap text-xs text-zinc-400 sm:text-sm">Webseite und Ticketsystem von</p>
-          <Image src="/starteventz-logo.jpg" alt="StartEventz" width={1280} height={640} sizes="(min-width: 640px) 112px, 96px" className="h-auto w-24 shrink-0 sm:w-28" />
+          <a href="https://starteventz.de" target="_blank" rel="noopener noreferrer" aria-label="StartEventz – Webseite und Ticketsystem" className="shrink-0 rounded focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"><Image src="/starteventz-logo.jpg" alt="StartEventz" width={1280} height={640} sizes="(min-width: 640px) 112px, 96px" className="h-auto w-24 shrink-0 sm:w-28" /></a>
         </div>
       </footer>
 
