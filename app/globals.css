@@ -26,25 +26,25 @@ body {
 
 /* StartEventz gold material, with restrained light on Wolnaa's dark surfaces. */
 :root {
-  --wolnaa-gold: #59ffff;
+  --wolnaa-gold: #e8cb7e;
   --wolnaa-surface: #16171c;
-  --wolnaa-metal: linear-gradient(115deg,#00ccd9,#00f3f0 48%,#00dce9);
-  --wolnaa-halo: #00e5eb10;
+  --wolnaa-metal: linear-gradient(112deg,#92702b,#d4ad53 17%,#fff1ae 32%,#d9b65d 46%,#b98d38 56%,#f5df8c 75%,#fff4bb 84%,#b28a38);
+  --wolnaa-halo: #d3aa4910;
 }
-:is(.wolnaa-page,.wolnaa-event,.wolnaa-info) :is(button,a)[class*="bg-[#00e5eb]"]:not(:disabled),
+:is(.wolnaa-page,.wolnaa-event,.wolnaa-info) :is(button,a)[class*="bg-[#d6b36a]"]:not(:disabled),
 .wolnaa-gold-button {
-  background-color: #00e5eb;
+  background-color: #d4ad53;
   background-image: var(--wolnaa-metal);
-  color: #00272a;
-  border-color: #59ffff;
-  box-shadow: inset 0 1px 1px #aaffff, inset 0 -2px 3px #008f99, 0 0 5px var(--wolnaa-halo);
+  color: #241b09;
+  border-color: #e8cb7e;
+  box-shadow: inset 0 1px 1px #fff3be, inset 0 -2px 3px #74521d, 0 0 5px var(--wolnaa-halo);
   text-shadow: 0 1px 0 #ffffff30;
 }
-:is(.wolnaa-page,.wolnaa-event,.wolnaa-info) [class*="text-[#00e5eb]"] {
+:is(.wolnaa-page,.wolnaa-event,.wolnaa-info) [class*="text-[#d6b36a]"] {
   color: var(--wolnaa-gold);
-  text-shadow: 0 0 10px #00e5eb26;
+  text-shadow: 0 0 10px #d3aa4926;
 }
-:is(.wolnaa-page,.wolnaa-event,.wolnaa-info) svg[class*="text-[#00e5eb]"] {
+:is(.wolnaa-page,.wolnaa-event,.wolnaa-info) svg[class*="text-[#d6b36a]"] {
   filter: drop-shadow(0 0 4px var(--wolnaa-halo));
 }
 .wolnaa-mobile-nav { display: none; }
@@ -54,8 +54,8 @@ body {
 .wolnaa-info p { color:#d4d4d4; line-height:1.7; margin:16px 0; }
 .wolnaa-info h2 { font-size:22px; margin:28px 0 12px; }
 .wolnaa-info a { color:var(--wolnaa-gold); }
-.wolnaa-info a.wolnaa-gold-button { display:inline-flex; align-items:center; justify-content:center; min-height:48px; padding:12px 22px; margin:12px 0; border-radius:6px; color:#00272a; font-weight:600; }
-.wolnaa-mobile-nav a:focus-visible,.wolnaa-info a:focus-visible { outline:2px solid #aaffff; outline-offset:5px; }
+.wolnaa-info a.wolnaa-gold-button { display:inline-flex; align-items:center; justify-content:center; min-height:48px; padding:12px 22px; margin:12px 0; border-radius:6px; color:#241b09; font-weight:600; }
+.wolnaa-mobile-nav a:focus-visible,.wolnaa-info a:focus-visible { outline:2px solid #fff3be; outline-offset:5px; }
 @media (hover:hover) {
   .wolnaa-gold-button:hover { filter:brightness(1.07); }
 }
@@ -80,11 +80,11 @@ body {
   .wolnaa-nav-icon { display:grid; place-items:center; width:32px; height:32px; position:relative; transition:transform .25s ease; }
   .wolnaa-nav-icon svg { position:relative; z-index:1; filter:drop-shadow(0 0 4px var(--wolnaa-halo)); }
   .wolnaa-mobile-nav [aria-current="page"] { font-weight:650; }
-  .wolnaa-mobile-nav [aria-current="page"] .wolnaa-nav-icon { transform:translateY(-14px); color:#00272a; }
+  .wolnaa-mobile-nav [aria-current="page"] .wolnaa-nav-icon { transform:translateY(-14px); color:#241b09; }
   .wolnaa-mobile-nav [aria-current="page"] .wolnaa-nav-icon::before {
     content:""; position:absolute; width:48px; height:48px; border-radius:50%;
-    background-image:radial-gradient(ellipse at 32% 12%,#ffffff50,transparent 46%),var(--wolnaa-metal);
-    box-shadow:inset 0 2px 2px #aaffff,inset 0 -3px 5px #008f99,0 0 8px var(--wolnaa-halo);
+    background-image:radial-gradient(ellipse at 32% 12%,#ffffff70,transparent 46%),var(--wolnaa-metal);
+    box-shadow:inset 0 2px 2px #fff3be,inset 0 -3px 5px #74521d,0 0 8px var(--wolnaa-halo);
   }
   .wolnaa-mobile-nav [aria-current="page"] svg { filter:none; }
   .wolnaa-purchase-bar { bottom:0; padding:12px 16px calc(12px + env(safe-area-inset-bottom)); background:rgba(20,20,19,.76); }
@@ -102,7 +102,7 @@ body {
 .wolnaa-account-field { display:block; width:100%; padding:14px; margin:8px 0 18px; background:#171717; border:1px solid #666; border-radius:10px; color:white; font-size:16px; }
 .wolnaa-account-button { min-height:48px; padding:12px 20px; border-radius:8px; font-weight:600; cursor:pointer; }
 .wolnaa-account-button:disabled { opacity:.5; cursor:wait; }
-.wolnaa-ticket-card { margin:16px 0; padding:18px; border:1px solid #00e5eb44; border-radius:14px; background:#141414; }
+.wolnaa-ticket-card { margin:16px 0; padding:18px; border:1px solid #d6b36a44; border-radius:14px; background:#141414; }
 
 /* Customer pages follow the compact StartEventz shop form composition. */
 .wolnaa-customer-page { padding:0 20px 110px; }
@@ -115,8 +115,8 @@ body {
 .wolnaa-customer-card label { display:block; font-size:14px; color:#f5f5f3; margin-bottom:10px; }
 .wolnaa-customer-card .wolnaa-account-field,.wolnaa-customer-select select { width:100%; height:54px; padding:0 15px; background:#191a20; border:1px solid #62625a; border-radius:12px; color:#f6f6f4; font-size:16px; margin:0 0 24px; }
 .wolnaa-customer-card .wolnaa-account-field::placeholder { color:#898980; }
-.wolnaa-customer-card :is(input,select,button,a):focus-visible { outline:2px solid #59ffff; outline-offset:3px; }
-.wolnaa-customer-card .wolnaa-customer-primary { width:100%; border-radius:12px; min-height:50px; margin:0; background-image:var(--wolnaa-metal); box-shadow:inset 0 1px 1px #aaffff,inset 0 -2px 3px #008f99,0 0 5px var(--wolnaa-halo); }
+.wolnaa-customer-card :is(input,select,button,a):focus-visible { outline:2px solid #e8cb7e; outline-offset:3px; }
+.wolnaa-customer-card .wolnaa-customer-primary { width:100%; border-radius:12px; min-height:50px; margin:0; background-image:var(--wolnaa-metal); box-shadow:inset 0 1px 1px #fff3be,inset 0 -2px 3px #74521d,0 0 5px var(--wolnaa-halo); }
 .wolnaa-customer-card .wolnaa-customer-note { font-size:12px; line-height:1.6; color:#aaa99f; margin:16px 0 0; min-height:38px; }
 .wolnaa-customer-card .wolnaa-customer-kicker { font-size:14px; color:#c7c7bf; margin:0 0 10px; }
 .wolnaa-customer-select { position:relative; }
@@ -124,7 +124,7 @@ body {
 .wolnaa-customer-select > span { pointer-events:none; position:absolute; right:16px; top:14px; color:#bcbcb3; }
 .wolnaa-customer-status { min-height:58px; padding-top:12px; color:#aaa99f; font-size:13px; line-height:1.55; }
 .wolnaa-customer-help { border-top:1px solid #ffffff12; margin-top:22px; padding-top:22px; }
-.wolnaa-customer-help > span { font-size:13px; color:#59ffff; }
+.wolnaa-customer-help > span { font-size:13px; color:#e3cf9e; }
 .wolnaa-customer-card .wolnaa-customer-help p { margin:8px 0 0; color:#b9b9b0; font-size:13px; line-height:1.7; }
 .wolnaa-customer-footer { max-width:460px; margin:24px auto 0; display:flex; justify-content:center; gap:24px; font-size:12px; }
 .wolnaa-customer-footer a { color:#f5f5f5; padding:10px 0; }
@@ -139,7 +139,7 @@ body {
 .cookie-dialog-heading h2 { font-size:23px; font-weight:750; letter-spacing:-.6px; line-height:1.2; }
 .cookie-dialog-heading button { min-width:36px; min-height:44px; font-size:30px; color:#aaa; }
 .wolnaa-cookie-dialog > p { color:#b7b7bf; font-size:14px; line-height:1.65; margin-bottom:22px; }
-.wolnaa-cookie-dialog a { color:#59ffff; text-decoration:underline; }
+.wolnaa-cookie-dialog a { color:#e8cb7e; text-decoration:underline; }
 .cookie-option { position:relative; display:flex; align-items:flex-start; gap:15px; padding:18px; border:1px solid #ffffff12; border-radius:16px; background:#ffffff02; margin-top:12px; }
 .cookie-option strong { font-size:16px; }
 .cookie-option p { color:#aaaab4; font-size:13px; line-height:1.6; margin-top:7px; }
@@ -147,17 +147,17 @@ body {
 .cookie-option input:focus-visible + span { outline:2px solid white; outline-offset:4px; }
 .cookie-toggle { display:block; width:42px; height:25px; border-radius:999px; flex-shrink:0; background:#555660; margin-top:2px; }
 .cookie-toggle::after { content:''; display:block; width:19px; height:19px; margin:3px; border-radius:50%; background:#17171c; transition:transform .15s; }
-.cookie-toggle.enabled { background:#00e5eb; }
+.cookie-toggle.enabled { background:#dfc282; }
 .cookie-toggle.enabled::after { transform:translateX(17px); }
 .cookie-actions { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:24px; }
 .cookie-actions button { min-height:48px; padding:12px 8px; border-radius:12px; border:1px solid #ffffff20; font-size:13px; font-weight:650; }
-.cookie-actions button:last-child { grid-column:1/-1; color:#59ffff; border-color:#59ffff70; }
+.cookie-actions button:last-child { grid-column:1/-1; color:#e8cb7e; border-color:#e8cb7e70; }
 
 /* Shared gold accents across the shop, consent controls and ticket account. */
 .wolnaa-page footer :is(button,a),.wolnaa-customer-footer a { color:#fff; text-shadow:none; }
 .wolnaa-customer-card .wolnaa-customer-kicker,.wolnaa-customer-help > span,.wolnaa-customer-select > span { color:var(--wolnaa-gold); }
-.wolnaa-customer-card :is(input,select):focus { border-color:var(--wolnaa-gold); box-shadow:0 0 12px #00e5eb20; }
-.wolnaa-customer-header img { filter:none; }
+.wolnaa-customer-card :is(input,select):focus { border-color:var(--wolnaa-gold); box-shadow:0 0 12px #d3aa4920; }
+.wolnaa-customer-header img { filter:sepia(1) saturate(1.8) brightness(.95); }
 .cookie-toggle.enabled { background-image:var(--wolnaa-metal); box-shadow:0 0 4px var(--wolnaa-halo); }
 .wolnaa-info a.wolnaa-gold-button { border-radius:12px; }
 
@@ -189,17 +189,3 @@ body {
 .moments-dots button { display:grid; place-items:center; width:40px; height:40px; background:none; border:0; }
 .moments-dots button span { display:block; width:6px; height:6px; border-radius:50%; background:#555; }
 .moments-dots button[aria-current="true"] span { width:8px; height:8px; background:var(--wolnaa-gold); }
-
-/* Cyan brand preview: tint the existing transparent Wolnaa marks without changing their shape. */
-.wolnaa-page header a[aria-label="WOLNAA Startseite"],
-.wolnaa-customer-header a[aria-label="Wolnaa Startseite"] {
-  position:relative;
-}
-.wolnaa-page header a[aria-label="WOLNAA Startseite"] img,
-.wolnaa-customer-header a[aria-label="Wolnaa Startseite"] img { opacity:0; }
-.wolnaa-page header a[aria-label="WOLNAA Startseite"]::after,
-.wolnaa-customer-header a[aria-label="Wolnaa Startseite"]::after {
-  content:""; position:absolute; inset:0; pointer-events:none; background:#00e5eb;
-  mask:url('/wolnaa-logo-gold-header.png') center / contain no-repeat;
-  -webkit-mask:url('/wolnaa-logo-gold-header.png') center / contain no-repeat;
-}

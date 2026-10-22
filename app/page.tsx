@@ -220,7 +220,7 @@ function EventCard({ event, lang }: { event: EventItem; lang: Lang }) {
         <p className="mt-3 flex items-start gap-2 text-sm text-zinc-400"><EventIcon kind="pin" /><span>{event.city}{event.location && ` · ${event.location}`}{event.address && <span className="mt-1 block">{event.address}</span>}</span></p>
         <div className="mt-5 flex items-center justify-between">
           <div>
-            <p className="float-text text-[#00e5eb] font-bold text-lg">{event.sales_closed ? (lang === "de" ? "Online-Verkauf beendet" : "Онлайн-продажа завершена") : event.sold_out ? t.soldOut : `${t.from} ${getStartingPrice(event)} €`}</p>
+            <p className="float-text text-[#d6b36a] font-bold text-lg">{event.sales_closed ? (lang === "de" ? "Online-Verkauf beendet" : "Онлайн-продажа завершена") : event.sold_out ? t.soldOut : `${t.from} ${getStartingPrice(event)} €`}</p>
             <p className="mt-1 text-[11px] text-zinc-500">{t.vatIncluded}</p>
           </div>
           {event.lounges && event.lounge_list?.length > 0 && (
@@ -236,18 +236,18 @@ function EmptyState({ lang }: { lang: Lang }) {
   const t = I18N[lang];
   return (
     <div className="col-span-3 py-20 flex flex-col items-center justify-center text-center gap-4">
-      <div className="w-20 h-20 rounded-md border border-[#00e5eb]/20 bg-[#00e5eb]/5 flex items-center justify-center mb-2">
+      <div className="w-20 h-20 rounded-md border border-[#d6b36a]/20 bg-[#d6b36a]/5 flex items-center justify-center mb-2">
         <span className="text-4xl">🎉</span>
       </div>
       <h3 className="text-2xl font-bold text-white">{t.noEventsTitle}</h3>
       <p className="text-zinc-400 text-sm max-w-sm leading-relaxed">{t.noEventsText}</p>
       <div className="flex gap-3 mt-2">
         <a href="https://www.instagram.com/wolnaa_event" target="_blank" rel="noopener noreferrer"
-          className="rounded-md bg-[#00e5eb] px-6 py-3 text-sm font-bold text-black hover:bg-[#6fffff] active:bg-[#6fffff] active:scale-95 transition-all">
+          className="rounded-md bg-[#d6b36a] px-6 py-3 text-sm font-bold text-black hover:bg-[#ead08d] active:bg-[#ead08d] active:scale-95 transition-all">
           📸 {t.followInstagram}
         </a>
         <a href="mailto:kontakt@wolnaa.de"
-          className="rounded-md border border-white/15 px-6 py-3 text-sm font-bold text-white hover:border-[#00e5eb] hover:text-[#00e5eb] active:border-[#00e5eb] active:text-[#00e5eb] active:scale-95 transition-all">
+          className="rounded-md border border-white/15 px-6 py-3 text-sm font-bold text-white hover:border-[#d6b36a] hover:text-[#d6b36a] active:border-[#d6b36a] active:text-[#d6b36a] active:scale-95 transition-all">
           ✉️ {t.notification}
         </a>
       </div>
@@ -283,7 +283,7 @@ function FeaturedEvent({ event, lang, first = false }: { event: EventItem; lang:
 
         <div className="mt-5 flex items-center justify-between gap-3 border-t border-white/10 pt-5">
           <span>
-            <span className="block text-lg font-bold text-[#00e5eb]">{event.sales_closed ? (lang === "de" ? "Online-Verkauf beendet" : "Онлайн-продажа завершена") : event.sold_out ? t.soldOut : `${t.from} ${getStartingPrice(event)} €`}</span>
+            <span className="block text-lg font-bold text-[#d6b36a]">{event.sales_closed ? (lang === "de" ? "Online-Verkauf beendet" : "Онлайн-продажа завершена") : event.sold_out ? t.soldOut : `${t.from} ${getStartingPrice(event)} €`}</span>
             <span className="mt-1 block text-[11px] text-zinc-500">{t.vatIncluded}</span>
           </span>
           <span className="wolnaa-gold-button rounded-xl px-4 py-3 text-sm font-semibold">{lang === 'de' ? 'Event ansehen' : 'Подробнее'} <span aria-hidden="true">→</span></span>
@@ -310,15 +310,15 @@ function LegalModal({ type, content, onClose, lang }: { type: LegalType; content
     <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4" onClick={onClose} role="dialog" aria-modal="true">
       <div className="bg-zinc-950 border border-zinc-700 rounded-md p-8 max-w-3xl w-full max-h-[80vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
         <div className="flex flex-col items-center mb-6 gap-3">
-          <button onClick={onClose} className="absolute top-4 left-1/2 -translate-x-1/2 bg-[#00e5eb] text-black font-bold text-sm border border-[#6fffff] rounded-md px-4 py-2 shadow-lg z-50">{t.close} ✕</button>
+          <button onClick={onClose} className="absolute top-4 left-1/2 -translate-x-1/2 bg-[#d6b36a] text-black font-bold text-sm border border-[#ead08d] rounded-md px-4 py-2 shadow-lg z-50">{t.close} ✕</button>
           <h2 className="text-2xl font-bold text-center">{titles[type]}</h2>
         </div>
         {content ? <div className="text-zinc-300 leading-7 text-base">{content.split("\n").map((line, i) => {
   const urlRegex = /(https?:\/\/[^\s]+|[\w.-]+@[\w.-]+\.[a-z]{2,})/gi;
   const parts = line.split(urlRegex);
   return <p key={i} className="mb-2">{parts.map((part, j) => {
-    if (part.match(/^https?:\/\//)) return <a key={j} href={part} target="_blank" rel="noopener noreferrer" className="text-[#00e5eb] underline">{part}</a>;
-    if (part.match(/[\w.-]+@[\w.-]+\.[a-z]{2,}/)) return <a key={j} href={`mailto:${part}`} className="text-[#00e5eb] underline">{part}</a>;
+    if (part.match(/^https?:\/\//)) return <a key={j} href={part} target="_blank" rel="noopener noreferrer" className="text-[#d6b36a] underline">{part}</a>;
+    if (part.match(/[\w.-]+@[\w.-]+\.[a-z]{2,}/)) return <a key={j} href={`mailto:${part}`} className="text-[#d6b36a] underline">{part}</a>;
     return part;
   })}</p>;
 })}</div> : <p className="text-zinc-500 italic">{t.noLegalContent}</p>}
@@ -365,8 +365,8 @@ function ContactModal({ onClose, lang }: { onClose: () => void; lang: Lang }) {
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm" onClick={onClose} role="dialog" aria-modal="true" aria-labelledby="contact-title">
       <div className="relative w-full max-w-lg rounded-md border border-white/10 bg-zinc-950 p-6 shadow-2xl md:p-8" onClick={event => event.stopPropagation()}>
-        <button type="button" onClick={onClose} aria-label={t.contactCloseAria} className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full border border-white/10 text-zinc-400 hover:border-[#00e5eb] hover:text-[#00e5eb]">✕</button>
-        <p className="mb-3 text-xs font-bold uppercase tracking-[0.26em] text-[#00e5eb]">{t.contact}</p>
+        <button type="button" onClick={onClose} aria-label={t.contactCloseAria} className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full border border-white/10 text-zinc-400 hover:border-[#d6b36a] hover:text-[#d6b36a]">✕</button>
+        <p className="mb-3 text-xs font-bold uppercase tracking-[0.26em] text-[#d6b36a]">{t.contact}</p>
         <h2 id="contact-title" className="mb-2 text-3xl font-semibold">{t.contactTitle}</h2>
         <p className="mb-6 text-sm leading-6 text-zinc-400">{t.contactModalText}</p>
 
@@ -374,24 +374,24 @@ function ContactModal({ onClose, lang }: { onClose: () => void; lang: Lang }) {
           <div className="border-t border-white/10 py-8 text-center">
             <p className="text-xl font-semibold text-white">{t.messageSent}</p>
             <p className="mt-2 text-sm text-zinc-400">{t.messageSentText}</p>
-            <button type="button" onClick={onClose} className="mt-6 inline-flex h-12 w-48 items-center justify-center rounded-md bg-[#00e5eb] text-sm font-bold text-black hover:bg-[#6fffff]">{t.close}</button>
+            <button type="button" onClick={onClose} className="mt-6 inline-flex h-12 w-48 items-center justify-center rounded-md bg-[#d6b36a] text-sm font-bold text-black hover:bg-[#ead08d]">{t.close}</button>
           </div>
         ) : (
           <form onSubmit={submit} className="space-y-4">
             <div>
               <label htmlFor="contact-name" className="mb-2 block text-xs font-bold uppercase tracking-[0.16em] text-zinc-400">{t.name}</label>
-              <input id="contact-name" required maxLength={100} value={name} onChange={event => setName(event.target.value)} className="w-full rounded-md border border-white/10 bg-black px-4 py-3 text-sm text-white outline-none transition-colors focus:border-[#00e5eb]" />
+              <input id="contact-name" required maxLength={100} value={name} onChange={event => setName(event.target.value)} className="w-full rounded-md border border-white/10 bg-black px-4 py-3 text-sm text-white outline-none transition-colors focus:border-[#d6b36a]" />
             </div>
             <div>
               <label htmlFor="contact-email" className="mb-2 block text-xs font-bold uppercase tracking-[0.16em] text-zinc-400">{t.email}</label>
-              <input id="contact-email" type="email" required maxLength={200} value={email} onChange={event => setEmail(event.target.value)} className="w-full rounded-md border border-white/10 bg-black px-4 py-3 text-sm text-white outline-none transition-colors focus:border-[#00e5eb]" />
+              <input id="contact-email" type="email" required maxLength={200} value={email} onChange={event => setEmail(event.target.value)} className="w-full rounded-md border border-white/10 bg-black px-4 py-3 text-sm text-white outline-none transition-colors focus:border-[#d6b36a]" />
             </div>
             <div>
               <label htmlFor="contact-message" className="mb-2 block text-xs font-bold uppercase tracking-[0.16em] text-zinc-400">{t.message}</label>
-              <textarea id="contact-message" required minLength={10} maxLength={3000} rows={5} value={message} onChange={event => setMessage(event.target.value)} className="w-full resize-none rounded-md border border-white/10 bg-black px-4 py-3 text-sm text-white outline-none transition-colors focus:border-[#00e5eb]" />
+              <textarea id="contact-message" required minLength={10} maxLength={3000} rows={5} value={message} onChange={event => setMessage(event.target.value)} className="w-full resize-none rounded-md border border-white/10 bg-black px-4 py-3 text-sm text-white outline-none transition-colors focus:border-[#d6b36a]" />
             </div>
             {status === "error" && <p className="text-sm text-red-400">{t.contactError}</p>}
-            <button type="submit" disabled={status === "sending"} className="inline-flex h-14 w-full items-center justify-center rounded-md bg-[#00e5eb] text-sm font-bold text-black hover:bg-[#6fffff] disabled:cursor-wait disabled:opacity-60">
+            <button type="submit" disabled={status === "sending"} className="inline-flex h-14 w-full items-center justify-center rounded-md bg-[#d6b36a] text-sm font-bold text-black hover:bg-[#ead08d] disabled:cursor-wait disabled:opacity-60">
               {status === "sending" ? t.sending : t.sendMessage}
             </button>
           </form>
@@ -570,26 +570,26 @@ export default function Home() {
 
         .wolnaa-page .motion-card:hover {
           transform: translateY(-6px);
-          border-color: rgba(0, 229, 235, 0.34);
+          border-color: rgba(214, 179, 106, 0.34);
           box-shadow:
             0 18px 50px rgba(0, 0, 0, 0.46),
-            0 0 22px rgba(0, 229, 235, 0.11);
+            0 0 22px rgba(214, 179, 106, 0.11);
         }
 
         .wolnaa-page .wolnaa-hover-glow {
           position: relative;
         }
         .wolnaa-page .event-card {
-          border-color: rgba(0,229,235,.55);
-          box-shadow: 0 0 16px rgba(0,229,235,.1), inset 0 0 0 1px rgba(0,229,235,.08);
+          border-color: rgba(214,179,106,.55);
+          box-shadow: 0 0 16px rgba(214,179,106,.1), inset 0 0 0 1px rgba(214,179,106,.08);
         }
         .wolnaa-page .event-card:hover,
         .wolnaa-page .event-card:focus-visible,
         .wolnaa-page .event-card:active,
         .wolnaa-page .event-card[data-tapped="true"] {
           transform: translateY(-6px) scale(1.025);
-          border-color: rgba(89,255,255,.95);
-          box-shadow: 0 18px 50px rgba(0,0,0,.46), 0 0 30px rgba(0,229,235,.3), inset 0 0 0 1px rgba(89,255,255,.22);
+          border-color: rgba(234,208,141,.95);
+          box-shadow: 0 18px 50px rgba(0,0,0,.46), 0 0 30px rgba(214,179,106,.3), inset 0 0 0 1px rgba(234,208,141,.22);
           outline: none;
         }
         @media (prefers-reduced-motion: reduce) {
@@ -606,18 +606,18 @@ export default function Home() {
           inset: 0;
           z-index: 2;
           pointer-events: none;
-          border: 1px solid rgba(0, 229, 235, 0);
-          box-shadow: inset 0 0 0 1px rgba(0, 229, 235, 0);
+          border: 1px solid rgba(214, 179, 106, 0);
+          box-shadow: inset 0 0 0 1px rgba(214, 179, 106, 0);
           opacity: 0;
           transition: opacity 420ms ease, border-color 420ms ease, box-shadow 420ms ease;
         }
 
         .wolnaa-page .wolnaa-hover-glow:hover::before {
           opacity: 1;
-          border-color: rgba(0, 229, 235, 0.38);
+          border-color: rgba(214, 179, 106, 0.38);
           box-shadow:
-            inset 0 0 0 1px rgba(0, 229, 235, 0.12),
-            0 0 18px rgba(0, 229, 235, 0.1);
+            inset 0 0 0 1px rgba(214, 179, 106, 0.12),
+            0 0 18px rgba(214, 179, 106, 0.1);
         }
 
         .wolnaa-page a,
@@ -655,7 +655,7 @@ export default function Home() {
 
         .wolnaa-page .moments-track {
           scrollbar-width: none;
-          scrollbar-color: rgba(0, 229, 235, 0.55) rgba(255, 255, 255, 0.06);
+          scrollbar-color: rgba(214, 179, 106, 0.55) rgba(255, 255, 255, 0.06);
         }
 
         .wolnaa-page .moments-track::-webkit-scrollbar {
@@ -668,7 +668,7 @@ export default function Home() {
 
         .wolnaa-page .moments-track::-webkit-scrollbar-thumb {
           border-radius: 999px;
-          background: rgba(0, 229, 235, 0.55);
+          background: rgba(214, 179, 106, 0.55);
         }
 
         @media (prefers-reduced-motion: reduce) {
@@ -693,8 +693,8 @@ export default function Home() {
           </a>
 
           <nav className="hidden items-center gap-8 text-sm font-bold uppercase tracking-[0.22em] text-white/75 md:flex">
-            <a href="#events" className="transition-colors hover:text-[#00e5eb]">{t.navEvents}</a>
-            <a href="#kontakt" className="transition-colors hover:text-[#00e5eb]">{t.navContact}</a>
+            <a href="#events" className="transition-colors hover:text-[#d6b36a]">{t.navEvents}</a>
+            <a href="#kontakt" className="transition-colors hover:text-[#d6b36a]">{t.navContact}</a>
           </nav>
 
           <div className="flex items-center rounded-md border border-white/15 bg-black/25 p-1 text-xs font-bold uppercase tracking-[0.16em]">
@@ -702,7 +702,7 @@ export default function Home() {
               <button
                 key={item}
                 onClick={() => setLang(item)}
-                className={`rounded-md px-3 py-2 transition-all ${lang === item ? "bg-[#00e5eb] text-black" : "text-white/70 hover:text-[#00e5eb]"}`}
+                className={`rounded-md px-3 py-2 transition-all ${lang === item ? "bg-[#d6b36a] text-black" : "text-white/70 hover:text-[#d6b36a]"}`}
               >
                 {item.toUpperCase()}
               </button>
@@ -716,7 +716,7 @@ export default function Home() {
         <div style={{position:"absolute",inset:0,zIndex:0,background:"linear-gradient(to bottom, rgba(0,0,0,0.45), rgba(0,0,0,0.55), rgba(0,0,0,0.92))"}} />
         <div className="wolnaa-hero-content relative z-10 max-w-7xl mx-auto text-center pt-40 md:pt-56">
           <div>
-            <p className="float-text mb-4 text-[11px] font-bold uppercase tracking-[0.26em] text-[#00e5eb] md:mb-5 md:text-sm md:tracking-[0.34em] lg:text-base">
+            <p className="float-text mb-4 text-[11px] font-bold uppercase tracking-[0.26em] text-[#d6b36a] md:mb-5 md:text-sm md:tracking-[0.34em] lg:text-base">
               {t.heroEyebrow}
             </p>
             <h1 className="float-text text-4xl font-semibold uppercase leading-[1.05] tracking-[-0.025em] text-white drop-shadow-[0_4px_24px_rgba(0,0,0,0.75)] sm:text-5xl lg:text-7xl">
@@ -734,7 +734,7 @@ export default function Home() {
       <ClubAtmosphere lang={lang} />
 
       <section id="events" className="reveal-section mx-auto max-w-7xl px-6 py-16">
-        <p className="mb-3 text-sm uppercase tracking-[0.26em] text-[#00e5eb]">{t.upcoming}</p>
+        <p className="mb-3 text-sm uppercase tracking-[0.26em] text-[#d6b36a]">{t.upcoming}</p>
         <h2 className="mb-10 text-4xl font-semibold md:text-5xl">{t.upcomingTitle}</h2>
 
         <div className="md:hidden">
@@ -744,7 +744,7 @@ export default function Home() {
         <div className="grid gap-8 md:grid-cols-3">
           {mounted && eventsLoading && (
             <div className="col-span-3 flex min-h-40 items-center justify-center">
-              <div className="h-7 w-7 animate-spin rounded-full border-2 border-[#00e5eb]/25 border-t-[#00e5eb]" aria-label="Events werden geladen" />
+              <div className="h-7 w-7 animate-spin rounded-full border-2 border-[#d6b36a]/25 border-t-[#d6b36a]" aria-label="Events werden geladen" />
             </div>
           )}
           {mounted && eventsError && <p role="alert">Veranstaltungen konnten nicht geladen werden. Bitte lade die Seite erneut.</p>}
@@ -759,7 +759,7 @@ export default function Home() {
       <section className="reveal-section mx-auto max-w-7xl px-6 py-20">
         <div className="mb-10 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
-            <p className="mb-4 text-xs font-bold uppercase tracking-[0.28em] text-[#00e5eb]">
+            <p className="mb-4 text-xs font-bold uppercase tracking-[0.28em] text-[#d6b36a]">
               {t.moments}
             </p>
             <h2 className="text-4xl font-semibold leading-tight md:text-5xl">
@@ -797,7 +797,7 @@ export default function Home() {
 
       <section className="reveal-section max-w-5xl mx-auto px-6 pb-20 text-center">
         <div className="px-6 py-10">
-          <p className="text-[#00e5eb] uppercase tracking-[0.26em] text-xs mb-3">
+          <p className="text-[#d6b36a] uppercase tracking-[0.26em] text-xs mb-3">
             {t.community}
           </p>
 
@@ -834,14 +834,14 @@ export default function Home() {
       {/* FAQ */}
       <section className="reveal-section mx-auto max-w-5xl px-6 py-20">
         <div>
-          <p className="mb-4 text-center text-xs font-bold uppercase tracking-[0.28em] text-[#00e5eb]">FAQ</p>
+          <p className="mb-4 text-center text-xs font-bold uppercase tracking-[0.28em] text-[#d6b36a]">FAQ</p>
           <h2 className="mb-12 text-center text-4xl font-semibold md:text-5xl">{t.faqTitle}</h2>
           <div className="mx-auto max-w-3xl divide-y divide-white/10 border-y border-white/10">
             {t.faq.map((item, i) => (
               <details key={i} className="group">
-                <summary className="flex cursor-pointer list-none items-center justify-between gap-6 py-6 text-left text-base font-semibold text-white transition-colors hover:text-[#00e5eb] md:text-lg">
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-6 py-6 text-left text-base font-semibold text-white transition-colors hover:text-[#d6b36a] md:text-lg">
                   {item.q}
-                  <span className="text-sm text-[#00e5eb] transition-transform group-open:rotate-45">+</span>
+                  <span className="text-sm text-[#d6b36a] transition-transform group-open:rotate-45">+</span>
                 </summary>
                 <p className="pb-6 text-sm leading-7 text-zinc-400 md:text-base">{item.a}</p>
               </details>
@@ -853,14 +853,14 @@ export default function Home() {
       {/* Kontakt */}
       <section id="kontakt" className="reveal-section max-w-5xl mx-auto px-4 pb-10">
         <div className="px-6 py-10 text-center">
-          <p className="text-[#00e5eb] uppercase tracking-[0.26em] text-xs mb-3">{t.contact}</p>
+          <p className="text-[#d6b36a] uppercase tracking-[0.26em] text-xs mb-3">{t.contact}</p>
           <h2 className="text-3xl md:text-4xl font-semibold mb-4">{t.contactTitle}</h2>
           <p className="text-zinc-400 max-w-xl mx-auto mb-8 text-sm leading-relaxed">
             {t.contactText}
           </p>
           <div className="flex flex-wrap items-center justify-center gap-4">
             <button type="button" onClick={() => setShowContact(true)}
-              className="inline-flex h-14 w-56 items-center justify-center rounded-md border border-white/15 text-sm font-bold text-white hover:border-[#00e5eb] hover:text-[#00e5eb] active:scale-95 transition-all">
+              className="inline-flex h-14 w-56 items-center justify-center rounded-md border border-white/15 text-sm font-bold text-white hover:border-[#d6b36a] hover:text-[#d6b36a] active:scale-95 transition-all">
               {t.contact}
             </button>
           </div>
