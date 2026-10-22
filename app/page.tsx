@@ -1,4 +1,5 @@
 "use client";
+import { MobileMenuIcon } from "@/components/MobileNavigation";
 import CookieBanner from "@/components/CookieBanner";
 import EventIcon from "@/components/EventIcon";
 import {eventTiming} from '@/lib/event-timing';
@@ -703,10 +704,10 @@ export default function Home() {
         </div>
       </header>
 
-      <section className="reveal-section relative flex min-h-[92vh] items-center justify-center overflow-hidden bg-black px-6 pb-16 pt-32 md:min-h-screen">
+      <section className="wolnaa-hero reveal-section relative flex min-h-[92vh] items-center justify-center overflow-hidden bg-black px-6 pb-16 pt-32 md:min-h-screen">
         <video className="absolute inset-0 z-0 h-full w-full object-cover" src="/hero-wolnaa-20260915.mp4" autoPlay muted loop playsInline preload="auto" />
         <div style={{position:"absolute",inset:0,zIndex:0,background:"linear-gradient(to bottom, rgba(0,0,0,0.45), rgba(0,0,0,0.55), rgba(0,0,0,0.92))"}} />
-        <div className="relative z-10 max-w-7xl mx-auto text-center pt-40 md:pt-56">
+        <div className="wolnaa-hero-content relative z-10 max-w-7xl mx-auto text-center pt-40 md:pt-56">
           <div>
             <p className="float-text mb-4 text-[11px] font-bold uppercase tracking-[0.26em] text-[#d6b36a] md:mb-5 md:text-sm md:tracking-[0.34em] lg:text-base">
               {t.heroEyebrow}
@@ -715,9 +716,9 @@ export default function Home() {
               {t.heroTitle}
             </h1>
           </div>
-          <div className="flex flex-wrap justify-center gap-4 mt-8 md:hidden">
-            <a href="#events" className="inline-flex h-14 w-56 items-center justify-center rounded-md bg-[#d6b36a] text-black font-bold text-base hover:bg-[#ead08d] active:scale-95 transition-all">{t.buyTickets}</a>
-            <a href="#events" className="inline-flex h-14 w-56 items-center justify-center rounded-md border border-white/30 text-white font-bold text-base hover:border-[#d6b36a] hover:text-[#d6b36a] active:scale-95 transition-all">{t.discoverEvents}</a>
+          <div className="wolnaa-hero-actions mt-8 grid gap-3 md:hidden">
+            <a href="#events" className="wolnaa-gold-button flex min-h-14 w-full items-center justify-center gap-3 rounded-xl px-5 py-4 text-base font-bold"><MobileMenuIcon name="calendar" />{t.discoverEvents}<span aria-hidden="true">↓</span></a>
+            <a href="https://whatsapp.com/channel/0029VaW2ybyAO7RDESfBPn0i" target="_blank" rel="noopener noreferrer" className="flex min-h-14 w-full items-center justify-center rounded-xl border border-white/30 bg-white/10 px-5 py-4 text-base font-bold text-white backdrop-blur-md">{lang === "de" ? "WhatsApp-Kanal" : "Канал WhatsApp"}<span className="sr-only"> WOLNAA</span></a>
           </div>
 
         </div>

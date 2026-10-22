@@ -166,3 +166,9 @@ body {
 .wolnaa-security-note { display:flex; align-items:flex-start; gap:14px; border-top:1px solid #ffffff12; margin-top:24px; padding-top:20px; }
 .wolnaa-security-note svg { color:var(--wolnaa-gold); flex-shrink:0; margin-top:4px; }
 .wolnaa-customer-card .wolnaa-security-note p { margin:0; font-size:13px; line-height:1.65; color:#b7b7bf; }
+
+@media (max-width:767px) {
+  .wolnaa-hero { min-height:calc(100svh - 64px); padding:112px 24px 100px; }
+  .wolnaa-hero .wolnaa-hero-content { width:100%; max-width:540px; padding-top:0; }
+  .wolnaa-hero-actions { width:100%; }
+}

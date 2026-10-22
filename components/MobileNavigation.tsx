@@ -9,7 +9,7 @@ const items = [
   { href: "/muttizettel", label: "Muttizettel", icon: "document" },
   { href: "/mein-bereich", label: "Mein Bereich", icon: "user" },
 ];
-function Icon({ name }: { name: string }) {
+export function MobileMenuIcon({ name }: { name: string }) {
   return <svg width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
     {name === "home" ? <><path d="m3 10 9-7 9 7v11h-6v-7H9v7H3Z" /></> :
       name === "calendar" ? <><rect x="3" y="5" width="18" height="16" rx="2" /><path d="M7 3v4m10-4v4M3 11h18" /></> :
@@ -38,7 +38,7 @@ export default function MobileNavigation() {
   const active = pathname === "/muttizettel" ? 2 : pathname === "/mein-bereich" ? 3 : pathname?.startsWith("/event/") || eventsVisible ? 1 : 0;
   return <nav className={`wolnaa-mobile-nav${pathname?.startsWith("/event/") ? " wolnaa-nav-flat" : ""}`} aria-label="Mobile Hauptnavigation">
     {items.map((item, index) => <Link key={item.href} href={item.href} aria-current={index === active ? "page" : undefined}>
-      <span className="wolnaa-nav-icon"><Icon name={item.icon} /></span><span>{item.label}</span>
+      <span className="wolnaa-nav-icon"><MobileMenuIcon name={item.icon} /></span><span>{item.label}</span>
     </Link>)}
   </nav>;
 }
