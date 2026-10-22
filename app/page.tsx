@@ -7,7 +7,7 @@ import {useEventClock} from '@/lib/use-event-clock';
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState, useCallback, type FormEvent } from "react";
+import { useEffect, useState, useCallback, useRef, type FormEvent } from "react";
 import { createClient } from "@supabase/supabase-js";
 import PurchaseActivity from "@/components/PurchaseActivity";
 import DiscountWheelPopup from '@/components/DiscountWheelPopup';
@@ -402,6 +402,13 @@ function ContactModal({ onClose, lang }: { onClose: () => void; lang: Lang }) {
 }
 
 export default function Home() {
+  const momentsRef = useRef<HTMLDivElement>(null);
+  const [momentIndex, setMomentIndex] = useState(0);
+  function selectMoment(index: number) {
+    const track = momentsRef.current;
+    if (!track) return;
+    track.scrollTo({left: (track.scrollWidth-track.clientWidth)*index/3, behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth"});
+  }
   const [events, setEvents] = useState<EventItem[]>([]);
   const eventNow = useEventClock();
   const visibleEvents = events.filter(event => eventNow > 0 && !eventTiming(event,eventNow).ended).map(event => ({...event, sales_closed:eventTiming(event,eventNow).salesClosed}));
@@ -647,12 +654,12 @@ export default function Home() {
         }
 
         .wolnaa-page .moments-track {
-          scrollbar-width: thin;
+          scrollbar-width: none;
           scrollbar-color: rgba(214, 179, 106, 0.55) rgba(255, 255, 255, 0.06);
         }
 
         .wolnaa-page .moments-track::-webkit-scrollbar {
-          height: 5px;
+          display: none;
         }
 
         .wolnaa-page .moments-track::-webkit-scrollbar-track {
@@ -764,7 +771,7 @@ export default function Home() {
           </p>
         </div>
 
-        <div className="moments-track -mx-6 flex snap-x snap-mandatory gap-4 overflow-x-auto px-6 pb-5 [scroll-padding-inline:1.5rem]">
+        <div ref={momentsRef} onScroll={e => { const track=e.currentTarget; const max=track.scrollWidth-track.clientWidth; setMomentIndex(max>0 ? Math.round(track.scrollLeft/max*3) : 0); }} className="moments-track -mx-6 flex snap-x snap-mandatory gap-4 overflow-x-auto px-6 pb-5 [scroll-padding-inline:1.5rem]">
           {[
             { src: "/moments/wolnaa-night-01.jpg", alt: t.momentsAlts[0] },
             { src: "/moments/wolnaa-night-02.jpg", alt: t.momentsAlts[1] },
@@ -783,7 +790,9 @@ export default function Home() {
             </div>
           ))}
         </div>
-        <p className="mt-3 text-xs uppercase tracking-[0.18em] text-zinc-600">{t.momentsScroll}</p>
+        <div className="moments-dots" aria-label={lang === "de" ? "Bilder auswählen" : "Выбрать фото"}>
+          {[0,1,2,3].map(index => <button key={index} type="button" aria-label={lang === "de" ? `Bild ${index+1} von 4` : `Фото ${index+1} из 4`} aria-current={momentIndex === index ? "true" : undefined} onClick={() => selectMoment(index)}><span /></button>)}
+        </div>
       </section>
 
       <section className="reveal-section max-w-5xl mx-auto px-6 pb-20 text-center">
@@ -805,18 +814,18 @@ export default function Home() {
               href="https://www.tiktok.com/@wolnaa_event?_r=1&_t=ZG-96mDjgLge8H"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex h-14 w-56 items-center justify-center rounded-md bg-[#d6b36a] text-sm font-bold text-black hover:bg-[#ead08d] active:bg-[#ead08d] active:scale-95 transition-all"
+              className="wolnaa-social-icon" aria-label={t.tiktokFollow}
             >
-              {t.tiktokFollow}
+              <svg width="34" height="34" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.6 2h-3.3v13.4a3 3 0 1 1-2.6-3V9a6.3 6.3 0 1 0 5.9 6.3V8.5A8 8 0 0 0 21 9.8V6.5A4.6 4.6 0 0 1 16.6 2Z"/></svg>
             </a>
 
             <a
               href="https://www.instagram.com/wolnaa_event?igsh=MWExbHJlcms3ZXp4MQ=="
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex h-14 w-56 items-center justify-center rounded-md border border-white/15 text-sm font-bold text-white hover:border-[#d6b36a] hover:text-[#d6b36a] active:border-[#d6b36a] active:text-[#d6b36a] active:scale-95 transition-all"
+              className="wolnaa-social-icon" aria-label={t.followInstagram}
             >
-              {t.followInstagram}
+              <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
             </a>
           </div>
         </div>
@@ -851,7 +860,7 @@ export default function Home() {
           </p>
           <div className="flex flex-wrap items-center justify-center gap-4">
             <button type="button" onClick={() => setShowContact(true)}
-              className="inline-flex h-14 w-56 items-center justify-center rounded-md border border-white/15 text-sm font-bold text-white hover:border-[#d6b36a] hover:text-[#d6b36a] active:border-[#d6b36a] active:text-[#d6b36a] active:scale-95 transition-all">
+              className="wolnaa-social-icon" aria-label={t.followInstagram}>
               {t.contact}
             </button>
           </div>

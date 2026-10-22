@@ -182,3 +182,10 @@ body {
 .wolnaa-customer-card .wolnaa-customer-primary,
 .wolnaa-page .wolnaa-gold-button,
 .cookie-actions button { border-radius:6px; }
+
+.wolnaa-page .wolnaa-social-icon { display:inline-flex; align-items:center; justify-content:center; width:56px; height:56px; color:var(--wolnaa-gold); }
+.wolnaa-social-icon:focus-visible,.moments-dots button:focus-visible { outline:2px solid var(--wolnaa-gold); outline-offset:3px; }
+.moments-dots { display:flex; justify-content:center; gap:4px; margin-top:8px; }
+.moments-dots button { display:grid; place-items:center; width:40px; height:40px; background:none; border:0; }
+.moments-dots button span { display:block; width:6px; height:6px; border-radius:50%; background:#555; }
+.moments-dots button[aria-current="true"] span { width:8px; height:8px; background:var(--wolnaa-gold); }
