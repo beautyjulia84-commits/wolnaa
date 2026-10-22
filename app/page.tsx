@@ -860,7 +860,7 @@ export default function Home() {
           </p>
           <div className="flex flex-wrap items-center justify-center gap-4">
             <button type="button" onClick={() => setShowContact(true)}
-              className="wolnaa-social-icon" aria-label={t.followInstagram}>
+              className="inline-flex h-14 w-56 items-center justify-center rounded-md border border-white/15 text-sm font-bold text-white hover:border-[#d6b36a] hover:text-[#d6b36a] active:scale-95 transition-all">
               {t.contact}
             </button>
           </div>
