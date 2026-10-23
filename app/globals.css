@@ -222,3 +222,13 @@ body {
 .wolnaa-site-header .wolnaa-language-options button[aria-pressed="true"] { color:var(--wolnaa-gold); background:#ffffff08; }
 .wolnaa-site-header .wolnaa-language-select button:hover { transform:none; background-color:#ffffff0a; }
 .wolnaa-language-select button:focus-visible { outline:2px solid var(--wolnaa-gold); outline-offset:2px; }
+
+/* Wolnaa moments: individually revealed, quiet gold accents. */
+.wolnaa-experience { display:grid; gap:18px; max-width:1100px; margin:0 auto; padding:0 24px 64px; }
+.wolnaa-page .wolnaa-experience-card { display:flex; align-items:flex-start; gap:18px; padding:26px 22px; border:1px solid #ffffff12; border-radius:14px; background:var(--wolnaa-surface); transform:translateY(22px); transition:opacity .6s ease,transform .6s cubic-bezier(.2,.65,.25,1); }
+.wolnaa-page .wolnaa-experience-card.is-visible { transform:translateY(0); }
+.wolnaa-experience-icon { flex:none; margin-top:3px; color:var(--wolnaa-gold); }
+.wolnaa-experience-card h3 { margin:0 0 9px; color:#f5f5f5; font-size:21px; line-height:1.25; font-weight:650; letter-spacing:-.02em; }
+.wolnaa-experience-card p { margin:0; color:#b4b4bc; font-size:15px; line-height:1.65; }
+@media(min-width:768px) { .wolnaa-experience { grid-template-columns:repeat(2,minmax(0,1fr)); gap:22px; padding-bottom:88px; } .wolnaa-experience-card:last-child { grid-column:1 / -1; } }
+@media(prefers-reduced-motion:reduce) { .wolnaa-page .wolnaa-experience-card { opacity:1; transform:none; transition:none; } }

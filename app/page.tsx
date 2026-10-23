@@ -773,6 +773,21 @@ export default function Home() {
         </div>
       </section>
 
+      <section className="wolnaa-experience" aria-label={lang === "de" ? "Das erwartet dich bei Wolnaa" : "Что тебя ждёт на Wolnaa"}>
+        {[
+          { icon: "music", de: "Dein Sound. Deine Nacht.", ru: "Твоя музыка. Твоя ночь.", textDe: "Von deinen Lieblingssongs bis zum nächsten Track, der dich auf die Tanzfläche zieht.", textRu: "От любимых песен до нового трека, под который невозможно устоять." },
+          { icon: "location", de: "Orte mit Atmosphäre", ru: "Места с атмосферой", textDe: "Besondere Locations für Abende, die sich nach Ausgehen anfühlen.", textRu: "Особенные площадки для вечеров, ради которых стоит выйти из дома." },
+          { icon: "spark", de: "Zusammen im Moment", ru: "В одном ритме", textDe: "Der Bass, die Lichter, deine Leute – und der Alltag hat Pause.", textRu: "Бас, свет, твои люди — и повседневность остаётся за дверью." },
+          { icon: "heart", de: "Mehr als ein Abend", ru: "Больше, чем просто вечер", textDe: "Gemeinsam feiern und Geschichten mitnehmen, die morgen noch ein Lächeln auslösen.", textRu: "Танцевать вместе и уносить с собой истории, которые завтра вызовут улыбку." },
+          { icon: "people", de: "Neue Gesichter, gute Vibes", ru: "Новые лица, яркие эмоции", textDe: "Komm mit deiner Crew oder lerne Menschen kennen, die deine Musik fühlen.", textRu: "Приходи со своей компанией или знакомься с теми, кто чувствует твою музыку." },
+        ].map(item => <article key={item.icon} className="reveal-section wolnaa-experience-card">
+          <svg className="wolnaa-experience-icon" viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            {item.icon === "music" ? <><path d="M9 18V5l12-3v13M9 8l12-3"/><ellipse cx="6" cy="18" rx="3" ry="3"/><ellipse cx="18" cy="15" rx="3" ry="3"/></> : item.icon === "location" ? <><path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="3"/></> : item.icon === "spark" ? <><path d="m10 3 2.5 6.5L19 12l-6.5 2.5L10 21l-2.5-6.5L1 12l6.5-2.5ZM20 2v4m-2-2h4"/></> : item.icon === "heart" ? <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z"/> : <><circle cx="9" cy="7" r="4"/><path d="M2 21v-2a7 7 0 0 1 14 0v2M17 3a4 4 0 0 1 0 8m3 10v-2a7 7 0 0 0-3-5.7"/></>}
+          </svg>
+          <div><h3>{lang === "de" ? item.de : item.ru}</h3><p>{lang === "de" ? item.textDe : item.textRu}</p></div>
+        </article>)}
+      </section>
+
       <section className="reveal-section max-w-5xl mx-auto px-6 pb-20 text-center">
         <div className="px-6 py-10">
           <p className="text-[#d6b36a] uppercase tracking-[0.26em] text-xs mb-3">
