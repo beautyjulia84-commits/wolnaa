@@ -259,8 +259,9 @@ function EmptyState({ lang }: { lang: Lang }) {
 
 function FeaturedEvent({ event, lang, first = false }: { event: EventItem; lang: Lang; first?: boolean }) {
   const t = I18N[lang];
+  const [pressed, setPressed] = useState(false);
   return (
-    <Link prefetch={true} href={createEventLink(event)} style={{"--event-poster": event.image_url ? `url(${JSON.stringify(event.image_url)})` : "none"} as React.CSSProperties} className="event-card frosted-event-card group mb-8 grid overflow-hidden border md:grid-cols-[1.15fr_0.85fr]">
+    <Link prefetch={true} href={createEventLink(event)} data-pressed={pressed} onPointerDown={() => setPressed(true)} onPointerUp={() => setPressed(false)} onPointerCancel={() => setPressed(false)} onPointerLeave={() => setPressed(false)} onBlur={() => setPressed(false)} style={{"--event-poster": event.image_url ? `url(${JSON.stringify(event.image_url)})` : "none"} as React.CSSProperties} className="event-card frosted-event-card group mb-8 grid overflow-hidden border md:grid-cols-[1.15fr_0.85fr]">
       <div className="relative min-h-[280px] overflow-hidden bg-zinc-950 md:min-h-[420px]">
         {event.image_url ? (
           <img src={event.image_url} alt={event.title} className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy" decoding="async" />

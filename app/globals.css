@@ -130,7 +130,7 @@ body {
 @media(min-width:768px) { .wolnaa-customer-header { min-height:120px; } .wolnaa-customer-card { padding:36px; } }
 @media(max-width:360px) { .wolnaa-customer-page { padding-left:14px; padding-right:14px; } .wolnaa-customer-card { padding:24px 20px; } .wolnaa-customer-card h1 { font-size:29px; } .wolnaa-customer-header { gap:12px; } }
 .wolnaa-page .event-card.frosted-event-card { border-radius:20px; border-color:#ffffff24; box-shadow:none; background-color:#08080a; background-size:cover; background-position:center; }
-.wolnaa-page .event-card.frosted-event-card:hover { transform:translateY(-3px); border-color:#ffffff40; box-shadow:0 15px 40px #0005; }
+
 .frosted-event-content { border-radius:20px; isolation:isolate; overflow:hidden; background:rgba(22,23,28,.88); backdrop-filter:blur(32px); -webkit-backdrop-filter:blur(32px); border-top:1px solid #ffffff24; }
 .wolnaa-cookie-dialog { width:calc(100% - 24px); max-width:520px; max-height:calc(100dvh - 32px); margin:auto; padding:24px; border:1px solid #ffffff24; border-radius:22px; background:var(--wolnaa-surface); color:#f5f5f5; overflow:auto; box-shadow:0 25px 80px #0008; }
 .wolnaa-cookie-dialog::backdrop { background:#000b; backdrop-filter:blur(7px); }
@@ -232,3 +232,20 @@ body {
 .wolnaa-experience-card p { margin:0; color:#b4b4bc; font-size:15px; line-height:1.65; }
 @media(min-width:768px) { .wolnaa-experience { grid-template-columns:repeat(2,minmax(0,1fr)); gap:22px; padding-bottom:88px; } .wolnaa-experience-card:last-child { grid-column:1 / -1; } }
 @media(prefers-reduced-motion:reduce) { .wolnaa-page .wolnaa-experience-card { opacity:1; transform:none; transition:none; } }
+
+/* Give the frosted event card the same gold interaction as the other cards. */
+.wolnaa-page .event-card.frosted-event-card { transition:transform 320ms cubic-bezier(.2,.8,.2,1),box-shadow 320ms ease,border-color 320ms ease; }
+@media(hover:hover) {
+  .wolnaa-page .event-card.frosted-event-card:hover { transform:translateY(-7px) scale(1.012); border-color:var(--wolnaa-gold); box-shadow:0 18px 40px #0007,0 0 26px #e8cb7e45,inset 0 0 0 1px #e8cb7e33; }
+}
+.wolnaa-page .event-card.frosted-event-card:focus-visible,
+.wolnaa-page .event-card.frosted-event-card:active,
+.wolnaa-page .event-card.frosted-event-card[data-pressed="true"] { transform:translateY(-3px) scale(.99); border-color:var(--wolnaa-gold); box-shadow:0 12px 32px #0006,0 0 30px #e8cb7e60,inset 0 0 0 1px #e8cb7e55; }
+.wolnaa-page .event-card.frosted-event-card:focus-visible { outline:2px solid var(--wolnaa-gold); outline-offset:4px; }
+@media(prefers-reduced-motion:reduce) {
+  .wolnaa-page .event-card.frosted-event-card,
+  .wolnaa-page .event-card.frosted-event-card:hover,
+  .wolnaa-page .event-card.frosted-event-card:active,
+  .wolnaa-page .event-card.frosted-event-card:focus-visible,
+  .wolnaa-page .event-card.frosted-event-card[data-pressed="true"] { transform:none; transition:none; }
+}
