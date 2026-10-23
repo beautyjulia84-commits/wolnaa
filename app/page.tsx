@@ -403,6 +403,21 @@ function ContactModal({ onClose, lang }: { onClose: () => void; lang: Lang }) {
 
 export default function Home() {
   const momentsRef = useRef<HTMLDivElement>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const headerRef = useRef<HTMLElement>(null);
+  useEffect(() => {
+    if (!menuOpen) return;
+    const close = (event: KeyboardEvent) => {
+      if (event.key === "Escape") { setMenuOpen(false); menuButtonRef.current?.focus(); }
+    };
+    const outside = (event: PointerEvent) => {
+      if (!headerRef.current?.contains(event.target as Node)) setMenuOpen(false);
+    };
+    document.addEventListener("keydown", close);
+    document.addEventListener("pointerdown", outside);
+    return () => { document.removeEventListener("keydown", close); document.removeEventListener("pointerdown", outside); };
+  }, [menuOpen]);
   const [momentIndex, setMomentIndex] = useState(0);
   function selectMoment(index: number) {
     const track = momentsRef.current;
@@ -686,7 +701,7 @@ export default function Home() {
         }
       `}</style>
 
-      <header className="fixed left-0 right-0 top-0 z-50 border-b border-white/10 bg-black/65 backdrop-blur-xl">
+      <header ref={headerRef} className="fixed left-0 right-0 top-0 z-50 border-b border-white/10 bg-black/65 backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-5 md:px-8">
           <a href="/" aria-label="WOLNAA Startseite" className="flex items-center">
             <Image src="/wolnaa-logo-gold-header.png" alt="WOLNAA" width={220} height={81} priority className="h-6 w-auto object-contain md:h-7" />
@@ -697,18 +712,33 @@ export default function Home() {
             <a href="#kontakt" className="transition-colors hover:text-[#d6b36a]">{t.navContact}</a>
           </nav>
 
-          <div className="flex items-center rounded-md border border-white/15 bg-black/25 p-1 text-xs font-bold uppercase tracking-[0.16em]">
-            {(["de", "ru"] as Lang[]).map((item) => (
-              <button
-                key={item}
-                onClick={() => setLang(item)}
-                className={`rounded-md px-3 py-2 transition-all ${lang === item ? "bg-[#d6b36a] text-black" : "text-white/70 hover:text-[#d6b36a]"}`}
-              >
-                {item.toUpperCase()}
-              </button>
-            ))}
+          <div className="wolnaa-header-controls">
+            <div className="wolnaa-language" role="group" aria-label={lang === "de" ? "Sprache wählen" : "Выбрать язык"}>
+              {(["de", "ru"] as Lang[]).map(item => (
+                <button key={item} type="button" onClick={() => setLang(item)} aria-pressed={lang === item} aria-label={item === "de" ? "Deutsch" : "Русский"} lang={item}>
+                  {item.toUpperCase()}
+                </button>
+              ))}
+            </div>
+            <button ref={menuButtonRef} type="button" className="wolnaa-menu-toggle" aria-expanded={menuOpen} aria-controls="wolnaa-header-menu" aria-label={lang === "de" ? (menuOpen ? "Menü schließen" : "Menü öffnen") : (menuOpen ? "Закрыть меню" : "Открыть меню")} onClick={() => setMenuOpen(!menuOpen)}>
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
+                {menuOpen ? <path d="m5 5 14 14M19 5 5 19" /> : <path d="M3 5h18M3 12h18M3 19h18" />}
+              </svg>
+            </button>
           </div>
         </div>
+        <nav id="wolnaa-header-menu" className="wolnaa-header-menu" hidden={!menuOpen} aria-label={lang === "de" ? "Hauptmenü" : "Главное меню"}>
+          {[
+            ["#", "Startseite", "Главная"],
+            ["#events", "Events", "Мероприятия"],
+            ["#momente", "Fotos", "Фото"],
+            ["#faq", "FAQ & Support", "Вопросы и поддержка"],
+            ["#kontakt", "Kontakt", "Контакты"],
+            ["/muttizettel", "Muttizettel", "Разрешение родителей"],
+            ["/mein-bereich", "Mein Bereich", "Мои билеты"],
+          ].map(([href, de, ru]) => <a key={href} href={href} onClick={() => setMenuOpen(false)}>{lang === "de" ? de : ru}</a>)}
+          <a href="#events" className="wolnaa-gold-button wolnaa-menu-cta" onClick={() => setMenuOpen(false)}><MobileMenuIcon name="calendar" />{lang === "de" ? "Tickets sichern" : "Купить билеты"}<span aria-hidden="true">→</span></a>
+        </nav>
       </header>
 
       <section className="wolnaa-hero reveal-section relative flex min-h-[92vh] items-center justify-center overflow-hidden bg-black px-6 pb-16 pt-32 md:min-h-screen">
@@ -756,7 +786,7 @@ export default function Home() {
       </section>
 
 
-      <section className="reveal-section mx-auto max-w-7xl px-6 py-20">
+      <section id="momente" className="reveal-section mx-auto max-w-7xl px-6 py-20">
         <div className="mb-10 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
             <p className="mb-4 text-xs font-bold uppercase tracking-[0.28em] text-[#d6b36a]">
@@ -832,7 +862,7 @@ export default function Home() {
       </section>
 
       {/* FAQ */}
-      <section className="reveal-section mx-auto max-w-5xl px-6 py-20">
+      <section id="faq" className="reveal-section mx-auto max-w-5xl px-6 py-20">
         <div>
           <p className="mb-4 text-center text-xs font-bold uppercase tracking-[0.28em] text-[#d6b36a]">FAQ</p>
           <h2 className="mb-12 text-center text-4xl font-semibold md:text-5xl">{t.faqTitle}</h2>
