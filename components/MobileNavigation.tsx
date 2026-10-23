@@ -37,6 +37,7 @@ export default function MobileNavigation() {
   if (!(pathname === "/" || pathname === "/muttizettel" || pathname === "/mein-bereich")) return null;
   const active = pathname === "/muttizettel" ? 2 : pathname === "/mein-bereich" ? 3 : pathname?.startsWith("/event/") || eventsVisible ? 1 : 0;
   return <nav className={`wolnaa-mobile-nav${pathname?.startsWith("/event/") ? " wolnaa-nav-flat" : ""}`} aria-label="Mobile Hauptnavigation">
+    <span aria-hidden="true" className="wolnaa-nav-glass pointer-events-none absolute inset-0 bg-black/65 backdrop-blur-xl" />
     {items.map((item, index) => <Link key={item.href} href={item.href} aria-current={index === active ? "page" : undefined}>
       <span className="wolnaa-nav-icon"><MobileMenuIcon name={item.icon} /></span><span>{item.label}</span>
     </Link>)}
