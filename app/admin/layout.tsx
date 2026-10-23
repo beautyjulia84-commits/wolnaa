@@ -1,3 +1,4 @@
+import "./admin.css";
 import type { Metadata, Viewport } from "next";
 import PwaRegister from "@/components/PwaRegister";
 
@@ -14,7 +15,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#d6b36a",
+  themeColor: "#fafafa",
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",

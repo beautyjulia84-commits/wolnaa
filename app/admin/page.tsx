@@ -1,15 +1,15 @@
 "use client";
 import {berlinLocal,berlinInstant,defaultEndLocal,eventTiming} from '@/lib/event-timing';
+import {splitAdminEvents} from '@/lib/admin-event-scope';
 import {useEventClock} from '@/lib/use-event-clock';
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import EventPromoReport from "@/components/EventPromoReport";
 import jsQR from "jsqr";
 
 function berlinInstantForDisplay(value:string) { try { return berlinInstant(value); } catch { return null; } }
 
-type Tab = "events" | "besucher" | "tickets" | "rechtliches" | "scanner" | "veranstalter" | "einstellungen";
+type Tab = "overview" | "archiv" | "events" | "besucher" | "tickets" | "rechtliches" | "scanner" | "veranstalter" | "einstellungen";
 type LegalKey = "impressum" | "datenschutz" | "agb" | "teilnahme" | "widerruf";
 type TicketType = { name: string; price: string; quantity: string };
 type Lounge = { name: string; persons: string; price: string };
@@ -39,7 +39,7 @@ type AnalyticsData = {
   referrers: Record<string, number>;
   devices: Record<string, number>;
   checkouts: Record<string, number>;
-  events: Array<{ id: string; title: string; slug?: string | null; tickets_sold?: number | null; total_revenue?: number | null }>;
+  events: Array<{ id: string; title: string; slug?: string | null; date: string; time?: string; event_ends_at?: string | null; tickets_sold?: number | null; total_revenue?: number | null }>;
 };
 
 const EMPTY_ANALYTICS: AnalyticsData = { days: {}, paths: {}, referrers: {}, devices: {}, checkouts: {}, events: [] };
@@ -230,12 +230,13 @@ export default function AdminPage() {
   const eventNow = useEventClock();
   const [authed, setAuthed] = useState(false);
   const [adminPw, setAdminPw] = useState("");
-  const [tab, setTab] = useState<Tab>("besucher");
+  const [tab, setTab] = useState<Tab>("overview");
   const [menuOpen, setMenuOpen] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [ev, setEv] = useState<EventItem>(EMPTY);
   const [evIdx, setEvIdx] = useState<string | null>(null); // now stores Supabase ID
   const [events, setEvents] = useState<EventItem[]>([]);
+  const [eventError, setEventError] = useState("");
   const [evLoading, setEvLoading] = useState(false);
   const [tickets, setTickets] = useState<TicketRow[]>([]);
   const [ticketLoading, setTicketLoading] = useState(false);
@@ -254,6 +255,7 @@ export default function AdminPage() {
   const [analytics, setAnalytics] = useState<AnalyticsData>(EMPTY_ANALYTICS);
   const [analyticsLoading, setAnalyticsLoading] = useState(false);
   const [analyticsError, setAnalyticsError] = useState("");
+  const [eventSearch, setEventSearch] = useState("");
   const [analyticsDays, setAnalyticsDays] = useState<7 | 30>(7);
 
   useEffect(() => {
@@ -321,6 +323,8 @@ export default function AdminPage() {
 
   async function loadEvents() {
     setEvLoading(true);
+    setEventError("");
+    try {
     const res = await fetch("/api/admin/events", {
       headers: adminPw ? { "x-admin-token": adminPw } : undefined,
     });
@@ -328,10 +332,10 @@ export default function AdminPage() {
     if (res.ok) {
       setEvents((data.events ?? []).map(rowToEvent));
     } else {
-      console.error("Events laden Fehler:", data.error);
-      setEvents([]);
+      setEventError(data.error || "Veranstaltungen konnten nicht geladen werden.");
     }
-    setEvLoading(false);
+    } catch { setEventError("Veranstaltungen konnten nicht geladen werden."); }
+    finally { setEvLoading(false); }
   }
 
   async function loadLegal() {
@@ -430,6 +434,7 @@ export default function AdminPage() {
     }
 
     await loadEvents();
+    void loadAnalytics();
     setSaveLoading(false);
     setShowForm(false);
   }
@@ -448,12 +453,13 @@ export default function AdminPage() {
     }
 
     await loadEvents();
+    void loadAnalytics();
   }
 
   function showEventTickets(id?: string) {
     const event = events.find(e => e.id === id);
     setSelectedTicketEventId(id || "");
-    setTab("tickets");
+    navigateTab("tickets");
     loadTickets(event);
   }
 
@@ -479,11 +485,15 @@ export default function AdminPage() {
     return ticket.event_id === event.id || (!ticket.event_id && ticket.event_title === event.title);
   }
 
+  const isPast = (event: EventItem) => eventTiming({date:event.date,time:event.time,event_ends_at:event.eventEndsAt ? berlinInstantForDisplay(event.eventEndsAt) : null}, eventNow).ended;
+  const currentEvents = eventNow ? events.filter(event => !isPast(event)).sort((a,b) => a.date.localeCompare(b.date)) : [];
+  const archivedEvents = eventNow ? events.filter(isPast).sort((a,b) => b.date.localeCompare(a.date)) : [];
+  const visibleEvents = (tab === "archiv" ? archivedEvents : currentEvents).filter(event => `${event.title} ${event.city}`.toLowerCase().includes(eventSearch.toLowerCase()));
   const selectedTicketEvent = events.find(event => event.id === selectedTicketEventId);
   const filtered = selectedTicketEvent ? tickets.filter(ticket => ticketBelongsToEvent(ticket, selectedTicketEvent)) : [];
   const selectedRevenue = filtered.reduce((s, t) => s + t.amount, 0);
   const selectedCheckedIn = filtered.filter(t => t.status === "checked_in").length;
-  const eventTicketStats = events.map(event => {
+  const eventTicketStats = currentEvents.map(event => {
     return {
       event,
       total: event.ticketsSold || 0,
@@ -493,8 +503,10 @@ export default function AdminPage() {
   });
 
   const tabs: { key: Tab; label: string }[] = [
-    { key: "events", label: "Events" },
-    { key: "besucher", label: "Besucher" },
+    { key: "overview", label: "Übersicht" },
+    { key: "events", label: "Aktuelle Events" },
+    { key: "archiv", label: "Event-Archiv" },
+    { key: "besucher", label: "Besucher & Statistik" },
     { key: "tickets", label: "Tickets" },
     { key: "rechtliches", label: "Rechtliches" },
     { key: "scanner", label: "Scanner" },
@@ -502,6 +514,26 @@ export default function AdminPage() {
     { key: "einstellungen", label: "Einstellungen" },
   ];
 
+  function navigateTab(next: Tab) {
+    setTab(next); setMenuOpen(false); setEventSearch("");
+    window.location.hash = next;
+  }
+  useEffect(() => {
+    const sync = () => {
+      const key = window.location.hash.slice(1);
+      if (["overview","events","archiv","besucher","tickets","rechtliches","scanner","veranstalter","einstellungen"].includes(key)) setTab(key as Tab);
+      else setTab("overview");
+      setMenuOpen(false);
+    };
+    sync(); window.addEventListener("hashchange", sync);
+    return () => window.removeEventListener("hashchange", sync);
+  }, []);
+  useEffect(() => {
+    if (!menuOpen) return;
+    const close = (event: KeyboardEvent) => { if (event.key === "Escape") setMenuOpen(false); };
+    window.addEventListener("keydown", close);
+    return () => window.removeEventListener("keydown", close);
+  }, [menuOpen]);
   const analyticsDates = Array.from({ length: analyticsDays }, (_, index) => {
     const date = new Date();
     date.setDate(date.getDate() - (analyticsDays - 1 - index));
@@ -513,7 +545,7 @@ export default function AdminPage() {
   const maxViews = Math.max(1, ...analyticsPeriod.map(day => day.views));
   const topEntries = (entries: Record<string, number>) => Object.entries(entries).sort((a, b) => b[1] - a[1]).slice(0, 5);
   const totalDevices = Object.values(analytics.devices).reduce((sum, count) => sum + count, 0);
-  const eventConversions = analytics.events.map(event => {
+  const allEventConversions = analytics.events.map(event => {
     const slug = event.slug || event.title.toLowerCase().replace(/\s+/g, "-").replace(/[^\w-]+/g, "");
     const views = analytics.paths[`/event/${slug}`] ?? analytics.paths[`/event/${event.id}`] ?? 0;
     const checkouts = analytics.checkouts[event.id] ?? 0;
@@ -521,6 +553,13 @@ export default function AdminPage() {
     const revenue = Number(event.total_revenue || 0) / 100;
     return { ...event, views, checkouts, sold, revenue, conversion: views ? (sold / views) * 100 : 0 };
   }).sort((a, b) => b.views - a.views || b.sold - a.sold);
+
+  const {current:eventConversions, archived:archivedConversions} = splitAdminEvents(allEventConversions,eventNow);
+  const activeTotals = eventConversions.reduce((sum,event) => ({views:sum.views+event.views,sold:sum.sold+event.sold,revenue:sum.revenue+event.revenue}),{views:0,sold:0,revenue:0});
+  const metrics = (rows: typeof eventConversions) => <div className="admin-performance-list">{rows.length ? rows.map(event => <article key={event.id} className="admin-performance-card">
+    <div><h3>{event.title}</h3><p>{new Date(event.date+"T12:00:00").toLocaleDateString("de-DE")} · {eventTiming(event,eventNow).status}</p></div>
+    <dl>{[["Aufrufe",event.views],["Checkouts",event.checkouts],["Tickets",event.sold],["Umsatz",event.revenue.toLocaleString("de-DE",{style:"currency",currency:"EUR"})]].map(([label,value]) => <div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}</dl>
+  </article>) : <p className="p-6 text-sm text-zinc-500">Keine Veranstaltungen in diesem Bereich.</p>}</div>;
 
   if (!authed) {
     return (
@@ -531,17 +570,17 @@ export default function AdminPage() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-50 text-zinc-950 flex flex-col">
+    <div className="wolnaa-admin min-h-screen bg-zinc-50 text-zinc-950 flex flex-col">
       <header className="bg-white/95 border-b border-zinc-200 sticky top-0 z-40 backdrop-blur-xl">
         <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between gap-4">
           <div className="flex items-center gap-2 shrink-0">
-            <img src="/wolnaa-logo.png" alt="Wolnaa" className="h-8 w-auto" />
-            <span className="font-bold text-sm hidden sm:block">Admin</span>
+            <span className="flex h-10 items-center rounded-lg bg-zinc-950 px-3"><img src="/wolnaa-logo-gold-header.png" alt="Wolnaa" className="h-5 w-auto" /></span>
+            <span className="font-bold text-sm">Admin</span>
           </div>
           <div className="relative shrink-0">
             <button
               type="button"
-              aria-label="Admin-Menü öffnen"
+              aria-label={menuOpen ? "Admin-Menü schließen" : "Admin-Menü öffnen"}
               aria-expanded={menuOpen}
               onClick={() => setMenuOpen(open => !open)}
               className="flex h-10 w-10 flex-col items-center justify-center gap-1.5 rounded-xl border border-zinc-200 bg-white text-zinc-950 shadow-sm transition-colors hover:border-[#d6b36a]"
@@ -551,11 +590,13 @@ export default function AdminPage() {
               <span className="h-0.5 w-5 rounded-full bg-current" />
             </button>
             {menuOpen && (
-              <div className="absolute right-0 top-12 w-56 overflow-hidden rounded-2xl border border-zinc-200 bg-white p-2 shadow-xl">
+              <div className="absolute right-0 top-12 w-72 max-h-[calc(100dvh-90px)] overflow-y-auto rounded-2xl border border-zinc-200 bg-white p-2 shadow-xl">
                 {tabs.map(t => (
-                  <button key={t.key} onClick={() => { setTab(t.key); if (t.key === "besucher") loadAnalytics(); setMenuOpen(false); }} className={`w-full rounded-xl px-4 py-3 text-left text-sm font-semibold transition-colors ${tab === t.key ? "bg-[#d6b36a] text-black" : "text-zinc-700 hover:bg-zinc-100 hover:text-black"}`}>{t.label}</button>
+                  <button key={t.key} onClick={() => navigateTab(t.key)} aria-current={tab === t.key ? "page" : undefined} className={`w-full rounded-xl px-4 py-3 text-left text-sm font-semibold transition-colors ${tab === t.key ? "bg-[#d6b36a] text-black" : "text-zinc-700 hover:bg-zinc-100 hover:text-black"}`}>{t.label}</button>
                 ))}
                 <Link href="/admin/promocodes" className="block rounded-xl px-4 py-3 text-sm font-semibold text-zinc-700 hover:bg-zinc-100">Promocode-Auswertung</Link>
+                <Link href="/admin/tickets-erneut" className="block rounded-xl px-4 py-3 text-sm font-semibold text-zinc-700 hover:bg-zinc-100">Ticket-Service / erneut senden</Link>
+                <Link href="/admin/gaestetickets" className="block rounded-xl px-4 py-3 text-sm font-semibold text-zinc-700 hover:bg-zinc-100">Gästetickets</Link>
                 <div className="my-2 border-t border-zinc-200" />
                 <Link href="/" onClick={() => setMenuOpen(false)} className="block rounded-xl px-4 py-3 text-sm font-medium text-zinc-600 hover:bg-zinc-100 hover:text-black">Zur Website</Link>
                 <button onClick={logout} className="w-full rounded-xl px-4 py-3 text-left text-sm font-medium text-red-600 hover:bg-red-50">Logout</button>
@@ -567,23 +608,34 @@ export default function AdminPage() {
 
       <main className="flex-1 max-w-5xl mx-auto w-full px-4 py-6 pb-10">
 
+        {tab === "overview" && <section>
+          <div className="admin-page-heading"><div><p className="admin-eyebrow">WOLNAA Verwaltung</p><h1>Übersicht</h1><p>Aktuelle Veranstaltungen und Verkäufe auf einen Blick.</p></div><button onClick={openNew} className="admin-primary">Event erstellen</button></div>
+          {analyticsError && <p role="alert" className="mb-4 rounded-xl bg-red-50 p-4 text-red-700">{analyticsError} <button onClick={loadAnalytics} className="underline">Erneut laden</button></p>}
+          <div className="admin-kpis">{[["Aktuelle Events",eventConversions.length],["Event-Aufrufe",activeTotals.views],["Verkaufte Tickets",activeTotals.sold],["Ticketumsatz",activeTotals.revenue.toLocaleString("de-DE",{style:"currency",currency:"EUR"})]].map(([label,value]) => <div key={label}><span>{label}</span><strong>{analyticsLoading || !eventNow || analyticsError ? "–" : value}</strong></div>)}</div>
+          <p className="mb-6 text-xs text-zinc-500">Kennzahlen der noch nicht beendeten Events, jeweils seit Erfassungsbeginn. Admin- und Veranstalter-Events.</p>
+          <div className="admin-section-heading"><h2>Aktuelle Veranstaltungen</h2><button onClick={() => navigateTab("events")}>Events verwalten →</button></div>
+          {analyticsLoading ? <p role="status" className="p-6">Veranstaltungen werden geladen …</p> : !analyticsError && metrics(eventConversions)}
+          <div className="admin-shortcuts"><button onClick={() => navigateTab("besucher")}><strong>Besucher & Statistik</strong><span>Verlauf, Herkunft und Geräte ansehen →</span></button><button onClick={() => navigateTab("archiv")}><strong>Event-Archiv</strong><span>Vergangene Events und Auswertungen →</span></button></div>
+        </section>}
         {/* Events */}
-        {tab === "events" && (
+        {(tab === "events" || tab === "archiv") && (
           <div>
             <div className="flex items-center justify-between mb-5">
-              <div><h1 className="text-lg font-bold">Events</h1><p className="text-zinc-600 text-xs mt-0.5">{events.length} gesamt</p></div>
+              <div><h1 className="text-lg font-bold">{tab === "archiv" ? "Event-Archiv" : "Aktuelle Events"}</h1><p className="text-zinc-600 text-xs mt-0.5">{tab === "archiv" ? "Abgeschlossene Veranstaltungen bleiben hier erhalten." : "Kommende und laufende Veranstaltungen."}</p></div>
               <button onClick={openNew} className="rounded-xl bg-[#d6b36a] text-black font-bold px-4 py-2 text-sm hover:bg-[#c5a15b] transition-colors">+ Neues Event</button>
             </div>
+            <label className="mb-5 block text-sm font-medium">Event suchen<input className={inp + " mt-2"} value={eventSearch} onChange={e => setEventSearch(e.target.value)} placeholder="Titel oder Stadt" /></label>
+            {eventError && <p role="alert" className="mb-4 text-sm text-red-700">{eventError} <button onClick={loadEvents} className="underline">Erneut laden</button></p>}
             {evLoading ? (
               <div className="flex justify-center py-12"><div className="w-6 h-6 border-2 border-[#d6b36a] border-t-transparent rounded-full animate-spin" /></div>
-            ) : events.length === 0 ? (
+            ) : visibleEvents.length === 0 ? (
               <div className="text-center py-16 rounded-2xl border-2 border-dashed border-zinc-300 bg-white">
-                <p className="text-zinc-600 text-sm mb-3">Noch keine Events vorhanden.</p>
+                <p className="text-zinc-600 text-sm mb-3">Keine passenden Veranstaltungen.</p>
                 <button onClick={openNew} className="rounded-xl bg-[#d6b36a] text-black font-bold px-4 py-2 text-sm">Event erstellen</button>
               </div>
             ) : (
               <div className="space-y-2">
-                {events.map((e) => (
+                {visibleEvents.map((e) => (
                   <div key={e.id} className="bg-white border border-zinc-200 rounded-2xl p-3 shadow-sm hover:border-zinc-300 transition-colors">
                     <div className="flex items-center gap-3">
                       {e.imageUrl ? <img src={e.imageUrl} alt="" className="w-12 h-12 rounded-xl object-cover shrink-0" /> : <div className="w-12 h-12 rounded-xl bg-zinc-100 shrink-0" />}
@@ -598,11 +650,11 @@ export default function AdminPage() {
                       <button onClick={() => showEventTickets(e.id)} className="flex-1 rounded-xl border border-zinc-300 text-zinc-700 text-xs py-2 hover:border-[#d6b36a] hover:text-black transition-colors font-medium">Tickets</button>
                       <button onClick={() => delEv(e.id!)} className="flex-1 rounded-xl border border-zinc-200 text-zinc-500 text-xs py-2 hover:border-red-300 hover:text-red-600 transition-colors font-medium">Löschen</button>
                     </div>
-                    {e.id && <EventPromoReport eventId={e.id} eventTitle={e.title} eventDate={e.date} adminToken={adminPw} />}
                   </div>
                 ))}
               </div>
             )}
+            {tab === "archiv" && <section className="mt-8"><h2 className="mb-4 text-lg font-bold">Archivierte Event-Auswertungen</h2><p className="mb-4 text-sm text-zinc-500">Admin- und Veranstalter-Events nach ihrem Veranstaltungsende.</p>{metrics(archivedConversions.filter(event => event.title.toLowerCase().includes(eventSearch.toLowerCase())))}</section>}
           </div>
         )}
 
@@ -612,7 +664,7 @@ export default function AdminPage() {
             <div className="mb-5 flex items-start justify-between gap-4">
               <div>
                 <h1 className="text-lg font-bold">Website-Besucher</h1>
-                <p className="mt-0.5 text-xs text-zinc-600">Anonymisierte Besuche und Seitenaufrufe</p>
+                <p className="mt-0.5 text-xs text-zinc-600">Websiteweite Besuche und Seitenaufrufe; getrennt von den aktuellen Event-Kennzahlen</p>
               </div>
               <button onClick={loadAnalytics} disabled={analyticsLoading} className="rounded-xl border border-zinc-300 bg-white px-4 py-2 text-sm font-semibold text-zinc-700 hover:border-[#d6b36a] disabled:opacity-50">
                 {analyticsLoading ? "Lädt…" : "↻ Aktualisieren"}
@@ -626,11 +678,6 @@ export default function AdminPage() {
                 </button>
               ))}
             </div>
-            <section className="mb-6 space-y-3 rounded-2xl border border-zinc-200 bg-white p-4">
-              <h2 className="font-bold">Promocode-Verkäufe pro Event</h2>
-              <p className="text-xs text-zinc-500">Admin- und Veranstalter-Events</p>
-              {analytics.events.map(event => <div key={event.id} className="min-w-0"><h3 className="mt-3 break-words text-sm font-semibold">{event.title}</h3><EventPromoReport eventId={event.id} eventTitle={event.title} adminToken={adminPw} /></div>)}
-            </section>
             {analyticsError && <div className="mb-5 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">{analyticsError}</div>}
 
             <div className="mb-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -639,7 +686,6 @@ export default function AdminPage() {
                 { label: "Seitenaufrufe", value: periodViews },
                 { label: "Seiten je Besuch", value: periodVisits ? (periodViews / periodVisits).toFixed(1) : "0" },
                 { label: "Heute", value: analytics.days[analyticsDates.at(-1) ?? ""]?.visits ?? 0 },
-                { label: "Glücksrad-Drehungen gesamt", value: analytics.wheelSpins ?? 0 },
               ].map(item => (
                 <div key={item.label} className="rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm">
                   <p className="text-2xl font-bold text-[#9b7435]">{item.value}</p>
@@ -702,39 +748,7 @@ export default function AdminPage() {
               </div>
             </div>
 
-            <div className="mt-5 overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm">
-              <div className="border-b border-zinc-200 px-5 py-4">
-                <h2 className="text-sm font-bold">Event-Aufrufe und Verkäufe</h2>
-                <p className="mt-1 text-xs text-zinc-500">Seit Aktivierung der Besucherstatistik</p>
-              </div>
-              <div className="overflow-x-auto">
-                <table className="w-full min-w-[720px] text-sm">
-                  <thead>
-                    <tr className="bg-zinc-50 text-left text-[11px] uppercase tracking-wide text-zinc-500">
-                      {['Event', 'Aufrufe', 'Checkouts', 'Tickets', 'Kaufquote', 'Umsatz'].map(label => <th key={label} className="px-4 py-3 font-semibold">{label}</th>)}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {eventConversions.length === 0 ? (
-                      <tr><td colSpan={6} className="px-5 py-10 text-center text-zinc-500">Noch keine Eventdaten vorhanden.</td></tr>
-                    ) : eventConversions.map(event => (
-                      <tr key={event.id} className="border-t border-zinc-100">
-                        <td className="max-w-[240px] px-4 py-3 font-semibold text-zinc-900"><span className="block truncate">{event.title}</span></td>
-                        <td className="px-4 py-3 text-zinc-700">{event.views}</td>
-                        <td className="px-4 py-3 text-zinc-700">{event.checkouts}</td>
-                        <td className="px-4 py-3 font-bold text-[#9b7435]">{event.sold}</td>
-                        <td className="px-4 py-3">
-                          <span className={`rounded-full px-2.5 py-1 text-xs font-bold ${event.conversion >= 5 ? 'bg-green-50 text-green-700' : 'bg-zinc-100 text-zinc-600'}`}>
-                            {event.conversion.toFixed(1)}%
-                          </span>
-                        </td>
-                        <td className="px-4 py-3 font-semibold text-zinc-900">{event.revenue.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' })}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
+            <section className="mt-6"><h2 className="mb-2 text-lg font-bold">Aktuelle Event-Aufrufe und Verkäufe</h2><p className="mb-4 text-sm text-zinc-500">Nur kommende und laufende Events. Vergangene Events findest du im Archiv.</p>{metrics(eventConversions)}</section>
 
             <p className="mt-5 text-xs leading-5 text-zinc-500">Die Statistik speichert nur zusammengefasste Werte. Namen, E-Mail-Adressen und vollständige IP-Adressen werden nicht erfasst. Ein Besuch beginnt beim Öffnen oder Neuladen der Website.</p>
           </div>
@@ -776,14 +790,14 @@ export default function AdminPage() {
                   <div className="text-center py-12 rounded-2xl border border-zinc-200 bg-white text-zinc-500 text-sm">Keine Veranstaltungen vorhanden.</div>
                 ) : eventTicketStats.map(({ event, total, checkedIn, revenue }) => (
                   <button key={event.id || event.title} onClick={() => { setSelectedTicketEventId(event.id || ""); loadTickets(event); }} className="w-full bg-white border border-zinc-200 rounded-2xl p-4 shadow-sm hover:border-[#d6b36a] transition-colors text-left">
-                    <div className="flex items-center justify-between gap-4">
+                    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                       <div className="min-w-0">
                         <p className="font-semibold text-sm truncate text-zinc-950">{event.title}</p>
                         <p className="text-zinc-600 text-xs mt-1">{event.date}{event.location ? ` · ${event.location}` : ""}</p>
                       </div>
                       <div className="flex items-center gap-5 shrink-0 text-right">
                         <div><p className="text-[#9b7435] font-bold text-sm">{total}</p><p className="text-zinc-600 text-xs">Tickets</p></div>
-                        <div><p className="text-green-400 font-bold text-sm">{checkedIn}</p><p className="text-zinc-600 text-xs">Check-in</p></div>
+                        
                         <div><p className="text-zinc-950 font-bold text-sm">€{revenue.toFixed(2)}</p><p className="text-zinc-600 text-xs">Umsatz</p></div>
                       </div>
                     </div>
