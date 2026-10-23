@@ -1,3 +1,4 @@
+import AdminShell from "@/components/admin/AdminShell";
 import "./admin.css";
 import type { Metadata, Viewport } from "next";
 import PwaRegister from "@/components/PwaRegister";
@@ -22,5 +23,5 @@ export const viewport: Viewport = {
 };
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
-  return <><PwaRegister worker="/admin-sw.js" scope="/admin/" />{children}</>;
+  return <><PwaRegister worker="/admin-sw.js" scope="/admin/" /><AdminShell>{children}</AdminShell></>;
 }

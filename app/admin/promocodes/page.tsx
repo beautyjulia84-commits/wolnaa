@@ -12,12 +12,11 @@ export default function PromoReport() {
     return ()=>abort.abort();
   },[]);
   const event=events.find(event=>event.id===eventId);
-  return <main className="min-h-screen bg-zinc-50 p-4 text-zinc-950 sm:p-6"><div className="mx-auto max-w-3xl">
-    <a href="/admin" className="underline">← Adminbereich</a>
-    <h1 className="my-6 text-2xl font-bold">Promocode-Verkäufe pro Event</h1>
-    <p>Wähle eine Veranstaltung. Anschließend kannst du ihre Verkäufe nach Promocode durchsuchen. Vergangene Veranstaltungen bleiben auswertbar.</p>
-    {error && <p role="alert" className="my-4 text-red-700">{error}</p>}
-    <label className="my-5 block font-semibold">Veranstaltung<select disabled={loading} value={eventId} onChange={e=>setEventId(e.target.value)} className="mt-2 block min-h-12 w-full rounded-lg border border-zinc-300 bg-white p-3 text-base"><option value="">{loading?'Veranstaltungen werden geladen …':'Bitte Veranstaltung auswählen'}</option>{events.map(event=><option key={event.id} value={event.id}>{event.title} · {new Date(event.date+'T12:00:00').toLocaleDateString('de-DE')}</option>)}</select></label>
+  return <main className="admin-tool-page"><div className="admin-tool-heading"><p className="admin-eyebrow">Auswertung</p><h1>Promocode-Verkäufe</h1><p>Verkäufe und eingelöste Codes für eine Veranstaltung auswerten. Auch archivierte Events bleiben verfügbar.</p></div>
+    <section className="admin-form-panel"><h2>Veranstaltung wählen</h2>
+    {error && <p role="alert" className="admin-feedback text-red-700">{error}</p>}
+    <label>Veranstaltung<select disabled={loading} value={eventId} onChange={e=>setEventId(e.target.value)}><option value="">{loading?'Veranstaltungen werden geladen …':'Veranstaltung auswählen'}</option>{events.map(event=><option key={event.id} value={event.id}>{event.title} · {new Date(event.date+'T12:00:00').toLocaleDateString('de-DE')}</option>)}</select></label>
+    {!loading && !error && !event && <p className="admin-form-hint">Wähle ein Event, um seine Promocode-Auswertung zu öffnen.</p>}
     {event && <EventPromoReport key={event.id} eventId={event.id} eventTitle={event.title} eventDate={event.date} />}
-  </div></main>;
+    </section></main>;
 }

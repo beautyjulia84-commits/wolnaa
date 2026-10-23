@@ -107,7 +107,7 @@ const saleEndTime = (value: string) => value.includes("T") ? value.slice(11, 16)
 function Toggle({ value, onChange, label }: { value: boolean; onChange: (v: boolean) => void; label: string }) {
   return (
     <div className="flex items-center justify-between py-1">
-      <span className="text-sm text-zinc-300">{label}</span>
+      <span className="text-sm text-zinc-700">{label}</span>
       <button onClick={() => onChange(!value)} className={`w-12 h-6 rounded-full transition-colors flex items-center px-0.5 shrink-0 ${value ? "bg-[#d6b36a]" : "bg-zinc-700"}`}>
         <div className={`w-5 h-5 rounded-full bg-white shadow transition-transform duration-200 ${value ? "translate-x-6" : "translate-x-0"}`} />
       </button>
@@ -231,7 +231,6 @@ export default function AdminPage() {
   const [authed, setAuthed] = useState(false);
   const [adminPw, setAdminPw] = useState("");
   const [tab, setTab] = useState<Tab>("overview");
-  const [menuOpen, setMenuOpen] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [ev, setEv] = useState<EventItem>(EMPTY);
   const [evIdx, setEvIdx] = useState<string | null>(null); // now stores Supabase ID
@@ -502,20 +501,8 @@ export default function AdminPage() {
     };
   });
 
-  const tabs: { key: Tab; label: string }[] = [
-    { key: "overview", label: "Übersicht" },
-    { key: "events", label: "Aktuelle Events" },
-    { key: "archiv", label: "Event-Archiv" },
-    { key: "besucher", label: "Besucher & Statistik" },
-    { key: "tickets", label: "Tickets" },
-    { key: "rechtliches", label: "Rechtliches" },
-    { key: "scanner", label: "Scanner" },
-    { key: "veranstalter", label: "Veranstalter" },
-    { key: "einstellungen", label: "Einstellungen" },
-  ];
-
   function navigateTab(next: Tab) {
-    setTab(next); setMenuOpen(false); setEventSearch("");
+    setTab(next); setEventSearch("");
     window.location.hash = next;
   }
   useEffect(() => {
@@ -523,17 +510,10 @@ export default function AdminPage() {
       const key = window.location.hash.slice(1);
       if (["overview","events","archiv","besucher","tickets","rechtliches","scanner","veranstalter","einstellungen"].includes(key)) setTab(key as Tab);
       else setTab("overview");
-      setMenuOpen(false);
     };
     sync(); window.addEventListener("hashchange", sync);
     return () => window.removeEventListener("hashchange", sync);
   }, []);
-  useEffect(() => {
-    if (!menuOpen) return;
-    const close = (event: KeyboardEvent) => { if (event.key === "Escape") setMenuOpen(false); };
-    window.addEventListener("keydown", close);
-    return () => window.removeEventListener("keydown", close);
-  }, [menuOpen]);
   const analyticsDates = Array.from({ length: analyticsDays }, (_, index) => {
     const date = new Date();
     date.setDate(date.getDate() - (analyticsDays - 1 - index));
@@ -571,40 +551,7 @@ export default function AdminPage() {
 
   return (
     <div className="wolnaa-admin min-h-screen bg-zinc-50 text-zinc-950 flex flex-col">
-      <header className="bg-white/95 border-b border-zinc-200 sticky top-0 z-40 backdrop-blur-xl">
-        <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-2 shrink-0">
-            <span className="flex h-10 items-center rounded-lg bg-zinc-950 px-3"><img src="/wolnaa-logo-gold-header.png" alt="Wolnaa" className="h-5 w-auto" /></span>
-            <span className="font-bold text-sm">Admin</span>
-          </div>
-          <div className="relative shrink-0">
-            <button
-              type="button"
-              aria-label={menuOpen ? "Admin-Menü schließen" : "Admin-Menü öffnen"}
-              aria-expanded={menuOpen}
-              onClick={() => setMenuOpen(open => !open)}
-              className="flex h-10 w-10 flex-col items-center justify-center gap-1.5 rounded-xl border border-zinc-200 bg-white text-zinc-950 shadow-sm transition-colors hover:border-[#d6b36a]"
-            >
-              <span className="h-0.5 w-5 rounded-full bg-current" />
-              <span className="h-0.5 w-5 rounded-full bg-current" />
-              <span className="h-0.5 w-5 rounded-full bg-current" />
-            </button>
-            {menuOpen && (
-              <div className="absolute right-0 top-12 w-72 max-h-[calc(100dvh-90px)] overflow-y-auto rounded-2xl border border-zinc-200 bg-white p-2 shadow-xl">
-                {tabs.map(t => (
-                  <button key={t.key} onClick={() => navigateTab(t.key)} aria-current={tab === t.key ? "page" : undefined} className={`w-full rounded-xl px-4 py-3 text-left text-sm font-semibold transition-colors ${tab === t.key ? "bg-[#d6b36a] text-black" : "text-zinc-700 hover:bg-zinc-100 hover:text-black"}`}>{t.label}</button>
-                ))}
-                <Link href="/admin/promocodes" className="block rounded-xl px-4 py-3 text-sm font-semibold text-zinc-700 hover:bg-zinc-100">Promocode-Auswertung</Link>
-                <Link href="/admin/tickets-erneut" className="block rounded-xl px-4 py-3 text-sm font-semibold text-zinc-700 hover:bg-zinc-100">Ticket-Service / erneut senden</Link>
-                <Link href="/admin/gaestetickets" className="block rounded-xl px-4 py-3 text-sm font-semibold text-zinc-700 hover:bg-zinc-100">Gästetickets</Link>
-                <div className="my-2 border-t border-zinc-200" />
-                <Link href="/" onClick={() => setMenuOpen(false)} className="block rounded-xl px-4 py-3 text-sm font-medium text-zinc-600 hover:bg-zinc-100 hover:text-black">Zur Website</Link>
-                <button onClick={logout} className="w-full rounded-xl px-4 py-3 text-left text-sm font-medium text-red-600 hover:bg-red-50">Logout</button>
-              </div>
-            )}
-          </div>
-        </div>
-      </header>
+
 
       <main className="flex-1 max-w-5xl mx-auto w-full px-4 py-6 pb-10">
 
@@ -807,18 +754,18 @@ export default function AdminPage() {
             ) : (
               <div className="bg-white border border-zinc-200 rounded-2xl overflow-hidden shadow-sm">
                 <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead><tr className="border-b border-zinc-200 bg-zinc-50">{["Name & E-Mail", "Event", "Betrag", "Status", "Check-in", ""].map(h => <th key={h} className="text-left text-zinc-600 font-medium px-4 py-3 text-xs uppercase tracking-wide whitespace-nowrap">{h}</th>)}</tr></thead>
+                  <table className="admin-ticket-table w-full text-sm">
+                    <thead><tr className="border-b border-zinc-200 bg-zinc-50">{["Name & E-Mail", "Event", "Betrag", "Status", "Aktion", "Check-in"].map(h => <th key={h} className="text-left text-zinc-600 font-medium px-4 py-3 text-xs uppercase tracking-wide whitespace-nowrap">{h}</th>)}</tr></thead>
                     <tbody>
                       {filtered.length === 0 ? <tr><td colSpan={6} className="text-center text-zinc-600 py-10 text-sm">Keine Einträge für diese Veranstaltung.</td></tr>
                         : filtered.map(t => (
                           <tr key={t.id} className="border-b border-zinc-100 hover:bg-zinc-50 transition-colors">
-                            <td className="px-4 py-3"><p className="font-semibold text-sm">{t.customer_name}</p><p className="text-zinc-600 text-xs">{t.customer_email}</p></td>
-                            <td className="px-4 py-3 text-zinc-700 text-xs whitespace-nowrap">{t.event_title}</td>
-                            <td className="px-4 py-3 font-bold text-sm whitespace-nowrap">€{t.amount.toFixed(2)}</td>
-                            <td className="px-4 py-3 whitespace-nowrap"><span className={`rounded-full px-2.5 py-1 text-xs font-medium ${t.status === "checked_in" ? "bg-green-400/10 text-green-400" : t.status === "cancelled" ? "bg-red-400/10 text-red-400" : "bg-[#d6b36a]/15 text-[#765725]"}`}>{t.status === "checked_in" ? "✓ Eingecheckt" : t.status === "cancelled" ? "✕ Storniert" : "Bezahlt"}</span></td>
-                            <td className="px-4 py-3 whitespace-nowrap">{t.status !== "cancelled" && <button onClick={() => cancelTicket(t.ticket_id, t.customer_name)} className="rounded-lg border border-red-500/30 text-red-400 text-xs px-3 py-1.5 hover:bg-red-500/10 transition-colors font-medium">Stornieren</button>}</td>
-                            <td className="px-4 py-3 text-zinc-600 text-xs whitespace-nowrap">{t.checked_in_at ? new Date(t.checked_in_at).toLocaleString("de-DE") : "—"}</td>
+                            <td data-label="Person" className="px-4 py-3"><p className="font-semibold text-sm">{t.customer_name}</p><p className="text-zinc-600 text-xs">{t.customer_email}</p></td>
+                            <td data-label="Veranstaltung" className="px-4 py-3 text-zinc-700 text-xs whitespace-nowrap">{t.event_title}</td>
+                            <td data-label="Betrag" className="px-4 py-3 font-bold text-sm whitespace-nowrap">€{t.amount.toFixed(2)}</td>
+                            <td data-label="Status" className="px-4 py-3 whitespace-nowrap"><span className={`rounded-full px-2.5 py-1 text-xs font-medium ${t.status === "checked_in" ? "bg-green-400/10 text-green-700" : t.status === "cancelled" ? "bg-red-400/10 text-red-700" : "bg-[#d6b36a]/15 text-[#765725]"}`}>{t.status === "checked_in" ? "✓ Eingecheckt" : t.status === "cancelled" ? "✕ Storniert" : "Bezahlt"}</span></td>
+                            <td data-label="Aktion" className="px-4 py-3 whitespace-nowrap">{t.status !== "cancelled" && <button onClick={() => cancelTicket(t.ticket_id, t.customer_name)} className="rounded-lg border border-red-500/30 text-red-700 text-xs px-3 py-1.5 hover:bg-red-500/10 transition-colors font-medium">Stornieren</button>}</td>
+                            <td data-label="Check-in" className="px-4 py-3 text-zinc-600 text-xs whitespace-nowrap">{t.checked_in_at ? new Date(t.checked_in_at).toLocaleString("de-DE") : "—"}</td>
                           </tr>
                         ))}
                     </tbody>
@@ -898,7 +845,7 @@ export default function AdminPage() {
       {/* Event Form */}
       {showForm && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-end md:items-center justify-center" onClick={() => setShowForm(false)}>
-          <div className="w-full md:max-w-2xl bg-white border border-zinc-200 rounded-t-3xl md:rounded-3xl max-h-[95vh] overflow-y-auto text-black" onClick={e => e.stopPropagation()}>
+          <div className="admin-event-editor w-full md:max-w-2xl bg-white border border-zinc-200 rounded-t-3xl md:rounded-3xl max-h-[95vh] overflow-y-auto text-black" onClick={e => e.stopPropagation()}>
             <div className="sticky top-0 bg-white border-b border-zinc-200 px-5 py-4 flex items-center justify-between z-10">
               <h2 className="font-bold text-base">{evIdx ? "Event bearbeiten" : "Neues Event erstellen"}</h2>
               <button onClick={() => setShowForm(false)} className="w-8 h-8 rounded-lg border border-zinc-300 text-zinc-600 hover:text-black flex items-center justify-center">✕</button>
