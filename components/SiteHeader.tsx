@@ -42,13 +42,6 @@ export default function SiteHeader({lang: controlledLang, onLanguageChange}: {la
           <nav className="hidden items-center gap-8 text-sm font-bold uppercase tracking-[0.22em] text-white/75 md:flex">
             <a href="/#events" className="transition-colors hover:text-[#d6b36a]">{lang === "de" ? "Events" : "Мероприятия"}</a>
             <a href="/#kontakt" className="transition-colors hover:text-[#d6b36a]">{lang === "de" ? "Kontakt" : "Контакты"}</a>
-            <div className="wolnaa-language" role="group" aria-label={lang === "de" ? "Sprache wählen" : "Выбрать язык"}>
-              {(["de", "ru"] as Lang[]).map(item => (
-                <button key={item} type="button" onClick={() => changeLanguage(item)} aria-pressed={lang === item} aria-label={item === "de" ? "Deutsch" : "Русский"} lang={item}>
-                  {item.toUpperCase()}
-                </button>
-              ))}
-            </div>
         </nav>
 
           <div className="wolnaa-header-controls">
