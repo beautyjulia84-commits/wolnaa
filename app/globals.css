@@ -212,3 +212,9 @@ body {
 .wolnaa-site-header a { text-decoration:none; }
 
 .wolnaa-site-header .wolnaa-header-menu .wolnaa-menu-cta { display:flex; width:100%; margin:16px 0 0; min-height:52px; padding:12px 8px; font-weight:700; }
+
+.wolnaa-language-select { position:relative; display:flex; align-items:center; color:#dedee1; }
+.wolnaa-language-select select { appearance:none; -webkit-appearance:none; min-height:44px; width:90px; padding:8px 18px 8px 6px; border:0; border-radius:4px; background:transparent; color:inherit; font-size:12px; font-weight:500; cursor:pointer; }
+.wolnaa-language-select option { background:#16171c; color:#fff; }
+.wolnaa-language-select svg { position:absolute; right:3px; pointer-events:none; }
+.wolnaa-language-select select:focus-visible { outline:2px solid var(--wolnaa-gold); outline-offset:2px; }

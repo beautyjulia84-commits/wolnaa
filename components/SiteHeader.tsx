@@ -45,6 +45,13 @@ export default function SiteHeader({lang: controlledLang, onLanguageChange}: {la
         </nav>
 
           <div className="wolnaa-header-controls">
+            <div className="wolnaa-language-select">
+              <select aria-label={lang === "de" ? "Sprache wählen" : "Выбрать язык"} value={lang} onChange={event => changeLanguage(event.target.value as Lang)}>
+                <option value="de" lang="de">Deutsch</option>
+                <option value="ru" lang="ru">Русский</option>
+              </select>
+              <svg aria-hidden="true" width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="m3 4.5 3 3 3-3" stroke="currentColor" strokeWidth="1.3" /></svg>
+            </div>
             <button ref={menuButtonRef} type="button" className="wolnaa-menu-toggle" aria-expanded={menuOpen} aria-controls="wolnaa-header-menu" aria-label={lang === "de" ? (menuOpen ? "Menü schließen" : "Menü öffnen") : (menuOpen ? "Закрыть меню" : "Открыть меню")} onClick={() => setMenuOpen(!menuOpen)}>
               <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
                 {menuOpen ? <path d="m5 5 14 14M19 5 5 19" /> : <path d="M3 5h18M3 12h18M3 19h18" />}
@@ -63,13 +70,6 @@ export default function SiteHeader({lang: controlledLang, onLanguageChange}: {la
             ["/mein-bereich", "Mein Bereich", "Мои билеты"],
           ].map(([href, de, ru]) => <a key={href} href={href} onClick={() => setMenuOpen(false)}>{lang === "de" ? de : ru}</a>)}
           <a href="/#events" className="wolnaa-gold-button wolnaa-menu-cta" onClick={() => setMenuOpen(false)}><MobileMenuIcon name="calendar" />{lang === "de" ? "Tickets sichern" : "Купить билеты"}<span aria-hidden="true">→</span></a>
-          <div className="wolnaa-language" role="group" aria-label={lang === "de" ? "Sprache wählen" : "Выбрать язык"}>
-              {(["de", "ru"] as Lang[]).map(item => (
-                <button key={item} type="button" onClick={() => changeLanguage(item)} aria-pressed={lang === item} aria-label={item === "de" ? "Deutsch" : "Русский"} lang={item}>
-                  {item.toUpperCase()}
-                </button>
-              ))}
-            </div>
         </nav>
       </header>
   );
