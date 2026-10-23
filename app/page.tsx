@@ -206,7 +206,7 @@ function EventCard({ event, lang }: { event: EventItem; lang: Lang }) {
     setTimeout(() => setTapped(false), 600);
   }
   return (
-    <Link prefetch={true} href={createEventLink(event)} onTouchStart={handleTouch} data-tapped={tapped} className="event-card motion-card group block overflow-hidden rounded-md border bg-zinc-950/70">
+    <Link data-motion="event" prefetch={true} href={createEventLink(event)} onTouchStart={handleTouch} data-tapped={tapped} className="event-card motion-card group block overflow-hidden rounded-md border bg-zinc-950/70">
       <div className="relative h-56 flex items-center justify-center bg-[radial-gradient(circle_at_top,#2b1b00_0%,#111_38%,#000_100%)] overflow-hidden">
         {event.image_url ? (
           <img src={event.image_url} alt={event.title} className="w-full h-56 object-cover transition-transform duration-700 group-hover:scale-[1.02]" loading="lazy" decoding="async" />
@@ -261,7 +261,7 @@ function FeaturedEvent({ event, lang, first = false }: { event: EventItem; lang:
   const t = I18N[lang];
   const [pressed, setPressed] = useState(false);
   return (
-    <Link prefetch={true} href={createEventLink(event)} data-pressed={pressed} onPointerDown={() => setPressed(true)} onPointerUp={() => setPressed(false)} onPointerCancel={() => setPressed(false)} onPointerLeave={() => setPressed(false)} onBlur={() => setPressed(false)} style={{"--event-poster": event.image_url ? `url(${JSON.stringify(event.image_url)})` : "none"} as React.CSSProperties} className="event-card frosted-event-card group mb-8 grid overflow-hidden border md:grid-cols-[1.15fr_0.85fr]">
+    <Link data-motion="event" prefetch={true} href={createEventLink(event)} data-pressed={pressed} onPointerDown={() => setPressed(true)} onPointerUp={() => setPressed(false)} onPointerCancel={() => setPressed(false)} onPointerLeave={() => setPressed(false)} onBlur={() => setPressed(false)} style={{"--event-poster": event.image_url ? `url(${JSON.stringify(event.image_url)})` : "none"} as React.CSSProperties} className="event-card frosted-event-card group mb-8 grid overflow-hidden border md:grid-cols-[1.15fr_0.85fr]">
       <div className="relative min-h-[280px] overflow-hidden bg-zinc-950 md:min-h-[420px]">
         {event.image_url ? (
           <img src={event.image_url} alt={event.title} className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy" decoding="async" />
@@ -462,7 +462,7 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    const sections = document.querySelectorAll<HTMLElement>(".reveal-section");
+    const sections = document.querySelectorAll<HTMLElement>(".reveal-section, [data-motion], .wolnaa-page section h1, .wolnaa-page section h2");
     const observer = new IntersectionObserver(
       entries => {
         entries.forEach(entry => {
@@ -474,9 +474,12 @@ export default function Home() {
       { threshold: 0.12, rootMargin: "0px 0px -8% 0px" }
     );
 
-    sections.forEach(section => observer.observe(section));
+    sections.forEach(section => {
+      if (!section.classList.contains("reveal-section")) section.classList.add("wolnaa-motion-ready");
+      observer.observe(section);
+    });
     return () => observer.disconnect();
-  }, []);
+  }, [events]);
 
   async function loadEvents() {
     setEventsLoading(true);
@@ -757,7 +760,7 @@ export default function Home() {
             { src: "/moments/wolnaa-night-03.jpg", alt: t.momentsAlts[2] },
             { src: "/moments/wolnaa-night-04.jpg", alt: t.momentsAlts[3] },
           ].map(photo => (
-            <div key={photo.src} className="motion-card group relative aspect-[3/4] w-[82vw] max-w-[440px] shrink-0 snap-center overflow-hidden rounded-md bg-zinc-950 md:w-[38vw] lg:w-[30vw]">
+            <div key={photo.src} data-motion="photo" className="motion-card group relative aspect-[3/4] w-[82vw] max-w-[440px] shrink-0 snap-center overflow-hidden rounded-md bg-zinc-950 md:w-[38vw] lg:w-[30vw]">
               <Image
                 src={photo.src}
                 alt={photo.alt}
