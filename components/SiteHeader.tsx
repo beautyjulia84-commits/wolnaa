@@ -17,6 +17,17 @@ export default function SiteHeader({lang: controlledLang, onLanguageChange}: {la
     onLanguageChange?.(value);
     try { localStorage.setItem("wolnaa-language", value); } catch { /* Optional preference storage. */ }
   }
+  const [languageOpen, setLanguageOpen] = useState(false);
+  const languageRef = useRef<HTMLDivElement>(null);
+  const languageButtonRef = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    if (!languageOpen) return;
+    const outside = (event: PointerEvent) => {
+      if (!languageRef.current?.contains(event.target as Node)) setLanguageOpen(false);
+    };
+    document.addEventListener("pointerdown", outside);
+    return () => document.removeEventListener("pointerdown", outside);
+  }, [languageOpen]);
   const [menuOpen, setMenuOpen] = useState(false);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const headerRef = useRef<HTMLElement>(null);
@@ -45,12 +56,14 @@ export default function SiteHeader({lang: controlledLang, onLanguageChange}: {la
         </nav>
 
           <div className="wolnaa-header-controls">
-            <div className="wolnaa-language-select">
-              <select aria-label={lang === "de" ? "Sprache wählen" : "Выбрать язык"} value={lang} onChange={event => changeLanguage(event.target.value as Lang)}>
-                <option value="de" lang="de">Deutsch</option>
-                <option value="ru" lang="ru">Русский</option>
-              </select>
-              <svg aria-hidden="true" width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="m3 4.5 3 3 3-3" stroke="currentColor" strokeWidth="1.3" /></svg>
+            <div ref={languageRef} className="wolnaa-language-select" onBlur={event => { if (!event.currentTarget.contains(event.relatedTarget as Node)) setLanguageOpen(false); }} onKeyDown={event => { if (event.key === "Escape" && languageOpen) { event.stopPropagation(); setLanguageOpen(false); languageButtonRef.current?.focus(); } }}>
+              <button ref={languageButtonRef} type="button" className="wolnaa-language-trigger" aria-expanded={languageOpen} aria-controls="wolnaa-language-options" aria-label={lang === "de" ? "Sprache wählen: Deutsch" : "Выбрать язык: Русский"} onClick={() => { setLanguageOpen(!languageOpen); setMenuOpen(false); }}>
+                {lang === "de" ? "Deutsch" : "Русский"}
+                <svg aria-hidden="true" width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="m3 4.5 3 3 3-3" stroke="currentColor" strokeWidth="1.3" /></svg>
+              </button>
+              <div id="wolnaa-language-options" className="wolnaa-language-options" hidden={!languageOpen} role="group" aria-label={lang === "de" ? "Sprache" : "Язык"}>
+                {(["de", "ru"] as Lang[]).map(item => <button key={item} type="button" lang={item} aria-pressed={lang === item} onClick={() => { changeLanguage(item); setLanguageOpen(false); languageButtonRef.current?.focus(); }}>{item === "de" ? "Deutsch" : "Русский"}<span aria-hidden="true">{lang === item ? "✓" : ""}</span></button>)}
+              </div>
             </div>
             <button ref={menuButtonRef} type="button" className="wolnaa-menu-toggle" aria-expanded={menuOpen} aria-controls="wolnaa-header-menu" aria-label={lang === "de" ? (menuOpen ? "Menü schließen" : "Menü öffnen") : (menuOpen ? "Закрыть меню" : "Открыть меню")} onClick={() => setMenuOpen(!menuOpen)}>
               <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">

@@ -213,8 +213,12 @@ body {
 
 .wolnaa-site-header .wolnaa-header-menu .wolnaa-menu-cta { display:flex; width:100%; margin:16px 0 0; min-height:52px; padding:12px 8px; font-weight:700; }
 
-.wolnaa-language-select { position:relative; display:flex; align-items:center; color:#dedee1; }
-.wolnaa-language-select select { appearance:none; -webkit-appearance:none; min-height:44px; width:90px; padding:8px 18px 8px 6px; border:0; border-radius:4px; background:transparent; color:inherit; font-size:12px; font-weight:500; cursor:pointer; }
-.wolnaa-language-select option { background:#16171c; color:#fff; }
-.wolnaa-language-select svg { position:absolute; right:3px; pointer-events:none; }
-.wolnaa-language-select select:focus-visible { outline:2px solid var(--wolnaa-gold); outline-offset:2px; }
+/* Compact in-page language dropdown; no native mobile picker. */
+.wolnaa-language-select { position:relative; color:#dedee1; }
+.wolnaa-site-header .wolnaa-language-trigger { display:flex; align-items:center; gap:7px; min-height:44px; padding:8px 4px; border:0; background:transparent; color:inherit; font-size:12px; font-weight:500; cursor:pointer; }
+.wolnaa-site-header .wolnaa-language-options { position:absolute; right:0; top:calc(100% + 4px); width:136px; padding:5px; border:1px solid #ffffff20; border-radius:8px; background:#16171cf5; box-shadow:0 8px 24px #0005; }
+.wolnaa-language-options[hidden] { display:none; }
+.wolnaa-site-header .wolnaa-language-options button { display:flex; align-items:center; justify-content:space-between; width:100%; min-height:44px; padding:10px 12px; border:0; background:transparent; color:#eee; font-size:13px; text-align:left; cursor:pointer; }
+.wolnaa-site-header .wolnaa-language-options button[aria-pressed="true"] { color:var(--wolnaa-gold); background:#ffffff08; }
+.wolnaa-site-header .wolnaa-language-select button:hover { transform:none; background-color:#ffffff0a; }
+.wolnaa-language-select button:focus-visible { outline:2px solid var(--wolnaa-gold); outline-offset:2px; }
