@@ -106,7 +106,7 @@ body {
 .wolnaa-ticket-card { margin:16px 0; padding:18px; border:1px solid #d6b36a44; border-radius:14px; background:#141414; }
 
 /* Customer pages follow the compact StartEventz shop form composition. */
-.wolnaa-customer-page { padding:0 20px 110px; }
+.wolnaa-customer-page { padding:96px 20px 110px; }
 .wolnaa-customer-header { max-width:460px; margin:0 auto; min-height:104px; display:flex; align-items:center; justify-content:space-between; gap:24px; }
 .wolnaa-customer-header img { width:126px; height:64px; object-fit:contain; }
 .wolnaa-customer-header > a:last-child { font-size:13px; text-decoration:none; display:flex; align-items:center; gap:6px; }
@@ -208,3 +208,7 @@ body {
 .wolnaa-header-controls button:focus-visible, .wolnaa-header-menu a:focus-visible { outline:2px solid var(--wolnaa-gold); outline-offset:2px; }
 #events, #momente, #faq, #kontakt { scroll-margin-top:80px; }
 @media(min-width:768px) { .wolnaa-header-menu { position:absolute; right:24px; top:64px; width:360px; max-height:calc(100dvh - 88px); } }
+
+.wolnaa-header-menu .wolnaa-language { margin-top:18px; padding-top:12px; border-top:1px solid #ffffff18; justify-content:center; gap:8px; }
+.wolnaa-header-menu .wolnaa-language button { min-width:44px; }
+.wolnaa-site-header a { text-decoration:none; }
