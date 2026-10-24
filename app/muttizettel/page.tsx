@@ -1,55 +1,39 @@
-"use client";
-import Link from "next/link";
-import CustomerPageShell from "@/components/CustomerPageShell";
-import { useEffect, useState } from "react";
-import { allowsMuttizettel } from "@/lib/event-timing";
-import { useEventClock } from "@/lib/use-event-clock";
-
-type Event = { id: string; slug?: string; title: string; city: string; date: string; time: string; event_ends_at?: string; min_age?: number; description?: string; veranstalter?: { kontakt_email?: string } };
-export default function MuttizettelPage() {
-  const [events, setEvents] = useState<Event[]>([]);
-  const [selected, setSelected] = useState("");
-  const [state, setState] = useState<"loading" | "ready" | "error">("loading");
-  const [retry, setRetry] = useState(0);
-  const now = useEventClock();
-  useEffect(() => {
-    const controller = new AbortController();
-    setState("loading");
-    fetch("/api/events", { signal: controller.signal, cache: "no-store" }).then(async response => {
-      if (!response.ok) throw new Error();
-      const data = await response.json();
-      if (!Array.isArray(data.events)) throw new Error();
-      setEvents(data.events);
-      setSelected(new URLSearchParams(window.location.search).get("event") || "");
-      setState("ready");
-    }).catch(() => { if (!controller.signal.aborted) setState("error"); });
-    return () => controller.abort();
-  }, [retry]);
-  const eligible = events.filter(event => allowsMuttizettel(event, now));
-  const event = eligible.find(event => event.id === selected);
-  return <CustomerPageShell>
-    <p className="wolnaa-customer-kicker">Muttizettel</p>
-    <h1>Gemeinsam<br />zum Event.</h1>
-    <p className="wolnaa-customer-intro">Für 16- und 17-Jährige bei freigeschalteten Wolnaa-Veranstaltungen.</p>
-    <label htmlFor="mutti-event">Veranstaltung auswählen</label>
-    <div className="wolnaa-customer-select">
-      <select id="mutti-event" disabled={state !== "ready" || !eligible.length} aria-busy={state === "loading"} aria-describedby="mutti-status" value={event?.id || ""} onChange={e => setSelected(e.target.value)}>
-        <option value="">{state !== "ready" || eligible.length ? "Veranstaltung auswählen" : "Keine Events ab 16 verfügbar"}</option>
-        {eligible.map(item => <option key={item.id} value={item.id}>{item.title} · {new Date(item.date + "T12:00:00").toLocaleDateString("de-DE")}</option>)}
-      </select><span aria-hidden="true">⌄</span>
-    </div>
-    <div id="mutti-status" className="wolnaa-customer-status" role="status">
-      {state === "loading" ? "Verfügbarkeit wird geprüft …" : state === "error" ? "Events konnten nicht geladen werden." : !eligible.length ? "Aktuell ist keine Veranstaltung ab 16 freigeschaltet." : "Wähle das Event, das du besuchen möchtest."}
-    </div>
-    {state === "error" && <button className="wolnaa-account-button" onClick={() => setRetry(value => value + 1)}>Erneut versuchen</button>}
-      {event && <section style={{marginTop:24,padding:20,border:"1px solid #d6b36a55",borderRadius:16}}>
-        <h2>{event.title}</h2>
-        <p>{event.city} · {new Date(event.date + "T12:00:00").toLocaleDateString("de-DE")} {event.time && `· ${event.time} Uhr`} · Eintritt ab 16</p>
-        <p>Du bist 16 oder 17? Stimme die benötigte Erziehungsbeauftragung und die Begleitung vorab mit dem Veranstalter ab. Die Auswahl hier stellt noch keinen Muttizettel aus.</p>
-        <p><a href={`mailto:${event.veranstalter?.kontakt_email || "kontakt@wolnaa.de"}?subject=${encodeURIComponent("Muttizettel: " + event.title)}`}>Muttizettel beim Veranstalter anfragen</a></p>
-        <Link className="wolnaa-gold-button" href={`/event/${event.slug || event.id}`}>Zum Event</Link>
-      </section>}
-    <div className="wolnaa-customer-help"><span>Gut zu wissen</span><p>Ein Muttizettel ersetzt weder dein Ticket noch die Ausweis- und Begleitpersonenprüfung am Einlass. Es gelten die Regeln des Veranstalters.</p></div>
-    <div className="wolnaa-security-note"><svg width="20" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V6a4 4 0 0 1 8 0v4"/></svg><p>Die Verbindung zu Wolnaa ist über HTTPS verschlüsselt. Auf dieser Seite werden keine persönlichen Angaben oder Unterschriften erfasst.</p></div>
-  </CustomerPageShell>;
+'use client';
+import {useEffect,useRef,useState,type FormEvent} from 'react';
+import CustomerPageShell from '@/components/CustomerPageShell';
+import SignaturePad from '@/components/SignaturePad';
+import {allowsMuttizettel} from '@/lib/event-timing';
+import {useEventClock} from '@/lib/use-event-clock';
+import {emptyPerson,personError,signatureValid,validateConsent,delegationText,companionText,type ConsentInput,type ConsentEvent,type Person} from '@/lib/muttizettel';
+const steps=['Event','Deine Angaben','Sorgeberechtigte Person','Begleitperson','Unterschriften','Prüfen & herunterladen'];
+const fresh=():ConsentInput=>({eventId:'',minor:emptyPerson(),parent:emptyPerson(),companion:emptyPerson(),mode:'digital',parentSignature:[],companionSignature:[],parentAgrees:false,companionAgrees:false,reviewed:false});
+const date=(value:string)=>new Date(value+'T12:00:00').toLocaleDateString('de-DE');
+export default function MuttizettelPage(){
+ const [events,setEvents]=useState<ConsentEvent[]>([]),[state,setState]=useState('loading'),[retry,setRetry]=useState(0);
+ const [data,setData]=useState(fresh),[step,setStep]=useState(0),[error,setError]=useState(''),[busy,setBusy]=useState(false),[download,setDownload]=useState('');
+ const heading=useRef<HTMLHeadingElement>(null),now=useEventClock();
+ useEffect(()=>{const controller=new AbortController();setState('loading');fetch('/api/events',{signal:controller.signal,cache:'no-store'}).then(async response=>{if(!response.ok)throw new Error();const result=await response.json();if(!Array.isArray(result.events))throw new Error();setEvents(result.events);setData(value=>({...value,eventId:value.eventId||new URLSearchParams(window.location.search).get('event')||''}));setState('ready');}).catch(()=>{if(!controller.signal.aborted)setState('error');});return()=>controller.abort();},[retry]);
+ useEffect(()=>()=>{if(download)URL.revokeObjectURL(download);},[download]);
+ const eligible=events.filter(event=>allowsMuttizettel(event,now)),event=eligible.find(event=>event.id===data.eventId);
+ function go(next:number){setError('');setStep(next);requestAnimationFrame(()=>{heading.current?.focus();heading.current?.scrollIntoView({block:'start',behavior:'smooth'});});}
+ function update(patch:Partial<ConsentInput>){setData(value=>({...value,...patch,parentSignature:[],companionSignature:[],parentAgrees:false,companionAgrees:false,reviewed:false}));setDownload('');setError('');}
+ function fields(role:'minor'|'parent'|'companion'){const person=data[role];const field=(key:keyof Person,label:string,type='text')=><label className="mutti-field" key={key} htmlFor={`${role}-${key}`}>{label}<input id={`${role}-${key}`} type={type} required value={person[key]} maxLength={key==='address'?200:key==='name'?100:35} autoComplete="off" onChange={e=>update({[role]:{...person,[key]:e.target.value}})}/></label>;
+ return <>{field('name','Vor- und Nachname')}{role!=='parent'&&field('birthDate','Geburtsdatum','date')}{field('address','Straße, Hausnummer, PLZ und Ort')}{role!=='minor'&&field('phone','Erreichbare Telefonnummer','tel')}<p className="mutti-hint">{role==='minor'?'Du musst am Eventtag 16 oder 17 Jahre alt sein.':role==='parent'?'Angaben eines Elternteils mit Personensorge oder einer anderen personensorgeberechtigten Person.':'Die Begleitperson muss mindestens 18 Jahre alt sein und die Aufsicht während des Aufenthalts übernehmen.'}</p></>;}
+ async function submit(e:FormEvent){e.preventDefault();setError('');if(!event){setError('Bitte eine freigeschaltete Veranstaltung auswählen.');setStep(0);return;}
+ let issue='';if(step>=1&&step<=3)issue=personError(data[(['minor','parent','companion'] as const)[step-1]],(['minor','parent','companion'] as const)[step-1],event.date||'');
+ if(step===4&&data.mode==='digital'&&(!signatureValid(data.parentSignature)||!signatureValid(data.companionSignature)||!data.parentAgrees||!data.companionAgrees))issue='Bitte beide Erklärungen bestätigen und beide Personen selbst unterschreiben lassen.';
+ if(step===5)issue=validateConsent(data,event,now);
+ if(issue){setError(issue);return;}if(step<5){go(step+1);return;}
+ setBusy(true);try{const response=await fetch('/api/muttizettel',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data),cache:'no-store'});if(!response.ok){const result=await response.json();throw new Error(result.error||'Der Download konnte nicht erstellt werden.');}const blob=await response.blob();const url=URL.createObjectURL(blob);setDownload(url);const anchor=document.createElement('a');anchor.href=url;anchor.download='WOLNAA-Muttizettel.pdf';anchor.click();}catch(cause){setError(cause instanceof Error?cause.message:'Bitte erneut versuchen.');}finally{setBusy(false);}
+ }
+ return <CustomerPageShell><div className="mutti-flow"><p className="wolnaa-customer-kicker">Muttizettel</p><h1>Gemeinsam<br/>zum Event.</h1><p className="wolnaa-customer-intro">In sechs Schritten zu deiner Erziehungsbeauftragung für freigeschaltete WOLNAA-Events ab 16.</p>
+ <div className="mutti-progress" role="status">Schritt {step+1} von 6 · {steps[step]}<progress max="6" value={step+1} aria-label={`Schritt ${step+1} von 6`}/></div>
+ {download?<section className="mutti-done"><h2>Dein PDF ist bereit.</h2><p>{data.mode==='print'?'Bitte ausdrucken und von der sorgeberechtigten Person sowie der Begleitperson unterschreiben lassen.':'Bitte das Dokument speichern und gemeinsam mit deiner Begleitperson zum Event mitbringen.'}</p><a className="wolnaa-account-button" href={download} download="WOLNAA-Muttizettel.pdf">PDF erneut herunterladen</a><p>Ausweise und Ticket mitbringen. Es gelten die Einlassregeln des Veranstalters.</p><button type="button" className="mutti-back" onClick={()=>{setDownload('');go(5);}}>Angaben bearbeiten</button></section>:<form onSubmit={submit}>
+ <h2 ref={heading} tabIndex={-1} className="mutti-step-title">{steps[step]}</h2>
+ {step===0&&<><label className="mutti-field" htmlFor="mutti-event">Veranstaltung auswählen<select id="mutti-event" required disabled={state!=='ready'||!eligible.length} value={event?.id||''} onChange={e=>update({eventId:e.target.value})}><option value="">Veranstaltung auswählen</option>{eligible.map(item=><option key={item.id} value={item.id}>{item.title} · {date(item.date||'')}</option>)}</select></label>{state==='loading'&&<p role="status">Events werden geladen …</p>}{state==='error'&&<p role="alert">Events konnten nicht geladen werden. <button type="button" onClick={()=>setRetry(v=>v+1)}>Erneut versuchen</button></p>}{state==='ready'&&!eligible.length&&<p>Aktuell ist keine Veranstaltung ab 16 freigeschaltet.</p>}<p className="mutti-hint">Ein Muttizettel ersetzt weder dein Ticket noch die Ausweis- und Begleitpersonenprüfung am Einlass. Die Regeln des Veranstalters gelten weiterhin.</p></>}
+ {step===1&&fields('minor')}{step===2&&fields('parent')}{step===3&&fields('companion')}
+ {step===4&&<><fieldset className="mutti-mode"><legend>Wie möchtet ihr unterschreiben?</legend>{(['digital','print'] as const).map(mode=><label key={mode}><input type="radio" name="signature-mode" checked={data.mode===mode} onChange={()=>update({mode})}/>{mode==='digital'?'Jetzt mit Finger oder Maus':'Nach dem Ausdrucken'}</label>)}</fieldset>{data.mode==='digital'?<><p className="mutti-hint">Jede Person muss ihre eigene Erklärung bestätigen und selbst unterschreiben.</p><h3>Sorgeberechtigte Person</h3><p>{delegationText}</p><label className="mutti-check"><input type="checkbox" checked={data.parentAgrees} onChange={e=>setData(v=>({...v,parentAgrees:e.target.checked,reviewed:false}))}/>Ich, {data.parent.name}, bestätige diese Erklärung.</label><SignaturePad label="Unterschrift der sorgeberechtigten Person" value={data.parentSignature} onChange={value=>setData(v=>({...v,parentSignature:value,reviewed:false}))}/><h3>Begleitperson</h3><p>{companionText}</p><label className="mutti-check"><input type="checkbox" checked={data.companionAgrees} onChange={e=>setData(v=>({...v,companionAgrees:e.target.checked,reviewed:false}))}/>Ich, {data.companion.name}, übernehme die Aufsicht.</label><SignaturePad label="Unterschrift der Begleitperson" value={data.companionSignature} onChange={value=>setData(v=>({...v,companionSignature:value,reviewed:false}))}/></>:<p>Das PDF enthält zwei freie Unterschriftsfelder. Bitte anschließend ausdrucken und von beiden Personen unterschreiben lassen. Ohne diese Unterschriften ist das Dokument noch nicht vollständig.</p>}</>}
+ {step===5&&<><div className="mutti-review"><h3>{event?.title}</h3><p>{event?.date&&date(event.date)} · {event?.city}</p><button type="button" onClick={()=>go(0)}>Event ändern</button>{(['minor','parent','companion'] as const).map((role,index)=><section key={role}><h3>{steps[index+1]}</h3><p>{data[role].name}<br/>{role!=='parent'&&<>{date(data[role].birthDate)}<br/></>}{data[role].address}{role!=='minor'&&<><br/>{data[role].phone}</>}</p><button type="button" onClick={()=>go(index+1)}>Angaben ändern</button></section>)}<p>{data.mode==='digital'?'Beide Unterschriften gezeichnet.':'Beide Unterschriften nach dem Ausdrucken ergänzen.'}</p><button type="button" onClick={()=>go(4)}>Unterschriften ändern</button></div><label className="mutti-check"><input type="checkbox" required checked={data.reviewed} onChange={e=>setData(v=>({...v,reviewed:e.target.checked}))}/>Ich habe alle Angaben geprüft. Mir ist bekannt, dass das Dokument kein Ticket und keine Einlassgarantie ersetzt.</label></>}
+ {error&&<p className="mutti-error" role="alert">{error}</p>}<div className="mutti-actions">{step>0&&<button className="mutti-back" type="button" disabled={busy} onClick={()=>go(step-1)}>Zurück</button>}<button className="wolnaa-account-button" disabled={busy||(step===0&&(!event||state!=='ready'))} type="submit">{busy?'PDF wird erstellt …':step===5?'Muttizettel als PDF herunterladen':'Weiter →'}</button></div></form>}
+ <div className="wolnaa-security-note"><svg width="20" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V6a4 4 0 0 1 8 0v4"/></svg><p>Deine Eingaben bleiben bis zum PDF-Download nur in diesem geöffneten Formular. Zur Erstellung werden sie über HTTPS übertragen und nicht dauerhaft gespeichert. Beim Neuladen gehen deine Eingaben verloren.</p></div></div></CustomerPageShell>;
 }
