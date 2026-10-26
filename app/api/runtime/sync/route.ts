@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { normalizeAttribution } from '@/lib/ad-attribution';
 import { recordAnalytics } from '@/lib/analytics';
 export async function POST(req: NextRequest) {
   try {
@@ -10,6 +11,16 @@ export async function POST(req: NextRequest) {
     const response = new NextResponse(null,{status:204});
     if (body.attributionConsent === true && !req.cookies.has('wolnaa-source')) response.cookies.set('wolnaa-source',source,{httpOnly:true,secure:process.env.NODE_ENV==='production',sameSite:'lax',path:'/'});
     if (body.attributionConsent === false) response.cookies.set('wolnaa-source','',{httpOnly:true,sameSite:'lax',path:'/',maxAge:0});
+    const options = {httpOnly:true,secure:process.env.NODE_ENV==='production',sameSite:'lax' as const,path:'/'};
+    if (body.attributionConsent === true) {
+      const attribution = normalizeAttribution(body.campaign);
+      // Last explicitly tagged campaign; ordinary navigation never overwrites it.
+      const capturedAt = Number(body.campaign?.capturedAt);
+      const remaining = Math.floor((capturedAt + 30*24*60*60*1000 - Date.now())/1000);
+      if (attribution.source && Number.isFinite(capturedAt) && capturedAt <= Date.now() && remaining > 0) response.cookies.set('wolnaa-campaign',JSON.stringify(attribution),{...options,maxAge:Math.min(remaining,30*24*60*60)});
+    } else if (body.attributionConsent === false) {
+      response.cookies.set('wolnaa-campaign','',{...options,maxAge:0});
+    }
     return response;
   } catch (error) {
     console.error('Analytics storage failed',error);

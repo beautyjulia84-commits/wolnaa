@@ -1,3 +1,4 @@
+import { attributionMetadata } from '@/lib/ad-attribution';
 import {withEventSchedules} from '@/lib/event-schedules';
 import {eventTiming} from '@/lib/event-timing';
 import { NextResponse } from "next/server";
@@ -159,6 +160,7 @@ export async function POST(req: Request) {
       customer_email: customerEmail,
       metadata: {
         acquisitionSource: acquisitionSource(req),
+        ...attributionMetadata(req),
         eventId: eventId || "",
         eventTitle: eventTitle || event.title || "",
         customerName: customerName || "",

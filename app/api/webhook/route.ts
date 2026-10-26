@@ -15,8 +15,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Webhook-Signatur ungültig." }, { status: 400 });
   }
 
-  if (event.type === "checkout.session.completed") {
+  if (event.type === "checkout.session.completed" || event.type === "checkout.session.async_payment_succeeded") {
     const session = event.data.object as Stripe.Checkout.Session;
+    if (session.payment_status !== "paid") return NextResponse.json({ received: true });
     try {
       await fulfillCheckoutSession(session);
     } catch (error) {

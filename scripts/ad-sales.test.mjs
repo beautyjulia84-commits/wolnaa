@@ -1,0 +1,24 @@
+import assert from 'node:assert/strict';
+import {adSale,summarizeAdSales} from '../lib/ad-sales.ts';
+import {attributionMetadata,normalizeAttribution} from '../lib/ad-attribution.ts';
+
+const base={id:'cs_live_test',livemode:true,status:'complete',mode:'payment',payment_status:'paid',created:123,amount_total:3600,currency:'eur',metadata:{ticketId:'T1',eventId:'munich',eventTitle:'München',lineItems:'[{"qty":3}]',acquisitionSource:'meta',acquisitionMedium:'paid_social',acquisitionCampaign:'muenchen_2026_11_06',acquisitionContent:'reel_22okt'},payment_intent:{latest_charge:{refunded:false,amount_refunded:0}}};
+const row=adSale(base);
+assert.equal(row.tickets,3);
+assert.equal(row.paidAd,true);
+let group=summarizeAdSales([row,row])[0];
+assert.equal(group.orders,1);assert.equal(group.tickets,3);assert.equal(group.revenue,3600);
+for(const override of [{livemode:false},{payment_status:'unpaid'},{status:'open'},{mode:'subscription'},{metadata:{}}]) assert.equal(adSale({...base,...override}),null);
+const full=adSale({...base,id:'full',payment_intent:{latest_charge:{refunded:true,amount_refunded:3600}}});
+const partial=adSale({...base,id:'partial',payment_intent:{latest_charge:{refunded:false,amount_refunded:1200}}});
+group=summarizeAdSales([row,full,partial])[0];
+assert.equal(group.tickets,3);assert.equal(group.orders,3);assert.equal(group.refunded,3);assert.equal(group.uncertain,1);assert.equal(group.revenue,6000);
+const old=adSale({...base,id:'old',metadata:{ticketId:'T',eventId:'munich'}});
+assert.equal(old.paidAd,false);assert.equal(old.tickets,null);assert.equal(old.source,'Nicht zugeordnet');
+assert.equal(summarizeAdSales([old])[0].uncertain,1);
+assert.deepEqual(attributionMetadata(new Request('https://www.wolnaa.de')),{});
+assert.deepEqual(attributionMetadata(new Request('https://www.wolnaa.de',{headers:{cookie:'wolnaa-campaign=broken'}})),{});
+const cookie=encodeURIComponent(JSON.stringify({source:'meta',medium:'paid_social',campaign:'muenchen',content:'reel'}));
+assert.equal(attributionMetadata(new Request('https://www.wolnaa.de',{headers:{cookie:`wolnaa-campaign=${cookie}`}})).acquisitionCampaign,'muenchen');
+assert.equal(normalizeAttribution({utm_source:'x'.repeat(200)}).source.length,100);
+console.log('Ad sales: paid live purchases, ticket quantities, duplicate prevention, refunds, unknown history and attribution passed.');

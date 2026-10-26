@@ -1,4 +1,5 @@
 "use client";
+import AdSalesReport from "@/components/admin/AdSalesReport";
 import {berlinLocal,berlinInstant,defaultEndLocal,eventTiming} from '@/lib/event-timing';
 import {splitAdminEvents} from '@/lib/admin-event-scope';
 import {useEventClock} from '@/lib/use-event-clock';
@@ -657,6 +658,7 @@ export default function AdminPage() {
               </div>
             </div>
 
+            <AdSalesReport token={adminPw} />
             <div className="grid gap-5 md:grid-cols-2">
               {[
                 { title: "Beliebte Seiten", entries: topEntries(analytics.paths), empty: "Noch keine Seitenaufrufe" },
