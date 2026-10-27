@@ -303,3 +303,9 @@ body {
 .mutti-flow .mutti-error { border-left:3px solid #f0a49e; padding:10px 14px; color:#ffc3bb; font-size:14px; }
 .mutti-flow .wolnaa-security-note { margin-top:30px; border-top:1px solid #35363c; padding-top:20px; }
 @media (prefers-reduced-motion:reduce) { .mutti-progress progress::-webkit-progress-value { transition:none; } }
+
+/* Desktop poster cards retain the whole artwork, including faces, on hover. */
+@media (min-width: 768px) {
+  .wolnaa-page a.event-card.event-card .event-card-poster img,
+  .wolnaa-page a.event-card.event-card:hover .event-card-poster img { transform: none; }
+}

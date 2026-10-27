@@ -207,9 +207,9 @@ function EventCard({ event, lang }: { event: EventItem; lang: Lang }) {
   }
   return (
     <Link data-motion="event" prefetch={true} href={createEventLink(event)} onTouchStart={handleTouch} data-tapped={tapped} className="event-card motion-card group block overflow-hidden rounded-md border bg-zinc-950/70">
-      <div className="relative h-56 flex items-center justify-center bg-[radial-gradient(circle_at_top,#2b1b00_0%,#111_38%,#000_100%)] overflow-hidden">
+      <div className="event-card-poster relative min-h-56 flex items-center justify-center bg-zinc-950">
         {event.image_url ? (
-          <img src={event.image_url} alt={event.title} className="w-full h-56 object-cover transition-transform duration-700 group-hover:scale-[1.02]" loading="lazy" decoding="async" />
+          <img src={event.image_url} alt={event.title} className="block w-full h-auto object-contain" loading="lazy" decoding="async" />
         ) : (
           <Image src="/wolnaa-logo.png" alt="WOLNAA" width={230} height={90} className="h-auto w-[190px] object-contain opacity-90" />
         )}
