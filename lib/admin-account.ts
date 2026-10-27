@@ -1,4 +1,4 @@
-import { createClient } from "@supabase/supabase-js";
+import { createClient, type User } from "@supabase/supabase-js";
 
 export const defaultAdminEmail = () => (process.env.ADMIN_EMAIL || "kontakt@wolnaa.de").trim().toLowerCase();
 
@@ -14,8 +14,9 @@ export async function findAdminUser() {
   const { data, error } = await client.auth.admin.listUsers({ page: 1, perPage: 1000 });
   if (error) throw error;
 
-  return data.users.find(user => user.app_metadata?.role === "admin")
-    || data.users.find(user => user.email?.toLowerCase() === defaultAdminEmail())
+  const users: User[] = data.users;
+  return users.find(user => user.app_metadata?.role === "admin")
+    || users.find(user => user.email?.toLowerCase() === defaultAdminEmail())
     || null;
 }
 

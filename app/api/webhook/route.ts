@@ -1,3 +1,4 @@
+import { sendMetaPurchase } from '@/lib/send-meta-purchase';
 import Stripe from "stripe";
 import { NextRequest, NextResponse } from "next/server";
 import { fulfillCheckoutSession } from "@/lib/fulfill-checkout";
@@ -20,9 +21,10 @@ export async function POST(req: NextRequest) {
     if (session.payment_status !== "paid") return NextResponse.json({ received: true });
     try {
       await fulfillCheckoutSession(session);
+      await sendMetaPurchase(session, event.created);
     } catch (error) {
-      console.error("Ticket fulfillment error:", error);
-      return NextResponse.json({ error: "Ticket konnte nicht erstellt werden." }, { status: 500 });
+      console.error("Payment processing error:", error);
+      return NextResponse.json({ error: "Zahlungsnachverarbeitung wird erneut versucht." }, { status: 500 });
     }
   }
 

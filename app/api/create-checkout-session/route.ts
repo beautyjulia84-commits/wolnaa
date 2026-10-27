@@ -1,3 +1,4 @@
+import { metaCheckoutMetadata } from '@/lib/meta-purchase';
 import { attributionMetadata } from '@/lib/ad-attribution';
 import {withEventSchedules} from '@/lib/event-schedules';
 import {eventTiming} from '@/lib/event-timing';
@@ -161,6 +162,8 @@ export async function POST(req: Request) {
       metadata: {
         acquisitionSource: acquisitionSource(req),
         ...attributionMetadata(req),
+        ...metaCheckoutMetadata(req),
+        metaTicketCount: String(requestedTicketQty),
         eventId: eventId || "",
         eventTitle: eventTitle || event.title || "",
         customerName: customerName || "",

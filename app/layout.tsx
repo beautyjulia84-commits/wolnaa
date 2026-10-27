@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 import ConsentGate from '@/components/ConsentGate';
+import MetaPixel from "@/components/MetaPixel";
 import AnalyticsTracker from "@/components/AnalyticsTracker";
 import { Bebas_Neue, DM_Sans } from "next/font/google";
 import "./globals.css";
@@ -116,6 +117,7 @@ export default function RootLayout({
       </head>
       <body className="min-h-full flex flex-col text-white">
         <AnalyticsTracker />
+        <MetaPixel />
         {children}
         <MobileNavigation />
       </body>
