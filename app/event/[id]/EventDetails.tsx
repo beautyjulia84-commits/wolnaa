@@ -209,12 +209,12 @@ export default function EventDetails({ event, initialNow }: { event: EventItem; 
 
       {!salesClosed && step === "tickets" && (
         <div role="dialog" aria-modal="true" aria-label="Ticketbestellung" className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-end justify-center" onClick={() => setStep("info")}>
-          <div className="w-full max-w-2xl bg-black border-t border-white/10 rounded-t-xl max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
-            <div className="sticky top-0 bg-black border-b border-white/10 px-6 pt-6 pb-4 flex items-center justify-between">
+          <div className="w-full max-w-2xl bg-black border-t border-white/10 rounded-t-xl max-h-[90dvh] flex flex-col overflow-hidden" onClick={e => e.stopPropagation()}>
+            <div className="shrink-0 bg-black border-b border-white/10 px-6 pt-6 pb-4 flex items-center justify-between">
               <div><h2 className="text-lg font-bold">Tickets auswählen</h2><p className="text-zinc-500 text-sm mt-0.5">{event.title}</p></div>
               <button onClick={() => setStep("info")} className="w-9 h-9 rounded-md border border-zinc-700 flex items-center justify-center text-zinc-400 hover:text-white">✕</button>
             </div>
-            <div className="px-6 py-5 space-y-3">
+            <div className="min-h-0 overflow-y-auto px-6 py-5 space-y-3">
               {activeTicket && (
                 <div className="flex items-center justify-between bg-black/35 border border-white/10 rounded-md px-5 py-4">
                   <div><p className="font-bold text-base">{activeTicket.name || "Ticket"}</p><p className="text-[#d6b36a] font-bold mt-0.5">{formatMoney(toMoney(activeTicket.price))}</p><p className="mt-1 text-[11px] text-zinc-500">inkl. 19% MwSt.{availability?.remaining !== null && availability?.remaining !== undefined ? ` · Noch ${availability.remaining} verfügbar` : ""}</p></div>
@@ -257,23 +257,25 @@ export default function EventDetails({ event, initialNow }: { event: EventItem; 
                     Wolnaa stellt die Plattform und Tickettechnik bereit. Die Zahlung wird sicher über Stripe verarbeitet.
                   </p>
                 </div>
-                <label className="flex items-start gap-3 cursor-pointer" onClick={() => setIsAdult(!isAdult)}>
-                  <div className={`mt-0.5 w-5 h-5 rounded-md border-2 shrink-0 flex items-center justify-center transition-all ${isAdult ? "bg-[#d6b36a] border-[#d6b36a]" : "border-zinc-600"}`}>{isAdult && <span className="text-black text-[10px] font-bold">✓</span>}</div>
-                  <span className="text-zinc-400 text-sm leading-relaxed">Ich bin mindestens <span className="text-white font-semibold">{event.min_age === 16 ? 16 : 18} Jahre alt</span>.</span>
-                </label>
-                <label className="flex items-start gap-3 cursor-pointer" onClick={() => setAcceptedLegal(!acceptedLegal)}>
-                  <div className={`mt-0.5 w-5 h-5 rounded-md border-2 shrink-0 flex items-center justify-center transition-all ${acceptedLegal ? "bg-[#d6b36a] border-[#d6b36a]" : "border-zinc-600"}`}>{acceptedLegal && <span className="text-black text-[10px] font-bold">✓</span>}</div>
-                  <span className="text-zinc-400 text-sm leading-relaxed">Ich akzeptiere die <Link href="/agb" target="_blank" className="text-[#d6b36a] underline underline-offset-2">AGB</Link>, die <Link href="/datenschutz" target="_blank" className="text-[#d6b36a] underline underline-offset-2">Datenschutzerklärung</Link> und die Hinweise zum jeweiligen Veranstalter.</span>
-                </label>
               </div>
             </div>
-            <div className="sticky bottom-0 bg-black border-t border-white/10 px-6 py-5">
+            <div className="shrink-0 bg-black border-t border-white/10 px-6 pt-3 pb-[max(1rem,env(safe-area-inset-bottom))]">
               {hasSelection && (
-                <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center justify-between mb-2">
                   <div><p className="text-zinc-500 text-xs">Gesamt</p>{(wheelPercent > 0 || appliedDiscount) && <p className="text-green-400 text-xs">− {wheelPercent ? combinedWheelPercent(wheelPercent, influencerPercent(event.id, appliedDiscount?.code)) : toDiscountPercent(appliedDiscount?.percent)}% Rabatt{wheelPercent ? ' auf Tickets' : ''}</p>}<p className="text-2xl font-bold text-[#d6b36a]">{formatMoney(total)}</p><p className="mt-1 text-[11px] text-zinc-500">inkl. 19% MwSt.</p></div>
                   <p className="text-zinc-600 text-xs">{totalTickets} Ticket{totalTickets !== 1 ? "s" : ""}</p>
                 </div>
               )}
+              <div className="mb-3 space-y-1" aria-label="Bestätigungen für den Ticketkauf">
+                <label className="flex min-h-11 cursor-pointer items-start gap-3 py-2 text-sm leading-5 text-zinc-200">
+                  <input type="checkbox" checked={isAdult} onChange={e => setIsAdult(e.target.checked)} className="mt-0.5 h-5 w-5 shrink-0 accent-[#d6b36a] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#d6b36a]" />
+                  <span>Ich bin mindestens <strong>{event.min_age === 16 ? 16 : 18} Jahre alt</strong>.</span>
+                </label>
+                <label className="flex min-h-11 cursor-pointer items-start gap-3 py-2 text-sm leading-5 text-zinc-200">
+                  <input type="checkbox" checked={acceptedLegal} onChange={e => setAcceptedLegal(e.target.checked)} className="mt-0.5 h-5 w-5 shrink-0 accent-[#d6b36a] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#d6b36a]" />
+                  <span>Ich akzeptiere die <Link href="/agb" target="_blank" className="text-[#d6b36a] underline underline-offset-2">AGB</Link>, die <Link href="/datenschutz" target="_blank" className="text-[#d6b36a] underline underline-offset-2">Datenschutzerklärung</Link> und die Hinweise zum jeweiligen Veranstalter.</span>
+                </label>
+              </div>
               <button onClick={() => {
                   if (typeof window !== "undefined" && (window as any).ttq) {
                     (window as any).ttq.track("InitiateCheckout", {
