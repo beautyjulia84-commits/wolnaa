@@ -29,8 +29,10 @@ export function defaultEndLocal(date: string): string {
   return Number.isFinite(next.getTime()) ? next.toISOString().slice(0,10) + 'T05:00' : '';
 }
 export function eventTiming(event: TimedEvent, now = Date.now()) {
+  const startTime = eventStartTime(event);
+  if (!event.time && startTime) event.time = startTime;
   let starts = NaN, ends = NaN;
-  try { starts = Date.parse(berlinInstant(`${event.date}T${eventStartTime(event) || '00:00'}`)); } catch { /* invalid configuration fails closed */ }
+  try { starts = Date.parse(berlinInstant(`${event.date}T${startTime || '00:00'}`)); } catch { /* invalid configuration fails closed */ }
   try { ends = Date.parse(event.event_ends_at || berlinInstant(defaultEndLocal(event.date || ''))); } catch { /* invalid configuration fails closed */ }
   const sale = event.online_sale_ends_at ? Date.parse(event.online_sale_ends_at) : starts;
   const salesEnd = Math.min(sale, ends);
