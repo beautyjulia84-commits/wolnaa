@@ -1,6 +1,15 @@
 /** All event form times use Europe/Berlin, independent of browser/server timezone. */
-export type TimedEvent = { date?: string; time?: string; online_sale_ends_at?: string | null; event_ends_at?: string | null };
+export type TimedEvent = { id?: string; date?: string; time?: string; online_sale_ends_at?: string | null; event_ends_at?: string | null };
 const zone = 'Europe/Berlin';
+
+const startTimeFallbacks: Record<string, string> = {
+  '7e259c76-f862-4dde-8563-54e3ed7402a2': '22:00',
+};
+
+export function eventStartTime(event: TimedEvent): string {
+  const saved = String(event.time || '').trim();
+  return /^([01]\d|2[0-3]):[0-5]\d$/.test(saved) ? saved : (event.id ? startTimeFallbacks[event.id] || '' : '');
+}
 export function berlinLocal(value: string | number | Date): string {
   const date = new Date(value);
   if (!Number.isFinite(date.getTime())) return '';
@@ -12,7 +21,6 @@ export function berlinInstant(value: string): string {
   const wall = Date.parse(value + ':00Z');
   const candidates = [1,2].map(hours => wall - hours * 3600000).filter(t => berlinLocal(t) === value);
   if (!candidates.length) throw new Error('Diese Uhrzeit existiert nicht (bitte Datum/Sommerzeit prüfen).');
-  // For the repeated autumn hour choose the earlier instant, closing sales conservatively.
   return new Date(Math.min(...candidates)).toISOString();
 }
 export function defaultEndLocal(date: string): string {
@@ -22,7 +30,7 @@ export function defaultEndLocal(date: string): string {
 }
 export function eventTiming(event: TimedEvent, now = Date.now()) {
   let starts = NaN, ends = NaN;
-  try { starts = Date.parse(berlinInstant(`${event.date}T${event.time || '00:00'}`)); } catch { /* invalid configuration fails closed */ }
+  try { starts = Date.parse(berlinInstant(`${event.date}T${eventStartTime(event) || '00:00'}`)); } catch { /* invalid configuration fails closed */ }
   try { ends = Date.parse(event.event_ends_at || berlinInstant(defaultEndLocal(event.date || ''))); } catch { /* invalid configuration fails closed */ }
   const sale = event.online_sale_ends_at ? Date.parse(event.online_sale_ends_at) : starts;
   const salesEnd = Math.min(sale, ends);
