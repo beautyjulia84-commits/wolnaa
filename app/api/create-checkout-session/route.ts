@@ -9,218 +9,65 @@ import { acquisitionSource } from '@/lib/analytics';
 import { createClient } from "@supabase/supabase-js";
 import { getTicketPhase, normalizeTicketName } from "@/lib/ticket-phases";
 import { readReward, signReward, WHEEL_COOKIE, WHEEL_EVENT_ID, wheelCookieOptions } from '@/lib/discount-wheel';
+import { entryItemName, getTableReservation, tableReservationItemName, TABLE_ENTRY_PRICE } from '@/lib/table-reservations';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
-
-function normalizeName(value: string) {
-  return (value || "").trim().toLowerCase();
-}
-
-function toMoney(value: unknown) {
-  const normalized = String(value ?? "0").replace(",", ".").replace(/[^\d.-]/g, "");
-  const amount = Number.parseFloat(normalized);
-  return Number.isFinite(amount) ? amount : 0;
-}
-
-function toDiscountPercent(value: unknown) {
-  const normalized = String(value ?? "").replace(",", ".").replace(/[^\d.-]/g, "");
-  const percent = Number.parseFloat(normalized);
-  if (!Number.isFinite(percent)) return 0;
-  return Math.min(Math.max(percent, 0), 100);
-}
+function normalizeName(value: string) { return (value || "").trim().toLowerCase(); }
+function toMoney(value: unknown) { const normalized = String(value ?? "0").replace(",", ".").replace(/[^\d.-]/g, ""); const amount = Number.parseFloat(normalized); return Number.isFinite(amount) ? amount : 0; }
+function toDiscountPercent(value: unknown) { const normalized = String(value ?? "").replace(",", ".").replace(/[^\d.-]/g, ""); const percent = Number.parseFloat(normalized); if (!Number.isFinite(percent)) return 0; return Math.min(Math.max(percent, 0), 100); }
 
 export async function POST(req: Request) {
   const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!);
-
   try {
     const body = await req.json();
-    const { eventTitle, customerName, customerEmail, lineItems = [], ticketId, discountCode, eventId, wheelDiscount } = body;
-
-    if (!eventId) {
-      return NextResponse.json({ error: "Event-ID fehlt. Bitte Seite neu laden." }, { status: 400 });
-    }
-
-    const { data: event, error: eventError } = await supabase
-      .from("events")
-      .select("id,title,date,time,tickets,lounge_list,discount_codes,online_sale_ends_at,stripe_account_id,veranstalter_id,veranstalter:veranstalter_id(platform_fee_percent)")
-      .eq("id", eventId)
-      .single();
-
-    if (eventError || !event) {
-      return NextResponse.json({ error: "Event nicht gefunden." }, { status: 404 });
-    }
-
+    const { eventTitle, customerName, customerEmail, lineItems = [], ticketId, discountCode, eventId, wheelDiscount, tableReservation } = body;
+    if (!eventId) return NextResponse.json({ error: "Event-ID fehlt. Bitte Seite neu laden." }, { status: 400 });
+    const { data: event, error: eventError } = await supabase.from("events").select("id,title,date,time,tickets,lounge_list,discount_codes,online_sale_ends_at,stripe_account_id,veranstalter_id,veranstalter:veranstalter_id(platform_fee_percent)").eq("id", eventId).single();
+    if (eventError || !event) return NextResponse.json({ error: "Event nicht gefunden." }, { status: 404 });
     const [scheduledEvent] = await withEventSchedules(supabase,[event]);
     const timing = eventTiming(scheduledEvent);
-    if (timing.salesClosed) {
-      return NextResponse.json({ error: "Der Online-Verkauf für dieses Event ist beendet." }, { status: 400 });
-    }
-
-    const requestedTickets = (lineItems || [])
-      .map((item: any) => ({
-        name: String(item.name || ""),
-        qty: Number(item.qty || 0),
-      }))
-      .filter((item: any) => item.qty > 0);
-
+    if (timing.salesClosed) return NextResponse.json({ error: "Der Online-Verkauf für dieses Event ist beendet." }, { status: 400 });
+    const requestedTickets = (lineItems || []).map((item: any) => ({ name: String(item.name || ""), qty: Number(item.qty || 0) })).filter((item: any) => item.qty > 0);
     const configuredTickets = Array.isArray(event.tickets) ? event.tickets : [];
     const configuredLounges = Array.isArray(event.lounge_list) ? event.lounge_list : [];
     const configuredDiscounts = Array.isArray(event.discount_codes) ? event.discount_codes : [];
-
-    const { data: soldRows, error: soldError } = await supabase
-      .from("tickets")
-      .select("ticket_name,status")
-      .eq("event_id", eventId);
-
-    if (soldError) {
-      return NextResponse.json({ error: "Ticketbestand konnte nicht geprüft werden." }, { status: 500 });
-    }
-
+    const { data: soldRows, error: soldError } = await supabase.from("tickets").select("ticket_name,status").eq("event_id", eventId);
+    if (soldError) return NextResponse.json({ error: "Ticketbestand konnte nicht geprüft werden." }, { status: 500 });
     const phase = getTicketPhase(configuredTickets, soldRows || []);
-    const configuredTicketRequests = requestedTickets.filter((item: any) =>
-      configuredTickets.some((ticket: any) => normalizeTicketName(ticket.name) === normalizeTicketName(item.name))
-    );
+    const configuredTicketRequests = requestedTickets.filter((item: any) => configuredTickets.some((ticket: any) => normalizeTicketName(ticket.name) === normalizeTicketName(item.name)));
     const requestedTicketQty = configuredTicketRequests.reduce((sum: number, item: any) => sum + item.qty, 0);
-    if (requestedTicketQty > 0 && !phase.activeTicket) {
-      return NextResponse.json({ error: "Dieses Event ist ausverkauft." }, { status: 400 });
-    }
-    for (const item of configuredTicketRequests) {
-      if (normalizeTicketName(item.name) !== normalizeTicketName(phase.activeTicket?.name)) {
-        return NextResponse.json({ error: "Die Ticketphase hat sich geändert. Bitte lade die Seite neu." }, { status: 409 });
-      }
-    }
-    if (phase.remaining !== null && requestedTicketQty > phase.remaining) {
-      return NextResponse.json({ error: "In dieser Ticketphase sind nicht mehr genügend Tickets verfügbar." }, { status: 409 });
-    }
-
-    let subtotal = 0;
-    let ticketSubtotal = 0;
-    const checkoutLineItems = (lineItems || [])
-      .map((item: any) => {
-        const name = String(item.name || "");
-        const qty = Math.max(0, Number(item.qty || 0));
-        const ticket = configuredTickets.find((entry: any) => normalizeName(entry.name) === normalizeName(name));
-        const lounge = configuredLounges.find((entry: any) => normalizeName(entry.name) === normalizeName(name));
-        const configured = ticket || lounge;
-        const price = toMoney(configured?.price ?? item.price);
-
-        if (!configured || qty <= 0) return null;
-        subtotal += price * qty;
-        if (ticket) ticketSubtotal += price * qty;
-        return { name, price: String(price.toFixed(2)), qty };
-      })
-      .filter(Boolean);
-
-    if (checkoutLineItems.length === 0 || subtotal <= 0) {
-      return NextResponse.json({ error: "Bitte wähle mindestens ein gültiges Ticket aus." }, { status: 400 });
-    }
-
-    let discountPercent = 0;
-    let appliedDiscountCode = "";
+    const reservedTable = getTableReservation(eventId, tableReservation?.tableId);
+    const reservedGuests = Number(tableReservation?.guests || 0);
+    if (tableReservation && (!reservedTable || !Number.isInteger(reservedGuests) || reservedGuests < reservedTable.minGuests || reservedGuests > reservedTable.maxGuests)) return NextResponse.json({ error: "Diese Tischreservierung ist nicht gültig. Bitte wähle den Bereich erneut aus." }, { status: 400 });
+    if (reservedTable && requestedTicketQty > 0) return NextResponse.json({ error: "Bitte buche entweder reguläre Tickets oder eine Tischgruppe – nicht beides zusammen." }, { status: 400 });
+    if (requestedTicketQty > 0 && !phase.activeTicket) return NextResponse.json({ error: "Dieses Event ist ausverkauft." }, { status: 400 });
+    for (const item of configuredTicketRequests) if (normalizeTicketName(item.name) !== normalizeTicketName(phase.activeTicket?.name)) return NextResponse.json({ error: "Die Ticketphase hat sich geändert. Bitte lade die Seite neu." }, { status: 409 });
+    if (phase.remaining !== null && requestedTicketQty > phase.remaining) return NextResponse.json({ error: "In dieser Ticketphase sind nicht mehr genügend Tickets verfügbar." }, { status: 409 });
+    if (reservedTable && (soldRows || []).some((row: any) => normalizeName(row.ticket_name) === normalizeName(tableReservationItemName(reservedTable)))) return NextResponse.json({ error: "Dieser Bereich wurde gerade reserviert. Bitte wähle einen anderen Tisch." }, { status: 409 });
+    let subtotal = 0; let ticketSubtotal = 0;
+    const checkoutLineItems = (lineItems || []).map((item: any) => { const name = String(item.name || ""); const qty = Math.max(0, Number(item.qty || 0)); const ticket = configuredTickets.find((entry: any) => normalizeName(entry.name) === normalizeName(name)); const lounge = configuredLounges.find((entry: any) => normalizeName(entry.name) === normalizeName(name)); const configured = ticket || lounge; const price = toMoney(configured?.price ?? item.price); if (!configured || qty <= 0) return null; subtotal += price * qty; if (ticket) ticketSubtotal += price * qty; return { name, price: String(price.toFixed(2)), qty }; }).filter(Boolean);
+    if (reservedTable) { checkoutLineItems.push({ name: tableReservationItemName(reservedTable), price: String(reservedTable.tablePrice.toFixed(2)), qty: 1 }, { name: entryItemName(reservedTable), price: String(TABLE_ENTRY_PRICE.toFixed(2)), qty: reservedGuests }); subtotal += reservedTable.tablePrice + reservedGuests * TABLE_ENTRY_PRICE; }
+    if (checkoutLineItems.length === 0 || subtotal <= 0) return NextResponse.json({ error: "Bitte wähle mindestens ein gültiges Ticket aus." }, { status: 400 });
+    let discountPercent = 0; let appliedDiscountCode = "";
     const wheelReward = wheelDiscount ? readReward(req) : null;
-    if (wheelDiscount) {
-      if (eventId !== WHEEL_EVENT_ID || !wheelReward || wheelReward.used || wheelReward.expiresAt <= Date.now()) {
-        return NextResponse.json({ error: 'Der Glücksrad-Rabatt ist abgelaufen oder bereits eingesetzt. Bitte lade die Seite neu.' }, { status: 400 });
-      }
-      if (ticketSubtotal <= 0 || (discountCode && !influencerPercent(eventId,discountCode))) return NextResponse.json({ error: 'Zum Glücksrad ist nur ein Code möglich: einfachwowa, janchik oder CHRIS.' }, { status: 400 });
-      discountPercent = combinedWheelPercent(wheelReward.percent,influencerPercent(eventId,discountCode));
-      appliedDiscountCode = `GLUECKSRAD-${wheelReward.percent}`;
-    }
-    if (discountCode && !wheelReward) {
-      const extra = influencerPercent(eventId,discountCode);
-      const foundDiscount = extra ? {code:String(discountCode).trim().toLowerCase(),percent:extra} : configuredDiscounts.find((entry: any) => normalizeName(entry.code) === normalizeName(discountCode));
-      if (!foundDiscount) {
-        return NextResponse.json({ error: "Rabattcode ist ungültig." }, { status: 400 });
-      }
-      discountPercent = toDiscountPercent(foundDiscount.percent);
-      if (discountPercent <= 0) {
-        return NextResponse.json({ error: "Rabattcode ist nicht korrekt konfiguriert." }, { status: 400 });
-      }
-      appliedDiscountCode = String(foundDiscount.code || "");
-    }
-
-    if (wheelReward && discountCode) appliedDiscountCode += `+${String(discountCode).trim().toLowerCase()}`;
+    if (wheelDiscount) { if (eventId !== WHEEL_EVENT_ID || !wheelReward || wheelReward.used || wheelReward.expiresAt <= Date.now()) return NextResponse.json({ error: 'Der Glücksrad-Rabatt ist abgelaufen oder bereits eingesetzt. Bitte lade die Seite neu.' }, { status: 400 }); if (ticketSubtotal <= 0 || (discountCode && !influencerPercent(eventId,discountCode))) return NextResponse.json({ error: 'Zum Glücksrad ist nur ein Code möglich: einfachwowa, janchik oder CHRIS.' }, { status: 400 }); discountPercent = combinedWheelPercent(wheelReward.percent,influencerPercent(eventId,discountCode)); appliedDiscountCode = 'GLUECKSRAD-' + wheelReward.percent; }
+    if (discountCode && !wheelReward) { const extra = influencerPercent(eventId,discountCode); const foundDiscount = extra ? {code:String(discountCode).trim().toLowerCase(),percent:extra} : configuredDiscounts.find((entry: any) => normalizeName(entry.code) === normalizeName(discountCode)); if (!foundDiscount) return NextResponse.json({ error: "Rabattcode ist ungültig." }, { status: 400 }); discountPercent = toDiscountPercent(foundDiscount.percent); if (discountPercent <= 0) return NextResponse.json({ error: "Rabattcode ist nicht korrekt konfiguriert." }, { status: 400 }); appliedDiscountCode = String(foundDiscount.code || ""); }
+    if (wheelReward && discountCode) appliedDiscountCode += '+' + String(discountCode).trim().toLowerCase();
     const totalAmount = Math.round((subtotal - (wheelReward || influencerPercent(eventId,discountCode) ? ticketSubtotal : subtotal) * discountPercent / 100) * 100);
-
-    if (!Number.isFinite(totalAmount) || totalAmount <= 0) {
-      return NextResponse.json({ error: "Der Gesamtbetrag ist ungültig. Bitte lade die Seite neu." }, { status: 400 });
-    }
-
+    if (!Number.isFinite(totalAmount) || totalAmount <= 0) return NextResponse.json({ error: "Der Gesamtbetrag ist ungültig. Bitte lade die Seite neu." }, { status: 400 });
     const stripeAccountId: string | null = event.stripe_account_id || null;
     let platformFeeAmount = 0;
-
-    if (stripeAccountId) {
-      const feePercent = (event.veranstalter as any)?.platform_fee_percent || parseFloat(process.env.WOLNAA_PLATFORM_FEE_PERCENT || "3");
-      platformFeeAmount = Math.round(totalAmount * (feePercent / 100));
-    }
-
+    if (stripeAccountId) { const feePercent = (event.veranstalter as any)?.platform_fee_percent || parseFloat(process.env.WOLNAA_PLATFORM_FEE_PERCENT || "3"); platformFeeAmount = Math.round(totalAmount * (feePercent / 100)); }
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://wolnaa.de";
-
-    const sessionConfig: Stripe.Checkout.SessionCreateParams = {
-      mode: "payment",
-      customer_email: customerEmail,
-      metadata: {
-        acquisitionSource: acquisitionSource(req),
-        ...attributionMetadata(req),
-        ...metaCheckoutMetadata(req),
-        metaTicketCount: String(requestedTicketQty),
-        eventId: eventId || "",
-        eventTitle: eventTitle || event.title || "",
-        customerName: customerName || "",
-        customerEmail: customerEmail || "",
-        ticketId: ticketId || "",
-        lineItems: JSON.stringify(checkoutLineItems || []),
-        discountCode: appliedDiscountCode,
-        discountPercent: discountPercent ? String(discountPercent) : "",
-      },
-      line_items: [{
-        quantity: 1,
-        price_data: {
-          currency: "eur",
-          product_data: { name: checkoutLineItems.map((i: any) => i.name).join(", ") || "Ticket" },
-          unit_amount: totalAmount,
-        },
-      }],
-      success_url: `${appUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: appUrl,
-    };
-
-    if (stripeAccountId) {
-      sessionConfig.payment_intent_data = {
-        application_fee_amount: platformFeeAmount,
-        transfer_data: { destination: stripeAccountId },
-      };
-    }
-
-    // Recheck after inventory/discount lookups so requests crossing the deadline
-    // cannot create a fresh checkout. Existing checkouts get a short payment window.
-    if (eventTiming(scheduledEvent).salesClosed) {
-      return NextResponse.json({ error: "Der Online-Verkauf für diese Veranstaltung ist beendet." }, { status: 400 });
-    }
+    const sessionConfig: Stripe.Checkout.SessionCreateParams = { mode: "payment", customer_email: customerEmail, metadata: { acquisitionSource: acquisitionSource(req), ...attributionMetadata(req), ...metaCheckoutMetadata(req), metaTicketCount: String(reservedTable ? reservedGuests : requestedTicketQty), eventId: eventId || "", eventTitle: eventTitle || event.title || "", customerName: customerName || "", customerEmail: customerEmail || "", ticketId: ticketId || "", lineItems: JSON.stringify(checkoutLineItems || []), discountCode: appliedDiscountCode, discountPercent: discountPercent ? String(discountPercent) : "", tableReservation: reservedTable ? JSON.stringify({ tableId: reservedTable.id, guests: reservedGuests }) : "" }, line_items: [{ quantity: 1, price_data: { currency: "eur", product_data: { name: checkoutLineItems.map((i: any) => i.name).join(", ") || "Ticket" }, unit_amount: totalAmount } }], success_url: appUrl + "/success?session_id={CHECKOUT_SESSION_ID}", cancel_url: appUrl };
+    if (stripeAccountId) sessionConfig.payment_intent_data = { application_fee_amount: platformFeeAmount, transfer_data: { destination: stripeAccountId } };
+    if (eventTiming(scheduledEvent).salesClosed) return NextResponse.json({ error: "Der Online-Verkauf für diese Veranstaltung ist beendet." }, { status: 400 });
     sessionConfig.expires_at = Math.ceil(Date.now() / 1000) + 30 * 60;
     const session = await stripe.checkout.sessions.create(sessionConfig);
-
-    const { data: analyticsRow } = await supabase
-      .from("settings")
-      .select("value")
-      .eq("key", "analytics_checkouts")
-      .maybeSingle();
-    try {
-      const checkouts = analyticsRow?.value ? JSON.parse(analyticsRow.value) : {};
-      checkouts[eventId] = Number(checkouts[eventId] || 0) + 1;
-      await supabase.from("settings").upsert(
-        { key: "analytics_checkouts", value: JSON.stringify(checkouts) },
-        { onConflict: "key" },
-      );
-    } catch (analyticsError) {
-      console.error("Checkout analytics error:", analyticsError);
-    }
-
+    const { data: analyticsRow } = await supabase.from("settings").select("value").eq("key", "analytics_checkouts").maybeSingle();
+    try { const checkouts = analyticsRow?.value ? JSON.parse(analyticsRow.value) : {}; checkouts[eventId] = Number(checkouts[eventId] || 0) + 1; await supabase.from("settings").upsert({ key: "analytics_checkouts", value: JSON.stringify(checkouts) }, { onConflict: "key" }); } catch (analyticsError) { console.error("Checkout analytics error:", analyticsError); }
     const response = NextResponse.json({ url: session.url });
     if (wheelReward) response.cookies.set(WHEEL_COOKIE, signReward({ ...wheelReward, used: true }), wheelCookieOptions);
     return response;
-  } catch (error: any) {
-    console.error("Stripe checkout error:", error);
-    return NextResponse.json({ error: error.message || "Stripe Fehler" }, { status: 500 });
-  }
+  } catch (error: any) { console.error("Stripe checkout error:", error); return NextResponse.json({ error: error.message || "Stripe Fehler" }, { status: 500 }); }
 }
