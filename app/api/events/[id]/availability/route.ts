@@ -3,6 +3,7 @@ import {eventTiming} from '@/lib/event-timing';
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { getTicketPhase } from '@/lib/ticket-phases';
+import { tableReservationItemName, tablesForEvent } from '@/lib/table-reservations';
 
 export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> }) {
   const { id } = await ctx.params;
@@ -24,6 +25,9 @@ export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> 
   const timing = eventTiming(scheduled);
   const tickets = Array.isArray(event.tickets) ? event.tickets : [];
   const phase = getTicketPhase(tickets, soldRows || []);
+  const reservedTableIds = tablesForEvent(id)
+    .filter((table) => (soldRows || []).some((row: any) => String(row.ticket_name || '').trim().toLowerCase() === tableReservationItemName(table).trim().toLowerCase()))
+    .map((table) => table.id);
 
   return NextResponse.json({
     activeIndex: timing.salesClosed ? -1 : phase.activeIndex,
@@ -32,5 +36,6 @@ export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> 
     salesClosed: timing.salesClosed,
     eventEnded: timing.ended,
     soldOut: phase.activeIndex < 0,
+    reservedTableIds,
   }, { headers: { 'Cache-Control': 'no-store' } });
 }
